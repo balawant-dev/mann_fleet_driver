@@ -46,7 +46,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
               subTitle!,
               size: 11,
               weight: FontWeight.w400,
-              color: ColorResource.textBlack,
+              color: ColorResource.black,
             ),
         ],
       ),
@@ -54,7 +54,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
       /// Back Button
       leading: !isBack && Navigator.canPop(context)
           ? IconButton(
-        icon: const Icon(Icons.arrow_back,color: Colors.black,),
+        icon: const Icon(Icons.arrow_back_ios,color: Colors.black,),
         onPressed: () {
           Navigator.pop(context);
         },

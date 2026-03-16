@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class AppTheme {
 
   /// Main Brand Color
-  static const Color primaryColor = Color(0xFF050660);
+  static const Color primaryColor =  Color(0xFF03045E);
 
   /// Light Theme
   static ThemeData lightTheme = ThemeData(
@@ -96,7 +96,7 @@ class AppTheme {
     ),
 
     /// Tab Bar Theme
-    tabBarTheme: const TabBarTheme(
+    tabBarTheme:  TabBarTheme(
       labelColor: primaryColor,
       unselectedLabelColor: Colors.grey,
       indicatorColor: primaryColor,

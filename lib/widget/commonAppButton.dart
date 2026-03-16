@@ -56,7 +56,7 @@ class CommonAppButton extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment(0.00, 0.50),
               end: Alignment(1.00, 0.50),
-              colors: [const Color(0xFF2F61C3), const Color(0xFF001E5A)],
+              colors: [ColorResource.primaryColor,  ColorResource.primaryColor],
             ),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
             shadows: [

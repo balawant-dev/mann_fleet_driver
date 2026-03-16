@@ -67,7 +67,7 @@ class CommonTextFormField extends StatefulWidget {
     this.height = 50.0,
     this.backgroundColor = Colors.white,
     this.borderColor,
-    this.borderRadius = 12.0,
+    this.borderRadius = 30.0,
   });
 
   @override
@@ -146,6 +146,7 @@ class _CommonTextFormFieldState extends State<CommonTextFormField> {
             decoration: InputDecoration(
               filled: false,
               hintText: widget.hintText,
+              hintStyle: TextStyle(color: Color(0xff6B7280)),
 
               helperText: widget.helperText,
               counterText: widget.counterText ?? "",

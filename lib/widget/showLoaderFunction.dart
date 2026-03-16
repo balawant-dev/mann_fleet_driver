@@ -32,7 +32,7 @@ void showLoader(BuildContext context) {
                   width: 50,
                   child:  SpinKitSpinningLines(
 
-                    color: ColorResource.buttonBackground,
+                    color: ColorResource.primaryColor,
                     size: 50,
                   ),
                 ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mann_fleet_driver/screen/fuel_entry/ui/fuel_entry_screen.dart';
 import 'package:mann_fleet_driver/screen/splash_screen/ui/splash_screen.dart';
 
 void main() {
@@ -14,7 +15,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Mann Fleet Driver',
       debugShowCheckedModeBanner: false,
-      home: const SplashScreen(),
+     // home: const SplashScreen(),
+      home: const FuelEntryScreen(),
     );
   }
 }

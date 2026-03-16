@@ -6,7 +6,9 @@ import 'package:mann_fleet_driver/widget/navigator_method.dart';
 import 'package:pinput/pinput.dart';
 import '../../../../widget/commonAppButton.dart';
 import '../../../home_screen/ui/home_screen.dart';
+
 import '../../register/ui/registerScreen.dart';
+
 
 class OtpScreen extends StatefulWidget {
   final String mobileNumber;
@@ -131,7 +133,11 @@ class _OtpScreenState extends State<OtpScreen> {
                     ),
                     SizedBox(width: 10,),
                     CustomImageView(
-                        imagePath: "assets/images/editImage.png",
+
+                        // imagePath: "assets/images/editImage.png",
+
+                        imagePath: AppImages.editImage,
+
                       fit: BoxFit.cover,
                       height: 14,
                       width: 14,
@@ -150,7 +156,11 @@ class _OtpScreenState extends State<OtpScreen> {
                   text: 'Get Started',
                   onPressed: () {
 
+
                navPush(context: context, action: RegisterScreen());
+// =======
+//                     navPush(context: context, action: HomeScreen());
+// >>>>>>> dev
                     if (otpController.text.length != 4) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text("Enter valid OTP")),

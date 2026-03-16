@@ -4,7 +4,9 @@ import 'package:mann_fleet_driver/util/image_resource/image_resource.dart';
 import 'package:mann_fleet_driver/widget/customImageView.dart';
 import 'package:mann_fleet_driver/widget/custom_text.dart';
 
+
 import '../../drawer/ui/custom_drawer.dart';
+
 import 'active_booking.dart';
 import 'new_booking.dart';
 class HomeScreen extends StatefulWidget {
@@ -15,29 +17,42 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+
   int selectedTab = 0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       key: _scaffoldKey,
       drawer: const CustomDrawer(),
+
       appBar: AppBar(
         elevation: 0,
         automaticallyImplyLeading: false,
         title: Row(
           children: [
+
             GestureDetector(
               onTap: (){
                 _scaffoldKey.currentState!.openDrawer();
               },
               child: CustomImageView(
                   imagePath: AppImages.menuImage,
-                width: 26,
-                height: 19,
-                fit: BoxFit.cover,
-              ),
-            ),
+                  width: 26,
+                  height: 19,
+                // fit: BoxFit.cover,
+              )),
+
+            // CustomImageView(
+            //     imagePath: AppImages.menuImage,
+            //   width: 26,
+            //   height: 19,
+            //   fit: BoxFit.cover,
+            //
+            // ),
             const SizedBox(width: 10,),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,

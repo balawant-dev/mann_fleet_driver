@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:mann_fleet_driver/screen/auth/register/provider/registerProvider.dart';
 import 'package:mann_fleet_driver/screen/auth/register/ui/registerScreen.dart';
 import 'package:mann_fleet_driver/screen/myBooking/ui/myBookingScreen.dart';
@@ -13,6 +14,10 @@ import 'package:mann_fleet_driver/screen/splash_screen/ui/splash_screen.dart';
 import 'package:mann_fleet_driver/util/theame/app_theme.dart';
 import 'package:provider/provider.dart';
 
+import 'package:mann_fleet_driver/screen/fuel_entry/ui/fuel_entry_screen.dart';
+import 'package:mann_fleet_driver/screen/splash_screen/ui/splash_screen.dart';
+
+
 void main() {
   runApp(const MyApp());
 }
@@ -23,6 +28,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => RegisterProvider()),
@@ -42,8 +48,15 @@ class MyApp extends StatelessWidget {
      home: const SplashScreen(),
   //home: const PerformanceScreen(),
  // home: const MyBookingScreen(),
-      ),
-    );
+ //      );
+
+//     return MaterialApp(
+//       title: 'Mann Fleet Driver',
+//       debugShowCheckedModeBanner: false,
+//      // home: const SplashScreen(),
+//       home: const FuelEntryScreen(),
+
+      )    );
   }
 }
 

@@ -5,12 +5,34 @@ import 'package:provider/provider.dart';
 import '../../../widget/commonAppBar.dart';
 import '../../../widget/commonAppButton.dart';
 import '../../../widget/commonTextFormField.dart';
+import '../../../widget/showLoaderFunction.dart';
 import '../provider/personal_profile_provider.dart';
+import '../provider/profileDetailProvider.dart';
 
 
-class PersonalProfileScreen extends StatelessWidget {
+class PersonalProfileScreen extends StatefulWidget {
   const PersonalProfileScreen({super.key});
 
+  @override
+  State<PersonalProfileScreen> createState() => _PersonalProfileScreenState();
+}
+
+class _PersonalProfileScreenState extends State<PersonalProfileScreen> {
+  @override
+  void initState() {
+    super.initState();
+
+    Future.microtask(() async {
+      final profileProvider = context.read<ProfileDetailProvider>();
+      final personalProvider = context.read<PersonalProfileProvider>();
+
+      await profileProvider.getProfileApi(context: context);
+
+      personalProvider.setProfileData(
+        profileProvider.getProfileModel?.data?.driver,
+      );
+    });
+  }
   @override
   Widget build(BuildContext context) {
 
@@ -21,7 +43,7 @@ class PersonalProfileScreen extends StatelessWidget {
 
       appBar: const CommonAppBar(title: "Personal Profile"),
 
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
 
@@ -33,7 +55,14 @@ class PersonalProfileScreen extends StatelessWidget {
                 radius: 50,
                 backgroundImage: provider.profileImage != null
                     ? FileImage(provider.profileImage!)
-                    : null,
+                    : (context.watch<ProfileDetailProvider>().getProfileModel?.data?.driver?.profilePic != null
+                    ? NetworkImage(
+                    context.watch<ProfileDetailProvider>().getProfileModel!.data!.driver!.profilePic!
+                ) as ImageProvider
+                    : null),
+                // backgroundImage: provider.profileImage != null
+                //     ? FileImage(provider.profileImage!)
+                //     : null,
                 child: provider.profileImage == null
                     ? const Icon(Icons.camera_alt)
                     : null,
@@ -67,17 +96,39 @@ class PersonalProfileScreen extends StatelessWidget {
             const SizedBox(height: 15),
 
             CommonTextFormField(
-              controller: provider.address,
-              labelText: "Address",
-              hintText: "Enter address",
+              controller: provider.permanentAddress,
+              labelText: "Permanent Address",
+              hintText: "Enter permanent address",
+            ),    const SizedBox(height: 15),
+
+            CommonTextFormField(
+              controller: provider.currentAddress,
+              labelText: "Current Address",
+              hintText: "Enter current address",
             ),
 
             const SizedBox(height: 30),
 
             CommonAppButton(
               text: "Save",
-              onPressed: () {},
-            )
+              onPressed: () async {
+
+                final provider = context.read<PersonalProfileProvider>();
+                showLoader(context);
+
+                await provider.updateBasicDetail(
+                  context: context,
+                  name: provider.name.text,
+                  email: provider.email.text,
+                  phone: provider.phone.text,
+                  permanentAddress: provider.permanentAddress.text,
+                  currentAddress: provider.currentAddress.text,
+                  gender: provider.gender,
+                  profilePic: provider.profileImage?.path ?? "", // 👈 optional
+                );
+                Navigator.pop(context);
+              },
+            ),
 
           ],
         ),

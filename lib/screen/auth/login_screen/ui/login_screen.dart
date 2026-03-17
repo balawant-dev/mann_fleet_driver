@@ -64,7 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     /// Mobile Input
                     Container(
                       height: 50,
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 5), // Side padding thodi kam ki
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
@@ -76,21 +76,30 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-
                           /// Country Picker
-                          CountryCodePicker(
-                            onChanged: (code) {
-                              countryCode = code.dialCode!;
-                            },
-                            initialSelection: 'IN',
-                            favorite: const ['+91', 'IN'],
-                            showFlag: false,
-                            showDropDownButton: true,
-                            padding: EdgeInsets.zero,
-                            textStyle: const TextStyle(fontSize: 14),
+                          Theme(
+                            // Isse picker ke andar ki default padding/margin control hoti hai
+                            data: Theme.of(context).copyWith(
+                              visualDensity: VisualDensity.compact,
+                            ),
+                            child: CountryCodePicker(
+                              onChanged: (code) {
+                                countryCode = code.dialCode!;
+                              },
+                              initialSelection: 'IN',
+                              favorite: const ['+91', 'IN'],
+                              showFlag: false,
+                              showDropDownButton: true,
+                              padding: EdgeInsets.zero, // Zero padding
+                              margin: EdgeInsets.zero,  // Extra margin hatane ke liye
+                              textStyle: const TextStyle(fontSize: 14),
+                            ),
                           ),
 
-                          const SizedBox(width: 5),
+                          // Vertical Divider (Optional: agar dono ke beech halki line chahiye toh)
+                          // Container(height: 20, width: 1, color: Colors.grey[300]),
+
+                       //   const SizedBox(width: 2), // Gap minimum rakha
 
                           /// Mobile TextField
                           Expanded(
@@ -103,18 +112,26 @@ class _LoginScreenState extends State<LoginScreen> {
                                 LengthLimitingTextInputFormatter(10),
                               ],
                               onChanged: (value) {
-                                provider.onPhoneChanged(value); // 👈 IMPORTANT
+                                provider.onPhoneChanged(value);
                               },
                               decoration: const InputDecoration(
                                 hintText: "Enter your Mobile number",
+                                hintStyle: TextStyle(fontSize: 14),
+                                // Sabhi borders ko explicitly hatane ke liye:
                                 border: InputBorder.none,
-                                isCollapsed: true,
+                                enabledBorder: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                errorBorder: InputBorder.none,
+                                disabledBorder: InputBorder.none,
+                                contentPadding: EdgeInsets.zero, // Default inner padding khatam
+                                isDense: true, // TextField ko compact banane ke liye
                               ),
                             ),
                           )
                         ],
                       ),
                     ),
+
 
                     const SizedBox(height: 25),
                     CommonAppButton(

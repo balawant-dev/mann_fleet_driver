@@ -12,6 +12,9 @@ class ApiConstants {
   static const String bookingEstimate = '/api/driver/bookingEstimate';
   static const String booking = '/api/driver/booking';
   static const String profile = '/api/driver/profile';
+  static const String vehicle = '/api/driver/vehicle';
+  static const String segment = '/api/driver/segment';
+
   static const String resendOtp = '/api/v1/driver/resend-otp';
   static const String update = '/api/v1/driver/update';
   static const String dashboardEndpoint = 'dashboard';

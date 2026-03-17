@@ -46,25 +46,7 @@ class RegisterProvider extends ChangeNotifier {
     countryCode = code;
     notifyListeners();
   }
-  // void getOTP(BuildContext context) {
-  //
-  //   if (mobileNumberController.text.length < 10) {
-  //     errorText = "Enter valid number";
-  //     notifyListeners();
-  //     return;
-  //   }
-  //
-  //   errorText = null;
-  //   notifyListeners();
-  //
-  //   navPushBottomRemove(
-  //     duration: 1,
-  //     context: context,
-  //     action: MainScreen(
-  //
-  //     ),
-  //   );
-  // }
+
 
   final api = RegisterRepo();
 

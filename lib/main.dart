@@ -6,8 +6,11 @@ import 'package:mann_fleet_driver/screen/pickup/provider/pickup_provider.dart';
 import 'package:mann_fleet_driver/screen/profileManagement/provider/compliance_provider.dart';
 import 'package:mann_fleet_driver/screen/profileManagement/provider/driving_credentials_provider.dart';
 import 'package:mann_fleet_driver/screen/profileManagement/provider/personal_profile_provider.dart';
-import 'package:mann_fleet_driver/screen/profileManagement/provider/vehicle_details_provider.dart';
+import 'package:mann_fleet_driver/screen/profileManagement/provider/profileDetailProvider.dart';
+import 'package:mann_fleet_driver/screen/vehicle/provider/editVehicalDetailPro.dart';
+import 'package:mann_fleet_driver/screen/vehicle/provider/vehicle_details_provider.dart';
 import 'package:mann_fleet_driver/screen/splash_screen/ui/splash_screen.dart';
+import 'package:mann_fleet_driver/util/theame/app_theme.dart';
 import 'package:provider/provider.dart';
 
 
@@ -33,12 +36,14 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => PersonalProfileProvider()),
         ChangeNotifierProvider(create: (_) => VehicleDetailsProvider()),
         ChangeNotifierProvider(create: (_) => PickupProvider()),
+        ChangeNotifierProvider(create: (_) => ProfileDetailProvider()),
+        ChangeNotifierProvider(create: (_) => EditVehicleDetailsPro()),
       ],
 
       child: MaterialApp(
         title: 'Mann Fleet Driver',
         debugShowCheckedModeBanner: false,
-      //  theme: AppTheme.lightTheme,
+       theme: AppTheme.lightTheme,
       //  home: const RegisterScreen(),
      //home: const PickupScreen(),
      home: const SplashScreen(),

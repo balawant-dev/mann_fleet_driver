@@ -17,6 +17,7 @@ class PersonalProfileScreen extends StatelessWidget {
     final provider = Provider.of<PersonalProfileProvider>(context);
 
     return Scaffold(
+      backgroundColor: Colors.white,
 
       appBar: const CommonAppBar(title: "Personal Profile"),
 

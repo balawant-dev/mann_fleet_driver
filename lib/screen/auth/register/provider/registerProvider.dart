@@ -4,6 +4,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mann_fleet_driver/screen/bottomBar/bottomBar.dart';
+import 'package:mann_fleet_driver/widget/navigator_method.dart';
+
+import '../model/registerModel.dart';
+import '../repo/registerRepo.dart';
 
 class RegisterProvider extends ChangeNotifier {
 
@@ -29,6 +34,72 @@ class RegisterProvider extends ChangeNotifier {
 
   void setGender(String value){
     gender = value;
+    notifyListeners();
+  }
+
+  TextEditingController mobileNumberController = TextEditingController();
+
+  String? errorText;
+  String countryCode = "+91";
+
+  void changeCountryCode(String code) {
+    countryCode = code;
+    notifyListeners();
+  }
+  // void getOTP(BuildContext context) {
+  //
+  //   if (mobileNumberController.text.length < 10) {
+  //     errorText = "Enter valid number";
+  //     notifyListeners();
+  //     return;
+  //   }
+  //
+  //   errorText = null;
+  //   notifyListeners();
+  //
+  //   navPushBottomRemove(
+  //     duration: 1,
+  //     context: context,
+  //     action: MainScreen(
+  //
+  //     ),
+  //   );
+  // }
+
+  final api = RegisterRepo();
+
+  RegisterModel? registerModel;
+
+
+  bool isLoading = false;
+
+  Future<void> registerApi({    required String name,
+    required String email ,
+    required String phone ,
+    required String licenseNumber ,
+    required String gender ,
+    required String profilePic ,
+    required BuildContext context,}) async {
+    try {
+      isLoading = true;
+      notifyListeners();
+
+      final res = await api.registerApi(phone: phone, context: context,email: email,name: name,gender: gender,licenseNumber: licenseNumber,profilePic: profilePic);
+      registerModel = res;
+      if (res != null && res.status == true){
+        print("registerApi Successfully");
+        // navPushBottomRemove(context: context, action: MainScreen(), duration: 2);
+      }
+
+    } catch (e) {
+      debugPrint("Error in sendOtp: $e");
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+
+  }
+  void onPhoneChanged(String value) {
     notifyListeners();
   }
 

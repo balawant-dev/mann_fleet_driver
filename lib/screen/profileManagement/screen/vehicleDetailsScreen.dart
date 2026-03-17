@@ -17,6 +17,7 @@ class VehicleDetailsScreen extends StatelessWidget {
     final provider = Provider.of<VehicleDetailsProvider>(context);
 
     return Scaffold(
+      backgroundColor: Colors.white,
 
       appBar: const CommonAppBar(title: "Vehicle Details"),
 

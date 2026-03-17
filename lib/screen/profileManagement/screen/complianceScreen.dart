@@ -16,6 +16,7 @@ class ComplianceScreen extends StatelessWidget {
     final provider = Provider.of<ComplianceProvider>(context);
 
     return Scaffold(
+      backgroundColor: Colors.white,
 
       appBar: const CommonAppBar(title: "Compliance"),
 

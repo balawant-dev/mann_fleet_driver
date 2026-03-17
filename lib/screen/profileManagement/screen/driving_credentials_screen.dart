@@ -17,6 +17,7 @@ class DrivingCredentialsScreen extends StatelessWidget {
     final provider = Provider.of<DrivingCredentialsProvider>(context);
 
     return Scaffold(
+      backgroundColor: Colors.white,
 
       appBar: const CommonAppBar(title: "Driving Credentials"),
 

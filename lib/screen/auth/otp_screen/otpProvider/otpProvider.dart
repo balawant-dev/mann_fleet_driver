@@ -49,12 +49,12 @@ class OtpProvider with ChangeNotifier {
 
   bool isLoading = false;
 
-  Future<void> verifyOtp({required BuildContext context,required String phone,required String otp,required String fcmToken}) async {
+  Future<void> verifyOtp({required BuildContext context,required String phone,required String otp,required String fcmToken,required String deviceID}) async {
     try {
       isLoading = true;
       notifyListeners();
 
-      final res = await api.verifyOtp(phone: phone, context: context,otp: otp,fcmToken: fcmToken );
+      final res = await api.verifyOtp(phone: phone, context: context,otp: otp,fcmToken: fcmToken ,deviceID: deviceID);
       verifyOtpModel = res;
       if(res!=null||res.status==true){
         print("verifyOtpModel Successfully");

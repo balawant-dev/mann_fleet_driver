@@ -127,7 +127,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     Icon(Icons.star,size: 18,color: ColorResource.grayColor,),
                     CustomText(
-                      '4.1',
+                      profilePro.getProfileModel!.data!.driver!.rating.toString()??"Update Profile",
                       size: 15,
                       weight: FontWeight.w500,
                       color: ColorResource.grayColor,

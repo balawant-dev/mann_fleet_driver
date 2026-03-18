@@ -17,12 +17,13 @@ class VerifyOtpRepo{
     required String phone,
     required String otp,
     required String fcmToken ,
+    required String deviceID ,
     required BuildContext context,
   }) async {
     try {
       final response = await _api.post(
         ApiConstants.verifyOtp,
-        data: {'phone': phone,"otp":otp,"fcmToken":fcmToken ,"deviceId":"Bhai Abhi Device ID Static use ho rha hai ok"},
+        data: {'phone': phone,"otp":otp,"fcmToken":fcmToken ,"deviceId":deviceID},
         requiresAuth: false,
       );
       //   await SecureStorageService.saveToken(response['token']);
@@ -32,13 +33,13 @@ class VerifyOtpRepo{
       if (e.error is NoInternetException) {
         showNoInternetScreen(
           context,
-          onRetry: () => verifyOtp(phone: phone, otp: otp,context: context,fcmToken: fcmToken),
+          onRetry: () => verifyOtp(phone: phone, otp: otp,context: context,fcmToken: fcmToken,deviceID: deviceID),
         );
         throw NoInternetException();
       } else if (e.error is ServerException) {
         showServerErrorScreen(
           context,
-          onRetry: () => verifyOtp(phone: phone, otp: otp,context: context,fcmToken: fcmToken),
+          onRetry: () => verifyOtp(phone: phone, otp: otp,context: context,fcmToken: fcmToken,deviceID: deviceID),
         );
         throw ServerException();
       } else if (e.error is UnauthorizedException) {

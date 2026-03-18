@@ -202,7 +202,8 @@ class _OtpScreenState extends State<OtpScreen> {
                         context: context,
                         phone: widget.mobileNumber,
                         otp: otpController.text,
-                        fcmToken: "Jab Firebase par kaam karenge tab dunga ok"
+                        fcmToken: "Jab Firebase par kaam karenge tab dunga ok",
+                      deviceID: "Bhai Abhi Device ID Static use ho rha hai ok Jab tumko jarurat padega to bta dena dynamic kar dunga"
                     );
                     Navigator.pop(context);
 

@@ -4,6 +4,7 @@ import 'package:mann_fleet_driver/widget/navigator_method.dart';
 import 'package:provider/provider.dart';
 
 import '../../../apiservice/services/secure_storage_service.dart';
+import '../../cms/ui/cMSContentScreen.dart';
 import '../../profileManagement/provider/profileDetailProvider.dart';
 import '../../profileManagement/screen/personal_profile_screen.dart';
 import '../../splash_screen/ui/splash_screen.dart';
@@ -21,9 +22,9 @@ class _CustomDrawerState extends State<CustomDrawer> {
   @override
   Widget build(BuildContext context) {
     return Consumer<ProfileDetailProvider>(builder: (context, profilePro, child) {
-      if (profilePro.getProfileModel==null||profilePro.getProfileModel!.data==null) {
-        return const Center(child: CircularProgressIndicator());
-      }
+      // if (profilePro.getProfileModel==null||profilePro.getProfileModel!.data==null) {
+      //   return const Center(child: CircularProgressIndicator());
+      // }
       return Drawer(
         width: MediaQuery.of(context).size.width * 0.80,
         child: Column(
@@ -97,7 +98,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     ),
                     SizedBox(height: 4),
                     Text(
-                      "+91 ${profilePro.getProfileModel!.data!.driver!.phone??"Update Profile"}",
+                      "+91 ${profilePro.getProfileModel?.data?.driver?.phone??"Update Profile"}",
                       style: TextStyle(
                         color: Colors.white70,
                         fontSize: 14,
@@ -139,7 +140,15 @@ class _CustomDrawerState extends State<CustomDrawer> {
                       drawerItem(
                         icon: Icons.currency_rupee,
                         title: "Refund Policy",
-                        onTap: () {},
+                        onTap: () {
+                          navPush(
+                            context: context,
+                            action: const CMSContentScreen(
+                              title: "Refund Policy",
+                              type: CMSContentType.refund,
+                            ),
+                          );
+                        },
                       ),
                       drawerItem(
                         icon: Icons.support_agent,
@@ -154,12 +163,28 @@ class _CustomDrawerState extends State<CustomDrawer> {
                       drawerItem(
                         icon: Icons.privacy_tip_outlined,
                         title: "Privacy Policy",
-                        onTap: () {},
+                        onTap: () {
+                          navPush(
+                            context: context,
+                            action: const CMSContentScreen(
+                              title: "Privacy Policy",
+                              type: CMSContentType.privacy,
+                            ),
+                          );
+                        },
                       ),
                       drawerItem(
                         icon: Icons.description_outlined,
                         title: "Terms & Conditions",
-                        onTap: () {},
+                        onTap: () {
+                          navPush(
+                            context: context,
+                            action: const CMSContentScreen(
+                              title: "Terms & Conditions",
+                              type: CMSContentType.terms,
+                            ),
+                          );
+                        },
                       ),
 
                       const Divider(height: 32, thickness: 1),

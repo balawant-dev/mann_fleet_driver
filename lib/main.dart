@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mann_fleet_driver/screen/auth/login_screen/provider/loginProvider.dart';
 import 'package:mann_fleet_driver/screen/auth/otp_screen/otpProvider/otpProvider.dart';
 import 'package:mann_fleet_driver/screen/auth/register/provider/registerProvider.dart';
+import 'package:mann_fleet_driver/screen/cms/viewModel/cmsPro.dart';
 import 'package:mann_fleet_driver/screen/pickup/provider/pickup_provider.dart';
 import 'package:mann_fleet_driver/screen/profileManagement/provider/compliance_provider.dart';
 import 'package:mann_fleet_driver/screen/profileManagement/provider/driving_credentials_provider.dart';
@@ -38,6 +39,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => PickupProvider()),
         ChangeNotifierProvider(create: (_) => ProfileDetailProvider()),
         ChangeNotifierProvider(create: (_) => EditVehicleDetailsPro()),
+        ChangeNotifierProvider(create: (_) => CMSProvider()),
       ],
 
       child: MaterialApp(

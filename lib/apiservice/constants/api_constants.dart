@@ -14,6 +14,10 @@ class ApiConstants {
   static const String profile = '/api/driver/profile';
   static const String vehicle = '/api/driver/vehicle';
   static const String segment = '/api/driver/segment';
+  static const String termsConditions = '/api/driver/termsConditions';
+  static const String privacyPolicy = '/api/driver/privacyPolicy';
+  static const String aboutUs = '/api/driver/aboutUs';
+  static const String refundPolicy = '/api/driver/refundPolicy';
 
   static const String resendOtp = '/api/v1/driver/resend-otp';
   static const String update = '/api/v1/driver/update';

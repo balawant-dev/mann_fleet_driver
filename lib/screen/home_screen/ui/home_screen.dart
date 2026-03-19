@@ -53,9 +53,9 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Consumer<ProfileDetailProvider>(builder: (context, profilePro, child) {
-      if (profilePro.getProfileModel==null||profilePro.getProfileModel!.data==null) {
-        return const Center(child: CircularProgressIndicator());
-      }
+      // if (profilePro.getProfileModel==null||profilePro.getProfileModel!.data==null) {
+      //   return const Center(child: CircularProgressIndicator());
+      // }
       return Scaffold(
         backgroundColor: Colors.white,
 
@@ -101,7 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       weight: FontWeight.w400,
                     ),
                     CustomText(
-                      profilePro.getProfileModel!.data!.driver!.name??"Update Profile",
+                      profilePro.getProfileModel?.data?.driver?.name??"Update Profile",
                       size: 12,
                       weight: FontWeight.w700,
                       color: ColorResource.black,
@@ -127,7 +127,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     Icon(Icons.star,size: 18,color: ColorResource.grayColor,),
                     CustomText(
-                      profilePro.getProfileModel!.data!.driver!.rating.toString()??"Update Profile",
+                      profilePro.getProfileModel?.data?.driver?.rating.toString()??"5.0",
                       size: 15,
                       weight: FontWeight.w500,
                       color: ColorResource.grayColor,

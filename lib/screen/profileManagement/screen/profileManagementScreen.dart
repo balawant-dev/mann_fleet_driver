@@ -45,9 +45,9 @@ class _ProfileManagementScreenState extends State<ProfileManagementScreen> {
         // backgroundColor: ColorResource.primaryColor, // uncomment if needed
       ),
       body:Consumer<VehicleDetailsProvider>(builder: (context, vehiclePro, child) {
-        if (vehiclePro.getVehicleModel==null) {
-          return const Center(child: CircularProgressIndicator());
-        }
+        // if (vehiclePro.getVehicleModel==null) {
+        //   return const Center(child: CircularProgressIndicator());
+        // }
         return  Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -94,7 +94,7 @@ class _ProfileManagementScreenState extends State<ProfileManagementScreen> {
                       title: "Vehicle Details",
                       icon: Icons.directions_car,
                       color: Colors.orange,
-                      screen:vehiclePro.getVehicleModel!.data==null? const VehicleDetailsScreen():EditVehicleDetailsScreen(),
+                      screen:vehiclePro.getVehicleModel?.data==null? const VehicleDetailsScreen():EditVehicleDetailsScreen(),
                     ),
                     _buildProfileCard(
                       context,

@@ -173,7 +173,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       email: provider.emailController.text,
                       phone: provider.mobileController.text,
                       licenseNumber: provider.licenceController.text,
-                      gender: provider.gender,
+                      gender: provider.gender=="Male"?"male":"female",
                       profilePic: provider.profileImage!.path??"No Image",
                     );
                     Navigator.pop(context);
@@ -191,7 +191,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text("Invalid OTP"),
+                          content: Text("Registration failed. Please try again."),
                         ),
                       );
 

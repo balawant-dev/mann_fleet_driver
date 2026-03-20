@@ -22,7 +22,7 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> pages = [
     const HomeScreen(),
-    const MyBookingScreen(),
+    const MyBookingScreenss(),
     const PerformanceScreen(),
     const PickupScreen(),
 
@@ -125,14 +125,14 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 }
-class MyBookingScreen extends StatefulWidget {
-  const MyBookingScreen({super.key});
+class MyBookingScreenss extends StatefulWidget {
+  const MyBookingScreenss({super.key});
 
   @override
-  State<MyBookingScreen> createState() => _MyBookingScreenState();
+  State<MyBookingScreenss> createState() => _MyBookingScreenssState();
 }
 
-class _MyBookingScreenState extends State<MyBookingScreen> {
+class _MyBookingScreenssState extends State<MyBookingScreenss> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

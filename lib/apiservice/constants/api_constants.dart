@@ -1,9 +1,9 @@
 class ApiConstants {
   //Live Url
-  static const String baseUrl = 'http://159.89.146.245:9020';
+  static const String baseUrl = 'https://maan.ablagro.in';
+  // static const String baseUrl = 'http://159.89.146.245:9020';
 
-  //Local Url
-  // static const String baseUrl = 'http://192.168.1.22:9020';
+
 
   static const String verifyOtp = '/api/driver/verifyOtp';
 
@@ -12,6 +12,8 @@ class ApiConstants {
   static const String bookingEstimate = '/api/driver/bookingEstimate';
   static const String booking = '/api/driver/booking';
   static const String profile = '/api/driver/profile';
+  static const String getMyAssignedBookings = '/api/driver/getMyAssignedBookings';
+  static const String bookingDetail = '/api/driver/booking';
   static const String vehicle = '/api/driver/vehicle';
   static const String segment = '/api/driver/segment';
   static const String termsConditions = '/api/driver/termsConditions';

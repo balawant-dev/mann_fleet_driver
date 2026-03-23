@@ -98,7 +98,7 @@ class _ProfileManagementScreenState extends State<ProfileManagementScreen> {
                     ),
                     _buildProfileCard(
                       context,
-                      title: "Compliance",
+                      title: "KYC Documents",
                       icon: Icons.verified,
                       color: Colors.purple,
                       screen: const ComplianceScreen(),

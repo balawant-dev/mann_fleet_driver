@@ -7,85 +7,108 @@ import '../../../widget/commonAppButton.dart';
 import '../../../widget/commonTextFormField.dart';
 import '../provider/driving_credentials_provider.dart';
 
-
 class DrivingCredentialsScreen extends StatelessWidget {
   const DrivingCredentialsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-
     final provider = Provider.of<DrivingCredentialsProvider>(context);
 
     return Scaffold(
-      backgroundColor: Colors.white,
-
+      backgroundColor: Colors.grey.shade100,
       appBar: const CommonAppBar(title: "Driving Credentials"),
 
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
-
         child: Column(
-
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+
+            const Text(
+              "Driving License Details",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+
+            const SizedBox(height: 15),
 
             CommonTextFormField(
               controller: provider.dlNumber,
               labelText: "DL Number",
             ),
 
-            const SizedBox(height: 15),
+            const SizedBox(height: 12),
 
             CommonTextFormField(
               controller: provider.dlExpiry,
-              labelText: "DL Expiry Date",
+              labelText: "Expiry Date",
+              readOnly: true,
+              suffixIcon: const Icon(Icons.calendar_month),
+              onTap: () => provider.pickExpiryDate(context),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 15),
 
-            Row(
-              children: [
-
-                Expanded(
-                  child: GestureDetector(
-                    onTap: provider.pickFront,
-                    child: Container(
-                      height: 120,
-                      color: Colors.grey.shade200,
-                      child: provider.dlFront == null
-                          ? const Center(child: Text("DL Front"))
-                          : Image.file(provider.dlFront!,fit: BoxFit.cover),
-                    ),
+            GestureDetector(
+              onTap: provider.pickLicense,
+              child: Container(
+                height: 130,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey.shade300),
+                ),
+                child: provider.licensePhoto == null
+                    ? Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Icon(Icons.cloud_upload, size: 30),
+                    SizedBox(height: 5),
+                    Text("Upload License Photo"),
+                  ],
+                )
+                    : ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.file(
+                    provider.licensePhoto!,
+                    fit: BoxFit.cover,
                   ),
                 ),
-
-                const SizedBox(width: 10),
-
-                Expanded(
-                  child: GestureDetector(
-                    onTap: provider.pickBack,
-                    child: Container(
-                      height: 120,
-                      color: Colors.grey.shade200,
-                      child: provider.dlBack == null
-                          ? const Center(child: Text("DL Back"))
-                          : Image.file(provider.dlBack!,fit: BoxFit.cover),
-                    ),
-                  ),
-                ),
-
-              ],
+              ),
             ),
 
             const SizedBox(height: 30),
 
             CommonAppButton(
               text: "Save",
-              onPressed: () {},
-            )
+              onPressed: () async {
 
+                if (provider.dlNumber.text.isEmpty) {
+                  _showError(context, "Enter DL Number");
+                  return;
+                }
+
+                if (provider.dlExpiry.text.isEmpty) {
+                  _showError(context, "Select Expiry Date");
+                  return;
+                }
+
+                if (provider.licensePhoto == null) {
+                  _showError(context, "Upload License Photo");
+                  return;
+                }
+
+                await provider.submitDrivingDetails(context);
+              },
+            ),
           ],
         ),
       ),
     );
+  }
+
+  void _showError(BuildContext context, String msg) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(msg)));
   }
 }

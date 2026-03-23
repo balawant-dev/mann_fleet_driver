@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -120,6 +121,98 @@ class ProfileRepo {
       } else {
         rethrow;
       }
+    } catch (e) {
+      throw ApiException(0, e.toString());
+    }
+  }
+  Future<RegisterModel> updateDrivingCredentials({
+    required String licenseNumber,
+    required String licenseExpiry,
+    required File? licensePhoto,
+    required BuildContext context,
+  }) async {
+    try {
+
+      FormData formData = FormData.fromMap({
+        "licenseNumber": licenseNumber,
+        "licenseExpiry": licenseExpiry,
+
+        if (licensePhoto != null)
+          "licensePhoto": await MultipartFile.fromFile(
+            licensePhoto.path,
+            filename: licensePhoto.path.split('/').last,
+          ),
+      });
+
+      final response = await _api.patchMultipart(
+        ApiConstants.profile,
+        data: formData,
+        requiresAuth: true,
+        isMultipart: true,
+      );
+
+      return RegisterModel.fromJson(response);
+
+    } catch (e) {
+      throw ApiException(0, e.toString());
+    }
+  }Future<RegisterModel> updateComplianceFull({
+    required File? adhaarFront,
+    required File? adhaarBack,
+    required File? panFront,
+    required File? panBack,
+    required File? policeVerification,
+    required String adhaarNumber,
+    required String panNumber,
+    required String policeExpiry,
+    required BuildContext context,
+  }) async {
+    try {
+      FormData formData = FormData.fromMap({
+        "adhaarNumber": adhaarNumber,
+        "panNumber": panNumber,
+        "policeVerificationExpiry": policeExpiry,
+
+        if (adhaarFront != null)
+          "adhaarFrontPhoto": await MultipartFile.fromFile(
+            adhaarFront.path,
+            filename: adhaarFront.path.split('/').last,
+          ),
+
+        if (adhaarBack != null)
+          "adhaarBackPhoto": await MultipartFile.fromFile(
+            adhaarBack.path,
+            filename: adhaarBack.path.split('/').last,
+          ),
+
+        if (panFront != null)
+          "panFrontPhoto": await MultipartFile.fromFile(
+            panFront.path,
+            filename: panFront.path.split('/').last,
+          ),
+
+        if (panBack != null)
+          "panBackPhoto": await MultipartFile.fromFile(
+            panBack.path,
+            filename: panBack.path.split('/').last,
+          ),
+
+        if (policeVerification != null)
+          "policeVerificationPhoto": await MultipartFile.fromFile(
+            policeVerification.path,
+            filename: policeVerification.path.split('/').last,
+          ),
+      });
+
+      final response = await _api.patchMultipart(
+        ApiConstants.profile,
+        data: formData,
+        requiresAuth: true,
+        isMultipart: true,
+      );
+
+      return RegisterModel.fromJson(response);
+
     } catch (e) {
       throw ApiException(0, e.toString());
     }

@@ -7,6 +7,7 @@ import '../home_screen/ui/home_screen.dart';
 
 import '../performance/ui/performanceScreen.dart';
 import '../pickup/ui/pickUpScreen.dart';
+import '../profile/ui/profile_screen.dart';
 
 
 class MainScreen extends StatefulWidget {
@@ -24,7 +25,8 @@ class _MainScreenState extends State<MainScreen> {
     const HomeScreen(),
     const MyBookingScreenss(),
     const PerformanceScreen(),
-    const PickupScreen(),
+    //const PickupScreen(),
+    const ProfileReviewScreen(),
 
   ];
 

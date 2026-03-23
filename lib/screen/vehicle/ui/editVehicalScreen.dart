@@ -418,6 +418,9 @@ class _EditVehicleDetailsScreenState extends State<EditVehicleDetailsScreen> {
                           height: 100,
                           width: 140,
                           fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(Icons.image_not_supported_outlined,size: 60,);
+                          },
                         ),
                       ),
                       Positioned(

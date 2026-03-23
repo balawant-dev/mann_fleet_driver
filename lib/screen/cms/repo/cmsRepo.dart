@@ -20,7 +20,7 @@ class CMSRepo2 {
 
   Future<PrivacyPolicyModel> getPrivacyPolicyApi({required BuildContext context}) async {
     try {
-      final response = await _api.get(ApiConstants.privacyPolicy, requiresAuth: false);
+      final response = await _api.get("${ApiConstants.privacyPolicy}?type=driver", requiresAuth: true);
 
       return PrivacyPolicyModel.fromJson(response);
 
@@ -50,7 +50,7 @@ class CMSRepo2 {
 
   Future<TermConditionsModel> getTermsConditionsApi({required BuildContext context}) async {
     try {
-      final response = await _api.get(ApiConstants.termsConditions, requiresAuth: false);
+      final response = await _api.get("${ApiConstants.termsConditions}?type=driver", requiresAuth: true);
 
       return TermConditionsModel.fromJson(response);
 
@@ -78,7 +78,7 @@ class CMSRepo2 {
     }
   }  Future<RefundPrivacyPolicyModel> getRefundPolicyApi({required BuildContext context}) async {
     try {
-      final response = await _api.get(ApiConstants.refundPolicy, requiresAuth: false);
+      final response = await _api.get("${ApiConstants.refundPolicy}?type=driver", requiresAuth: true);
 
       return RefundPrivacyPolicyModel.fromJson(response);
 

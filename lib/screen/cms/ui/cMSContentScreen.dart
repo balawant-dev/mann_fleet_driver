@@ -55,7 +55,7 @@ class _CMSContentScreenState extends State<CMSContentScreen> {
     return Scaffold(
       appBar: CommonAppBar(
         title: widget.title,
-        isBack: true,
+        isBack: false,
       ),
       body: Consumer<CMSProvider>(
         builder: (context, provider, child) {
@@ -88,27 +88,30 @@ class _CMSContentScreenState extends State<CMSContentScreen> {
           if (isLoading) {
             return const Center(child: CircularProgressIndicator());
           }
-
-          if (model == null || model.status != true) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.error_outline, size: 60, color: Colors.red),
-                  const SizedBox(height: 16),
-                  const Text(
-                    "Failed to load content",
-                    style: TextStyle(fontSize: 18, color: Colors.grey),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () => _loadData(provider),
-                    child: const Text("Retry"),
-                  ),
-                ],
-              ),
-            );
+          if (model == null || model.status != true || content == null || content.isEmpty) {
+            content = _getDefaultContent();
           }
+
+          // if (model == null || model.status != true) {
+          //   return Center(
+          //     child: Column(
+          //       mainAxisAlignment: MainAxisAlignment.center,
+          //       children: [
+          //         const Icon(Icons.error_outline, size: 60, color: Colors.red),
+          //         const SizedBox(height: 16),
+          //         const Text(
+          //           "Failed to load content",
+          //           style: TextStyle(fontSize: 18, color: Colors.grey),
+          //         ),
+          //         const SizedBox(height: 16),
+          //         ElevatedButton(
+          //           onPressed: () => _loadData(provider),
+          //           child: const Text("Retry"),
+          //         ),
+          //       ],
+          //     ),
+          //   );
+          // }
 
           if (content == null || content.isEmpty) {
             return const Center(
@@ -147,4 +150,42 @@ class _CMSContentScreenState extends State<CMSContentScreen> {
       ),
     );
   }
+  String _getDefaultContent() {
+    switch (widget.type) {
+      case CMSContentType.privacy:
+        return """
+      <h2>Privacy Policy - Driver Maan</h2>
+      <p>Your privacy is important to us. We collect driver and vehicle details only for service purposes.</p>
+      <ul>
+        <li>We do not share your personal data with third parties.</li>
+        <li>Location data is used for ride tracking and safety.</li>
+        <li>All payments are securely processed.</li>
+      </ul>
+      """;
+
+      case CMSContentType.terms:
+        return """
+      <h2>Terms & Conditions - Driver Maan</h2>
+      <p>By using this app, drivers agree to follow these rules:</p>
+      <ul>
+        <li>Maintain valid driving license and vehicle documents.</li>
+        <li>Ensure vehicle cleanliness and safety.</li>
+        <li>Follow traffic rules strictly.</li>
+        <li>Misuse of app may lead to account suspension.</li>
+      </ul>
+      """;
+
+      case CMSContentType.refund:
+        return """
+      <h2>Refund Policy - Driver Maan</h2>
+      <p>Refunds are processed based on ride cancellation conditions.</p>
+      <ul>
+        <li>Incorrect charges can be reported within 24 hours.</li>
+        <li>Refunds will be credited within 5-7 working days.</li>
+        <li>Driver penalties may apply in case of service issues.</li>
+      </ul>
+      """;
+    }
+  }
 }
+

@@ -182,7 +182,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         provider.registerModel!.status == true) {
 
 
-                      navPushReplace(
+                      navPushBottomRemove(
+                        duration: 1,
                         context: context,
                         action: const MainScreen(),
                       );

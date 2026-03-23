@@ -54,20 +54,23 @@ class _SplashScreenState extends State<SplashScreen> {
       body: Container(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
-        color: ColorResource.splashBackground,
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children:  [
-              CustomImageView(
-                  imagePath: AppImages.logo,
-                  height: MediaQuery.of(context).size.height * 0.115,
-                  width: MediaQuery.of(context).size.width * 0.786,
-                  fit: BoxFit.contain
-              )
-            ],
-          ),
+        // color: ColorResource.splashBackground,
+        decoration: BoxDecoration(
+            image: DecorationImage(image: AssetImage("assets/images/spalshBackround.jpeg"),fit: BoxFit.cover)
         ),
+        // child: Center(
+        //   child: Column(
+        //     mainAxisAlignment: MainAxisAlignment.center,
+        //     children:  [
+        //       CustomImageView(
+        //           imagePath: AppImages.logo,
+        //           height: MediaQuery.of(context).size.height * 0.115,
+        //           width: MediaQuery.of(context).size.width * 0.786,
+        //           fit: BoxFit.contain
+        //       )
+        //     ],
+        //   ),
+        // ),
       ),
     );
   }

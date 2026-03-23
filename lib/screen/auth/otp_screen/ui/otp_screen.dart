@@ -209,11 +209,16 @@ class _OtpScreenState extends State<OtpScreen> {
 
                     if (provider.verifyOtpModel != null &&
                         provider.verifyOtpModel!.status == true) {
-
-                      navPushReplace(
+                      navPushBottomRemove(
+                        duration: 1,
                         context: context,
-                        action:  RegisterScreen(mobileNumber:  widget.mobileNumber,),
+                        action: const MainScreen(),
                       );
+
+                      // navPushReplace(
+                      //   context: context,
+                      //   action:  RegisterScreen(mobileNumber:  widget.mobileNumber,),
+                      // );
                       // navPushReplace(
                       //   context: context,
                       //   action: const MainScreen(),

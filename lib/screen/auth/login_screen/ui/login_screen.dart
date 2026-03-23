@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:country_code_picker/country_code_picker.dart';
@@ -7,6 +8,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../util/color/app_colors.dart';
 import '../../../../widget/showLoaderFunction.dart';
+import '../../../cms/ui/cMSContentScreen.dart';
 import '../../otp_screen/ui/otp_screen.dart';
 import '../provider/loginProvider.dart';
 
@@ -195,7 +197,19 @@ class _LoginScreenState extends State<LoginScreen> {
                               fontWeight: FontWeight.w400,
                             ),
                           ),
-                          const TextSpan(
+                           TextSpan(
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                navPush(
+                                  context: context,
+                                  action: const CMSContentScreen(
+                                    title: "Terms & Conditions",
+                                    type: CMSContentType.terms,
+                                  ),
+                                );
+                                // 👉 Navigate or open screen
+                                print("Terms clicked");
+                              },
                             text: 'Terms of Use',
                             style: TextStyle(
                               color: Color(0xFF3E4959),
@@ -204,6 +218,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               fontWeight: FontWeight.w700,
                               decoration: TextDecoration.underline,
                             ),
+
                           ),
                           TextSpan(
                             text: ' and\n ',
@@ -214,8 +229,20 @@ class _LoginScreenState extends State<LoginScreen> {
                               fontWeight: FontWeight.w400,
                             ),
                           ),
-                          const TextSpan(
+                           TextSpan(
                             text: 'Privacy Policy',
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                navPush(
+                                  context: context,
+                                  action: const CMSContentScreen(
+                                    title: "Privacy Policy",
+                                    type: CMSContentType.privacy,
+                                  ),
+                                );
+                                // 👉 Navigate or open screen
+                                print("Policy clicked");
+                              },
                             style: TextStyle(
                               color: Color(0xFF3E4959),
                               fontSize: 12,

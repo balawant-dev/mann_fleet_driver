@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:mann_fleet_driver/util/color/app_colors.dart';
 import 'package:provider/provider.dart';
 
 import '../../../widget/commonAppBar.dart';
@@ -49,32 +50,94 @@ class _PersonalProfileScreenState extends State<PersonalProfileScreen> {
 
           children: [
 
+            // GestureDetector(
+            //   onTap: provider.pickProfile,
+            //   child: CircleAvatar(
+            //     radius: 50,
+            //     backgroundImage: provider.profileImage != null
+            //         ? FileImage(provider.profileImage!)
+            //         : (context.watch<ProfileDetailProvider>().getProfileModel?.data?.driver?.profilePic != null
+            //         ? NetworkImage(
+            //         context.watch<ProfileDetailProvider>().getProfileModel!.data!.driver!.profilePic!
+            //     ) as ImageProvider
+            //         : null),
+            //     // backgroundImage: provider.profileImage != null
+            //     //     ? FileImage(provider.profileImage!)
+            //     //     : null,
+            //     child: provider.profileImage == null
+            //         ? const Icon(Icons.camera_alt)
+            //         : null,
+            //   ),
+            // ),
+
             GestureDetector(
               onTap: provider.pickProfile,
-              child: CircleAvatar(
-                radius: 50,
-                backgroundImage: provider.profileImage != null
-                    ? FileImage(provider.profileImage!)
-                    : (context.watch<ProfileDetailProvider>().getProfileModel?.data?.driver?.profilePic != null
-                    ? NetworkImage(
-                    context.watch<ProfileDetailProvider>().getProfileModel!.data!.driver!.profilePic!
-                ) as ImageProvider
-                    : null),
-                // backgroundImage: provider.profileImage != null
-                //     ? FileImage(provider.profileImage!)
-                //     : null,
-                child: provider.profileImage == null
-                    ? const Icon(Icons.camera_alt)
-                    : null,
+              child: Stack(
+                children: [
+                  CircleAvatar(
+                    radius: 50,
+                    backgroundImage: provider.profileImage != null
+                        ? FileImage(provider.profileImage!)
+                        : (context.watch<ProfileDetailProvider>().getProfileModel?.data?.driver?.profilePic != null
+                        ? NetworkImage(
+                      context.watch<ProfileDetailProvider>()
+                          .getProfileModel!
+                          .data!
+                          .driver!
+                          .profilePic!,
+                    ) as ImageProvider
+                        : null),
+                    child: provider.profileImage == null &&
+                        context.watch<ProfileDetailProvider>()
+                            .getProfileModel
+                            ?.data
+                            ?.driver
+                            ?.profilePic ==
+                            null
+                        ? const Icon(Icons.person, size: 40)
+                        : null,
+                  ),
+
+                  /// 🔹 Edit Icon
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: ColorResource.primaryColor,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 2),
+                      ),
+                      child: const Icon(
+                        Icons.edit,
+                        size: 16,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
 
             const SizedBox(height: 20),
 
             CommonTextFormField(
-              controller: provider.name,
-              labelText: "Name",
-              hintText: "Enter name",
+              controller: provider.firstName,
+              labelText: "First Name",
+              hintText: "Enter First Name",
+            ),
+
+            const SizedBox(height: 15),      CommonTextFormField(
+              controller: provider.middleName,
+              labelText: "Middle Name",
+              hintText: "Enter Middle Name",
+            ),
+
+            const SizedBox(height: 15),      CommonTextFormField(
+              controller: provider.lastName,
+              labelText: "Last Name",
+              hintText: "Enter Last Name",
             ),
 
             const SizedBox(height: 15),
@@ -118,7 +181,7 @@ class _PersonalProfileScreenState extends State<PersonalProfileScreen> {
 
                 await provider.updateBasicDetail(
                   context: context,
-                  name: provider.name.text,
+                  name: "${provider.firstName.text} ${provider.middleName.text} ${provider.lastName.text}",
                   email: provider.email.text,
                   phone: provider.phone.text,
                   permanentAddress: provider.permanentAddress.text,

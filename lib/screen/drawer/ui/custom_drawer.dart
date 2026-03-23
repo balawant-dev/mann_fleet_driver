@@ -127,7 +127,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                       ),
                       drawerItem(
                         icon: Icons.gavel_outlined,
-                        title: "Penalty",
+                        title: "Deduction",
                         onTap: () {
                           // TODO: Navigate to penalty screen
                         },

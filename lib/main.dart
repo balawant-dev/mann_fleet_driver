@@ -3,7 +3,6 @@ import 'package:mann_fleet_driver/screen/auth/login_screen/provider/loginProvide
 import 'package:mann_fleet_driver/screen/auth/otp_screen/otpProvider/otpProvider.dart';
 import 'package:mann_fleet_driver/screen/auth/register/provider/registerProvider.dart';
 import 'package:mann_fleet_driver/screen/cms/viewModel/cmsPro.dart';
-
 import 'package:mann_fleet_driver/screen/home_screen/provider/newBookingProvider.dart';
 import 'package:mann_fleet_driver/screen/myBooking/provider/bookingDetailProvider.dart';
 import 'package:mann_fleet_driver/screen/pickup/provider/pickup_provider.dart';

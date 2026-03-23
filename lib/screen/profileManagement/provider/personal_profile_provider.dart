@@ -11,7 +11,9 @@ import 'package:provider/provider.dart';
 
 class PersonalProfileProvider extends ChangeNotifier {
 
-  TextEditingController name = TextEditingController();
+  TextEditingController firstName = TextEditingController();
+  TextEditingController middleName = TextEditingController();
+  TextEditingController lastName = TextEditingController();
   TextEditingController email = TextEditingController();
   TextEditingController phone = TextEditingController();
   TextEditingController permanentAddress = TextEditingController();
@@ -73,8 +75,33 @@ class PersonalProfileProvider extends ChangeNotifier {
   bool isLoading = false;
   void setProfileData(DriverProfile? driver) {
     if (driver == null) return;
+    String fullName = (driver.name ?? "").trim();
+    List<String> parts = fullName.split(RegExp(r'\s+')).where((p) => p.isNotEmpty).toList();
 
-    name.text = driver.name ?? "";
+    // Reset
+    firstName.text = "";
+    middleName.text = "";
+    lastName.text = "";
+
+    if (parts.isNotEmpty) {
+      if (parts.length == 1) {
+        firstName.text = parts[0];
+      } else if (parts.length == 2) {
+        firstName.text = parts[0];
+        lastName.text = parts[1];
+      } else {
+        firstName.text = parts[0];
+        lastName.text = parts.last;
+        middleName.text = parts.sublist(1, parts.length - 1).join(" ");
+      }
+    }
+    print("Final values set → First: '${firstName.text}', Middle: '${middleName.text}', Last: '${lastName.text}'");
+    print("Raw name from API: '${driver.name}'");
+    print("After trim: '${fullName}'");
+    print("Parts: $parts");
+    // firstName.text = driver.name ?? "";
+    // middleName.text = driver.name ?? "";
+    // lastName.text = driver.name ?? "";
     email.text = driver.email ?? "";
     phone.text = driver.phone ?? "";
     currentAddress.text = driver.currentAddress ?? "";
@@ -96,7 +123,7 @@ class PersonalProfileProvider extends ChangeNotifier {
       isLoading = true;
       notifyListeners();
 
-      final res = await api.updateBasicDetail(phone: phone, context: context,email: email,name: name,gender: gender,permanentAddress: permanentAddress,currentAddress: currentAddress,profilePic: profilePic);
+      final res = await api.updateBasicDetail(phone: phone, context: context,email: email,name: name,gender: "male",permanentAddress: permanentAddress,currentAddress: currentAddress,profilePic: profilePic);
       registerModel = res;
       if (res != null && res.status == true){
         print("Profile Updated Successfully ✅");

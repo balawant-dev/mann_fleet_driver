@@ -295,7 +295,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                       // AppSettings.clearUserType();
                       SecureStorageService.logout(context);
                       // Navigator.pop(context, true);
-                      navPushReplace(context: context, action: SplashScreen());
+                      navPushBottomRemove(context: context, action: SplashScreen(),duration: 1);
                     },
                     child: const Text("Logout"),
                   ),

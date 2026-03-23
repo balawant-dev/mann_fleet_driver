@@ -26,76 +26,114 @@ class VerifyOtpModel {
 }
 
 class Data {
-  User? user;
+  Astrologer? astrologer;
 
-  Data({this.user});
+  Data({this.astrologer});
 
   Data.fromJson(Map<String, dynamic> json) {
-    user = json['user'] != null ? new User.fromJson(json['user']) : null;
+    astrologer = json['astrologer'] != null
+        ? new Astrologer.fromJson(json['astrologer'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.user != null) {
-      data['user'] = this.user!.toJson();
+    if (this.astrologer != null) {
+      data['astrologer'] = this.astrologer!.toJson();
     }
     return data;
   }
 }
 
-class User {
+class Astrologer {
   String? sId;
-  String? id;
-  String? mobile;
-  int? walletBalance;
+  String? phone;
   bool? isVerified;
+  bool? isOnline;
+  bool? isAvailable;
+  int? rating;
+  int? ratingCount;
+  int? totalRides;
+  String? gender;
+  bool? firstUser;
+  bool? isProfileComplete;
   String? deviceId;
   String? deviceType;
+  bool? isPunchedIn;
+  bool? isDeleted;
+  String? activePunch;
   String? createdAt;
-  String? updatedAt;
   int? iV;
   String? fcmToken;
+  String? id;
 
-  User(
+  Astrologer(
       {this.sId,
-        this.id,
-        this.mobile,
-        this.walletBalance,
+        this.phone,
         this.isVerified,
+        this.isOnline,
+        this.isAvailable,
+        this.rating,
+        this.ratingCount,
+        this.totalRides,
+        this.gender,
+        this.firstUser,
+        this.isProfileComplete,
         this.deviceId,
         this.deviceType,
+        this.isPunchedIn,
+        this.isDeleted,
+        this.activePunch,
         this.createdAt,
-        this.updatedAt,
         this.iV,
-        this.fcmToken});
+        this.fcmToken,
+        this.id});
 
-  User.fromJson(Map<String, dynamic> json) {
+  Astrologer.fromJson(Map<String, dynamic> json) {
     sId = json['_id'];
-    id = json['id'];
-    mobile = json['mobile'];
-    walletBalance = json['walletBalance'];
+    phone = json['phone'];
     isVerified = json['isVerified'];
+    isOnline = json['isOnline'];
+    isAvailable = json['isAvailable'];
+    rating = json['rating'];
+    ratingCount = json['ratingCount'];
+    totalRides = json['totalRides'];
+    gender = json['gender'];
+    firstUser = json['firstUser'];
+    isProfileComplete = json['isProfileComplete'];
     deviceId = json['deviceId'];
     deviceType = json['deviceType'];
+    isPunchedIn = json['isPunchedIn'];
+    isDeleted = json['isDeleted'];
+    activePunch = json['activePunch'];
     createdAt = json['createdAt'];
-    updatedAt = json['updatedAt'];
     iV = json['__v'];
     fcmToken = json['fcmToken'];
+    id = json['id'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['_id'] = this.sId;
-    data['id'] = this.id;
-    data['mobile'] = this.mobile;
-    data['walletBalance'] = this.walletBalance;
+    data['phone'] = this.phone;
     data['isVerified'] = this.isVerified;
+    data['isOnline'] = this.isOnline;
+    data['isAvailable'] = this.isAvailable;
+    data['rating'] = this.rating;
+    data['ratingCount'] = this.ratingCount;
+    data['totalRides'] = this.totalRides;
+    data['gender'] = this.gender;
+    data['firstUser'] = this.firstUser;
+    data['isProfileComplete'] = this.isProfileComplete;
     data['deviceId'] = this.deviceId;
     data['deviceType'] = this.deviceType;
+    data['isPunchedIn'] = this.isPunchedIn;
+    data['isDeleted'] = this.isDeleted;
+    data['activePunch'] = this.activePunch;
     data['createdAt'] = this.createdAt;
-    data['updatedAt'] = this.updatedAt;
     data['__v'] = this.iV;
     data['fcmToken'] = this.fcmToken;
+    data['id'] = this.id;
     return data;
   }
 }

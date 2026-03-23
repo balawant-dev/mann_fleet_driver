@@ -1,16 +1,19 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:mann_fleet_driver/screen/profileManagement/screen/profileManagementScreen.dart';
 import 'package:mann_fleet_driver/util/image_resource/image_resource.dart';
 import 'package:mann_fleet_driver/widget/customImageView.dart';
 import 'package:mann_fleet_driver/widget/navigator_method.dart';
 import 'package:pinput/pinput.dart';
+import '../../../../apiservice/services/secure_storage_service.dart';
 import '../../../../util/color/app_colors.dart';
 import '../../../../widget/commonAppButton.dart';
 import '../../../../widget/showLoaderFunction.dart';
 import '../../../bottomBar/bottomBar.dart';
 import '../../../home_screen/ui/home_screen.dart';
 
+import '../../../profileManagement/provider/profileDetailProvider.dart';
 import '../../register/ui/registerScreen.dart';
 import '../otpProvider/otpProvider.dart';
 import 'package:provider/provider.dart';
@@ -188,70 +191,158 @@ class _OtpScreenState extends State<OtpScreen> {
                 ),
                 const SizedBox(height: 25),
                 //
-           // navPush(context: context, action: RegisterScreen());
+
                 CommonAppButton(
                   text: 'Verify Now',
                   backgroundColor: isOtpValid ? ColorResource.primaryColor : Colors.grey,
                   onPressed: isOtpValid
                       ? () async {
+
                     showLoader(context);
 
-                    final provider = context.read<OtpProvider>();
+                    final otpProvider = context.read<OtpProvider>();
+                    final profileProvider = context.read<ProfileDetailProvider>();
 
-                    await provider.verifyOtp(
-                        context: context,
-                        phone: widget.mobileNumber,
-                        otp: otpController.text,
-                        fcmToken: "Jab Firebase par kaam karenge tab dunga ok",
-                      deviceID: "Bhai Abhi Device ID Static use ho rha hai ok Jab tumko jarurat padega to bta dena dynamic kar dunga"
+                    /// 🔹 VERIFY OTP
+                    await otpProvider.verifyOtp(
+                      context: context,
+                      phone: widget.mobileNumber,
+                      otp: otpController.text,
+                      fcmToken: "temp_token",
+                      deviceID: "temp_device",
                     );
+
+                    /// ❌ CLOSE LOADER
                     Navigator.pop(context);
 
-                    if (provider.verifyOtpModel != null &&
-                        provider.verifyOtpModel!.status == true) {
-                      navPushBottomRemove(
-                        duration: 1,
-                        context: context,
-                        action: const MainScreen(),
-                      );
+                    if (otpProvider.verifyOtpModel != null &&
+                        otpProvider.verifyOtpModel!.status == true) {
 
-                      // navPushReplace(
-                      //   context: context,
-                      //   action:  RegisterScreen(mobileNumber:  widget.mobileNumber,),
-                      // );
-                      // navPushReplace(
-                      //   context: context,
-                      //   action: const MainScreen(),
-                      // );
+                      /// 🔹 GET PROFILE (IMPORTANT 🔥)
+                      showLoader(context);
+
+                      await profileProvider.getProfileApi(context: context);
+
+                      Navigator.pop(context);
+
+                      final driver = profileProvider.getProfileModel?.data?.driver;
+
+                      /// 🔥 SAVE ALL STATES LOCALLY
+                      await SecureStorageService.saveFirstUser(driver?.firstUser ?? false);
+                      await SecureStorageService.saveProfileComplete(driver?.isProfileComplete ?? false);
+                      await SecureStorageService.saveVerified(driver?.isVerified ?? false);
+
+                      if (driver == null) {
+                        _showError("Something went wrong");
+                        return;
+                      }
+
+                      /// 🔥 SAME LOGIC AS SPLASH
+                      if (driver.firstUser == true) {
+
+                        navPushReplace(
+                          context: context,
+                          action: RegisterScreen(
+                            mobileNumber: widget.mobileNumber,
+                          ),
+                        );
+
+                      } else if (driver.isProfileComplete == false) {
+
+                        navPushBottomRemove(
+                          duration: 1,
+                          context: context,
+                          action: const ProfileManagementScreen(),
+                        );
+
+                      } else if (driver.isVerified == false) {
+
+                        navPushBottomRemove(
+                          duration: 1,
+                          context: context,
+                          action: const MainScreen(),
+                        );
+
+                      } else {
+
+                        navPushBottomRemove(
+                          duration: 1,
+                          context: context,
+                          action: const MainScreen(),
+                        );
+                      }
 
                     } else {
 
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Invalid OTP"),
-                        ),
-                      );
+                      _showError("Invalid OTP");
 
                     }
+
                   }
                       : null,
+                  // onPressed: isOtpValid
+                  //     ? () async {
+                  //   showLoader(context);
+                  //
+                  //   final provider = context.read<OtpProvider>();
+                  //
+                  //   await provider.verifyOtp(
+                  //       context: context,
+                  //       phone: widget.mobileNumber,
+                  //       otp: otpController.text,
+                  //       fcmToken: "Jab Firebase par kaam karenge tab dunga ok",
+                  //     deviceID: "Bhai Abhi Device ID Static use ho rha hai ok Jab tumko jarurat padega to bta dena dynamic kar dunga"
+                  //   );
+                  //   Navigator.pop(context);
+                  //
+                  //   if (provider.verifyOtpModel != null &&
+                  //       provider.verifyOtpModel!.status == true) {
+                  //     // navPushBottomRemove(
+                  //     //   duration: 1,
+                  //     //   context: context,
+                  //     //   action: const MainScreen(),
+                  //     // );
+                  //     if(provider.verifyOtpModel!.data!.astrologer!.firstUser==true){
+                  //       navPushReplace(
+                  //         context: context,
+                  //         action:  RegisterScreen(mobileNumber:  widget.mobileNumber,),
+                  //       );
+                  //
+                  //     }else       if(provider.verifyOtpModel!.data!.astrologer!.isProfileComplete==false){
+                  //       navPushBottomRemove(
+                  //         duration: 1,
+                  //         context: context,
+                  //         action: const ProfileManagementScreen(),
+                  //       );
+                  //
+                  //     }else  if(provider.verifyOtpModel!.data!.astrologer!.isVerified==false){
+                  //       navPushBottomRemove(
+                  //         duration: 1,
+                  //         context: context,
+                  //         action: const MainScreen(),
+                  //       );
+                  //
+                  //     }
+                  //
+                  //
+                  //     // navPushReplace(
+                  //     //   context: context,
+                  //     //   action: const MainScreen(),
+                  //     // );
+                  //
+                  //   } else {
+                  //
+                  //     ScaffoldMessenger.of(context).showSnackBar(
+                  //       const SnackBar(
+                  //         content: Text("Invalid OTP"),
+                  //       ),
+                  //     );
+                  //
+                  //   }
+                  // }
+                  //     : null,
                 ),
-//                 CommonAppButton(
-//                   text: 'Get Started',
-//                   onPressed: () {
-//
-//
-//                navPush(context: context, action: RegisterScreen());
-// // =======
-// //                     navPush(context: context, action: HomeScreen());
-// // >>>>>>> dev
-//                     if (otpController.text.length != 4) {
-//                       ScaffoldMessenger.of(context).showSnackBar(
-//                         const SnackBar(content: Text("Enter valid OTP")),
-//                       );
-//                     }
-//                   },
-//                 ),
+
 
                 const SizedBox(height: 20),
 
@@ -316,4 +407,9 @@ class _OtpScreenState extends State<OtpScreen> {
       ),
     );
   }
+  void _showError(String msg) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(msg)));
+  }
 }
+

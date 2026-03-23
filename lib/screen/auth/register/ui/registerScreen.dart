@@ -10,6 +10,7 @@ import '../../../../widget/navigator_method.dart';
 import '../../../../widget/showLoaderFunction.dart';
 import '../../../bottomBar/bottomBar.dart';
 import '../../../home_screen/ui/home_screen.dart';
+import '../../../profileManagement/screen/profileManagementScreen.dart';
 import '../provider/registerProvider.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -185,7 +186,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       navPushBottomRemove(
                         duration: 1,
                         context: context,
-                        action: const MainScreen(),
+                        action: const ProfileManagementScreen(),
                       );
 
                     } else {

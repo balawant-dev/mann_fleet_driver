@@ -70,7 +70,7 @@ class RegisterProvider extends ChangeNotifier {
       registerModel = res;
       if (res != null && res.status == true){
         print("registerApi Successfully");
-        // navPushBottomRemove(context: context, action: MainScreen(), duration: 2);
+        navPushBottomRemove(context: context, action: MainScreen(), duration: 2);
       }
 
     } catch (e) {

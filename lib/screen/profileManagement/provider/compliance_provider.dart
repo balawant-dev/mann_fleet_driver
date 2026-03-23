@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../widget/showLoaderFunction.dart';
+import '../model/getProfileModel.dart';
 import '../repo/profileRepo.dart';
 class ComplianceProvider extends ChangeNotifier {
-
+  bool submitted = false;          // to show errors only after submit attempt
+  DriverProfile? driver;           // store reference for showing existing images
   File? adhaarFront;
   File? adhaarBack;
   File? panFront;
@@ -15,6 +17,19 @@ class ComplianceProvider extends ChangeNotifier {
   TextEditingController panNumber = TextEditingController();
   TextEditingController policeExpiry = TextEditingController();
   final picker = ImagePicker();
+  void setInitialData(DriverProfile? driver) {
+    if (driver == null) return;
+
+    adhaarNumber.text = driver.adhaarNumber ?? "";
+    panNumber.text = driver.panNumber ?? "";
+
+    if (driver.policeVerificationExpiry != null) {
+      policeExpiry.text =
+          driver.policeVerificationExpiry!.split("T").first;
+    }
+
+    notifyListeners();
+  }
   Future<void> pickPoliceExpiryDate(BuildContext context) async {
     DateTime? pickedDate = await showDatePicker(
       context: context,

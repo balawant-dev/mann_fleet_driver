@@ -3,6 +3,9 @@ import '../constants/api_constants.dart';
 import 'package:flutter/material.dart';
 class SecureStorageService {
   static const _storage = FlutterSecureStorage();
+  static const firstUserKey = "firstUser";
+  static const profileCompleteKey = "profileComplete";
+  static const verifiedKey = "verified";
 
   /// TOKEN
   static Future<void> saveToken(String token) async {
@@ -15,7 +18,35 @@ class SecureStorageService {
 
 
 
+  /// FIRST USER
+  static Future<void> saveFirstUser(bool value) async {
+    await _storage.write(key: firstUserKey, value: value.toString());
+  }
 
+  static Future<bool> getFirstUser() async {
+    final val = await _storage.read(key: firstUserKey);
+    return val == 'true';
+  }
+
+  /// PROFILE COMPLETE
+  static Future<void> saveProfileComplete(bool value) async {
+    await _storage.write(key: profileCompleteKey, value: value.toString());
+  }
+
+  static Future<bool> getProfileComplete() async {
+    final val = await _storage.read(key: profileCompleteKey);
+    return val == 'true';
+  }
+
+  /// VERIFIED
+  static Future<void> saveVerified(bool value) async {
+    await _storage.write(key: verifiedKey, value: value.toString());
+  }
+
+  static Future<bool> getVerified() async {
+    final val = await _storage.read(key: verifiedKey);
+    return val == 'true';
+  }
 
 
 

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../widget/showLoaderFunction.dart';
+import '../model/getProfileModel.dart';
 import '../repo/profileRepo.dart';
 
 class DrivingCredentialsProvider extends ChangeNotifier {
@@ -11,12 +12,23 @@ class DrivingCredentialsProvider extends ChangeNotifier {
   TextEditingController dlExpiry = TextEditingController();
 
   File? licensePhoto;
-
+  bool submitted = false;          // to show errors only after submit attempt
+  DriverProfile? driver;           // store reference for showing existing images
   final picker = ImagePicker();
   final api = ProfileRepo();
 
   bool isLoading = false;
+  void setInitialData(DriverProfile? driver) {
+    if (driver == null) return;
 
+    dlNumber.text = driver.licenseNumber ?? "";
+
+    if (driver.licenseExpiry != null) {
+      dlExpiry.text = driver.licenseExpiry!.split("T").first;
+    }
+
+    notifyListeners();
+  }
   /// 📸 PICK IMAGE
   Future pickLicense() async {
     final picked = await picker.pickImage(source: ImageSource.gallery);

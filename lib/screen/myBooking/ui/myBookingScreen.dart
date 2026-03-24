@@ -63,7 +63,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
             "${data?.vehicle?.model ?? "Dzire"} , ${data?.vehicle?.color ?? "White"}";
 
         return Scaffold(
-          backgroundColor: const Color(0xffF3F5F7),
+          backgroundColor:  Colors.white,
           appBar: CommonAppBar(title: "Booking Detail",),
           // appBar: AppBar(
           //   backgroundColor: Colors.white,
@@ -82,9 +82,19 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
               child: Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: const Color(0xFFF1F5F9)),
+                  color: const Color(0xFFF8FAFC),        // ← Changed: Soft elegant background
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: const Color(0xFFE2E8F0),      // ← Changed: Cleaner border
+                    width: 1.2,
+                  ),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x0A000000),           // ← Softer shadow
+                      blurRadius: 8,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
                 ),
 
                 child: Column(
@@ -143,7 +153,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                               decoration: const BoxDecoration(
                                   color: Colors.orange, shape: BoxShape.circle),
                             ),
-                            Container(height: 35, width: 2, color: Colors.grey),
+                            Container(height: 60, width: 2, color: Colors.grey),
                             Container(
                               width: 10,
                               height: 10,
@@ -162,11 +172,11 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                             children: [
                               Text(pickup,
                                   style:
-                                  const TextStyle(fontWeight: FontWeight.w700)),
+                                  const TextStyle(fontWeight: FontWeight.w500)),
                               const SizedBox(height: 20),
                               Text(drop,
                                   style:
-                                  const TextStyle(fontWeight: FontWeight.w700)),
+                                  const TextStyle(fontWeight: FontWeight.w500)),
                             ],
                           ),
                         ),

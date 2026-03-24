@@ -261,7 +261,7 @@ class _ActiveBookingScreenState extends State<ActiveBookingScreen> {
                   button(
                       title: 'Cancel',
                       onTap: (){
-                        navPush(context: context, action: TripCancellationScreen());
+                        navPush(context: context, action: TripCancellationScreen(bookingId: "sdfrsdr",));
                       },
                       color: ColorResource.red
                   ),

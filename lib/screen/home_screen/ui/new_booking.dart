@@ -33,239 +33,367 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
   Widget build(BuildContext context) {
     return Consumer<NewBookingProvider>(
       builder: (context, provider, child) {
-
-        if (provider.isLoading) {
+        if (provider.newBookingModel==null||provider.newBookingModel!.data==null) {
           return const Center(child: CircularProgressIndicator());
         }
+        // if (provider.isLoading) {
+        //   return const Center(child: CircularProgressIndicator());
+        // }
 
-        final booking = provider.newBookingModel?.data?.isNotEmpty == true
-            ? provider.newBookingModel!.data!.first
-            : null;
+        final bookings = provider.newBookingModel?.data ?? [];
 
-        /// 🔥 Fallback values
-        final title = booking?.segment?.name ?? "Airport Taxi – Terminal 3";
-        final dateTime = booking?.scheduledAtIST ?? "Oct 24, 2023 • 10:30 AM";
-        final price = booking?.estimatedFare ?? 850;
-        final bookingType = booking?.bookingType ?? "One Way";
-        final vehicleNo = booking?.vehicle?.carNumber ?? "DL 1C AB 1234";
-        final vehicleModel = booking?.vehicle?.model ?? "Mercedes E-Class";
+        if (bookings.isEmpty) {
+          return const Center(child: Text("No bookings available"));
+        }
 
-        return Column(
+        // if (provider.isLoading) {
+        //   return const Center(child: CircularProgressIndicator());
+        // }
+        //
+        // final booking = provider.newBookingModel?.data?.isNotEmpty == true
+        //     ? provider.newBookingModel!.data!.first
+        //     : null;
+        //
+        // /// 🔥 Fallback values
+        // final title = booking?.segment?.name ?? "Airport Taxi – Terminal 3";
+        // final dateTime = booking?.scheduledAtIST ?? "Oct 24, 2023 • 10:30 AM";
+        // final price = booking?.estimatedFare ?? 850;
+        // final bookingType = booking?.bookingType ?? "One Way";
+        // final vehicleNo =  "DL 1C AB 1234";
+        // // final vehicleNo = booking?.vehicle?.carNumber ?? "DL 1C AB 1234";
+        // final vehicleModel = booking?.vehicle?.model ?? "Mercedes E-Class";
+        // final joIDApiMeJayega=booking?.id??"Dfgd";
+        // final driverStatus=booking?.driverResponse?.status;//enum value hai // ["pending", "accepted", "cancelled"], ager ye pending aa rh ahai hai to cancle and accept botton dikhega
+
+
+        return Stack(
           children: [
-            CustomImageView(
-              imagePath: AppImages.banner,
-              height: 150,
-              width: MediaQuery.of(context).size.width,
-              fit: BoxFit.cover,
-            ),
-
-            const SizedBox(height: 10),
-
-            GestureDetector(
-              onTap: (){
-                navPush(context: context, action: MyBookingScreen(id:booking!.sId.toString() ,));
-              },
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(12),
-                        //    margin: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: ColorResource.white,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: const Color(0xFFF1F5F9)),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x0C000000),
-                      blurRadius: 4,
-                      offset: Offset(0, 2),
-                    )
-                  ],
+            SingleChildScrollView(
+              child: Column(
+                children: [      CustomImageView(
+                  imagePath: AppImages.banner,
+                  height: 150,
+                  width: MediaQuery.of(context).size.width,
+                  fit: BoxFit.cover,
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
 
-                    /// 🔹 Header
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            CustomText(title,
-                                size: 18,
-                                weight: FontWeight.w700,
-                                color: ColorResource.black),
+                  const SizedBox(height: 10),
+                  ListView.builder(
+                      shrinkWrap: true,
+                      physics: BouncingScrollPhysics(),
+                      // padding: const EdgeInsets.symmetric(vertical: 10),
+                      itemCount: bookings.length,
+                      itemBuilder: (context, index) {
 
-                            const SizedBox(height: 8),
+                        final booking = bookings[index];
 
-                            CustomText(dateTime,
-                                size: 14,
-                                weight: FontWeight.w500,
-                                color: ColorResource.grayText),
-                          ],
-                        ),
+                        final title = booking.segment?.name ?? "Airport Taxi – Terminal 3";
+                        final dateTime = booking.scheduledAtIST ?? "Oct 24, 2023 • 10:30 AM";
+                        final price = booking.estimatedFare ?? 850;
+                        final bookingType = booking.bookingType ?? "One Way";
+                        final vehicleNo = "DL 1C AB 1234";
+                        final vehicleModel = booking.vehicle?.model ?? "Mercedes E-Class";
+                        final bookingId = booking.id ?? "";
+                        final driverStatus = booking.driverResponse?.status ?? "pending";
+                        print(bookings[index].tripEndOtpVerify);//ye bool value hai
+                        print(bookings[index].tripStartOtpVerify);//ye bool value hai ok
+                        print(bookings[index].tripStatus); // if trip status arrived hoga tab start ride wal botton hit hoga  jaise in progress hoga to type end otp wala hit hoga ok//enum: ["not_started","driver_enroute","arrived","in_progress","completed","cancelled",],
 
-                        CustomText("₹$price",
-                            size: 22,
-                            weight: FontWeight.w700,
-                            color: ColorResource.green),
-                      ],
-                    ),
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 5.0),
+                          child: Column(
+                            children: [
 
-                    const SizedBox(height: 15),
-                    const Divider(),
 
-                    /// 🔹 Booking Info
-                    const SizedBox(height: 10),
-                    CustomText("BOOKING INFO",
-                        size: 14,
-                        weight: FontWeight.w400,
-                        color: ColorResource.grayText),
+                              GestureDetector(
+                                onTap: (){
+                                  navPush(context: context, action: MyBookingScreen(id:booking!.id.toString() ,));
+                                },
+                                child: Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.all(12),
+                                  //    margin: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: ColorResource.white,
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(color: const Color(0xFFF1F5F9)),
+                                    boxShadow: const [
+                                      BoxShadow(
+                                        color: Color(0x0C000000),
+                                        blurRadius: 4,
+                                        offset: Offset(0, 2),
+                                      )
+                                    ],
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
 
-                    const SizedBox(height: 10),
+                                      /// 🔹 Header
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              CustomText(title,
+                                                  size: 18,
+                                                  weight: FontWeight.w700,
+                                                  color: ColorResource.black),
 
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        /// LEFT
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            CustomText("BOOKING TYPE",
-                                size: 12,
-                                weight: FontWeight.w700,
-                                color: ColorResource.grayText),
+                                              const SizedBox(height: 8),
 
-                            CustomText(bookingType,
-                                size: 16,
-                                weight: FontWeight.w700,
-                                color: ColorResource.black),
+                                              CustomText(dateTime,
+                                                  size: 14,
+                                                  weight: FontWeight.w500,
+                                                  color: ColorResource.grayText),
+                                            ],
+                                          ),
 
-                            const SizedBox(height: 10),
+                                          CustomText("₹$price",
+                                              size: 22,
+                                              weight: FontWeight.w700,
+                                              color: ColorResource.green),
+                                        ],
+                                      ),
 
-                            CustomText("OTP",
-                                size: 12,
-                                weight: FontWeight.w700,
-                                color: ColorResource.grayText),
+                                      const SizedBox(height: 15),
+                                      const Divider(),
 
-                            CustomText(
-                              booking?.otp ?? "1234",
-                              size: 16,
-                              weight: FontWeight.w700,
-                              color: ColorResource.black,
-                            ),
-                          ],
-                        ),
+                                      /// 🔹 Booking Info
+                                      const SizedBox(height: 10),
+                                      CustomText("BOOKING INFO",
+                                          size: 14,
+                                          weight: FontWeight.w400,
+                                          color: ColorResource.grayText),
 
-                        /// RIGHT
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            CustomText("Vehicle No",
-                                size: 12,
-                                weight: FontWeight.w700,
-                                color: ColorResource.grayText),
+                                      const SizedBox(height: 10),
 
-                            CustomText(vehicleNo,
-                                size: 16,
-                                weight: FontWeight.w700,
-                                color: ColorResource.black),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          /// LEFT
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              CustomText("BOOKING TYPE",
+                                                  size: 12,
+                                                  weight: FontWeight.w700,
+                                                  color: ColorResource.grayText),
 
-                            const SizedBox(height: 10),
+                                              CustomText(bookingType,
+                                                  size: 16,
+                                                  weight: FontWeight.w700,
+                                                  color: ColorResource.black),
 
-                            CustomText("STATUS",
-                                size: 12,
-                                weight: FontWeight.w700,
-                                color: ColorResource.grayText),
+                                              const SizedBox(height: 10),
 
-                            CustomText(
-                              booking?.tripStatus ?? "Pending",
-                              size: 16,
-                              weight: FontWeight.w700,
-                              color: ColorResource.black,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                                              CustomText("OTP",
+                                                  size: 12,
+                                                  weight: FontWeight.w700,
+                                                  color: ColorResource.grayText),
 
-                    const SizedBox(height: 15),
-                    const Divider(),
+                                              CustomText(
+                                                "1234",
+                                                // booking?.otp ?? "1234",
+                                                size: 16,
+                                                weight: FontWeight.w700,
+                                                color: ColorResource.black,
+                                              ),
+                                            ],
+                                          ),
 
-                    /// 🔹 Pickup & Drop
-                    const SizedBox(height: 10),
+                                          /// RIGHT
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              CustomText("Vehicle No",
+                                                  size: 12,
+                                                  weight: FontWeight.w700,
+                                                  color: ColorResource.grayText),
 
-                    CustomText("ROUTE",
-                        size: 14,
-                        weight: FontWeight.w400,
-                        color: ColorResource.grayText),
+                                              CustomText(vehicleNo,
+                                                  size: 16,
+                                                  weight: FontWeight.w700,
+                                                  color: ColorResource.black),
 
-                    const SizedBox(height: 8),
+                                              const SizedBox(height: 10),
 
-                    CustomText(
-                      "Pickup: ${booking?.pickup?.address ?? "Noida Sector 63"}",
-                      size: 14,
-                      weight: FontWeight.w500,
-                      color: ColorResource.black,
-                    ),
+                                              CustomText("STATUS",
+                                                  size: 12,
+                                                  weight: FontWeight.w700,
+                                                  color: ColorResource.grayText),
 
-                    CustomText(
-                      "Drop: ${booking?.dropoff?.address ?? "Delhi Airport"}",
-                      size: 14,
-                      weight: FontWeight.w500,
-                      color: ColorResource.black,
-                    ),
+                                              CustomText(
+                                                driverStatus ?? "pending",
+                                                // booking?.tripStatus ?? "Pending",
+                                                size: 16,
+                                                weight: FontWeight.w700,
+                                                color: ColorResource.black,
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
 
-                    const SizedBox(height: 15),
-                    const Divider(),
+                                      const SizedBox(height: 15),
+                                      const Divider(),
 
-                    /// 🔹 Vehicle
-                    const SizedBox(height: 10),
+                                      /// 🔹 Pickup & Drop
+                                      const SizedBox(height: 10),
 
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        CustomText("Vehicle Model",
-                            size: 14,
-                            color: ColorResource.grayText),
+                                      CustomText("ROUTE",
+                                          size: 14,
+                                          weight: FontWeight.w400,
+                                          color: ColorResource.grayText),
 
-                        CustomText(vehicleModel,
-                            size: 14,
-                            color: ColorResource.black),
-                      ],
-                    ),
+                                      const SizedBox(height: 8),
+                                      RichText(
+                                        text: TextSpan(
+                                          children: [
+                                            TextSpan(
+                                              text: "Pickup: ",
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w700,
+                                                color: ColorResource.grayText,
+                                              ),
+                                            ),
+                                            TextSpan(
+                                              text: booking?.pickup?.address ?? "Noida Sector 63",
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                                color: ColorResource.black,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(height: 20,),
 
-                    const SizedBox(height: 20),
+                                      // CustomText(
+                                      //   "Pickup: ${booking?.pickup?.address ?? "Noida Sector 63"}",
+                                      //   size: 14,
+                                      //   weight: FontWeight.w500,
+                                      //   color: ColorResource.black,
+                                      // ),
+                                      RichText(
+                                        text: TextSpan(
+                                          children: [
+                                            TextSpan(
+                                              text: "Drop: ",
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w700,
+                                                color: ColorResource.grayText,
+                                              ),
+                                            ),
+                                            TextSpan(
+                                              text: booking?.dropoff?.address ?? "Delhi Airport",
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                                color: ColorResource.black,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
 
-                    /// 🔹 Buttons
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        button(
-                          title: "Cancel",
-                          color: ColorResource.red,
-                          onTap: () {
-                          //   navPush(
-                          //       context: context,
-                          //       action: TripCancellationScreen());
-                          },
-                        ),
-                        button(
-                          title: "Accept",
-                          color: ColorResource.green,
-                          onTap: () {
-                            // navPush(
-                            //     context: context,
-                            //     action: StartRideScreen());
-                          },
-                        ),
-                      ],
-                    )
-                  ],
+                                      // CustomText(
+                                      //   "Drop: ${booking?.dropoff?.address ?? "Delhi Airport"}",
+                                      //   size: 14,
+                                      //   weight: FontWeight.w500,
+                                      //   color: ColorResource.black,
+                                      // ),
+
+                                      const SizedBox(height: 15),
+                                      const Divider(),
+
+                                      /// 🔹 Vehicle
+                                      const SizedBox(height: 10),
+
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          CustomText("Vehicle Model",
+                                              size: 14,
+                                              color: ColorResource.grayText),
+
+                                          CustomText(vehicleModel,
+                                              size: 14,
+                                              color: ColorResource.black),
+                                        ],
+                                      ),
+
+                                      const SizedBox(height: 20),
+                                      buildActionButtons(
+                                        status: driverStatus,
+                                        tripStatus: booking.tripStatus ?? "",
+                                        bookingId: bookingId,
+                                        provider: provider,
+                                        isStartOtpVerified: booking.tripStartOtpVerify ?? false,
+                                        isEndOtpVerified: booking.tripEndOtpVerify ?? false,
+                                      ),
+                                      // buildActionButtons(
+                                      //   status: driverStatus,
+                                      //   bookingId: bookingId,
+                                      //   provider: provider,
+                                      //   isStartOtpVerified: booking.tripStartOtpVerify ?? false,
+                                      //   isEndOtpVerified: booking.tripEndOtpVerify ?? false,
+                                      // ),
+                                      // buildActionButtons(
+                                      //   status: driverStatus ?? "pending",
+                                      //   bookingId: bookingId.toString(),
+                                      //   provider: provider,
+                                      // ),
+
+                                      /// 🔹 Buttons
+                                      // Row(
+                                      //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      //   children: [
+                                      //     button(
+                                      //       title: "Cancel",
+                                      //       color: ColorResource.red,
+                                      //       onTap: () {
+                                      //       //   navPush(
+                                      //       //       context: context,
+                                      //       //       action: TripCancellationScreen());
+                                      //       },
+                                      //     ),
+                                      //     button(
+                                      //       title: "Accept",
+                                      //       color: ColorResource.green,
+                                      //       onTap: () {
+                                      //         // navPush(
+                                      //         //     context: context,
+                                      //         //     action: StartRideScreen());
+                                      //       },
+                                      //     ),
+                                      //   ],
+                                      // )
+                                    ],
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        );
+                      }
+                  )
+                ],
+              ),
+            ),
+            if (provider.isLoading)
+              const Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: LinearProgressIndicator(
+                  minHeight: 3,
                 ),
               ),
-            )
           ],
         );
       },
@@ -318,6 +446,419 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
           color: ColorResource.black,
         )
       ],
+    );
+  }
+
+  //
+  // Widget buildActionButtons({
+  //   required String status,
+  //   required String bookingId,
+  //   required NewBookingProvider provider,
+  //   required bool isStartOtpVerified,
+  //   required bool isEndOtpVerified,
+  // }) {
+  //
+  //   /// 🔹 1. PENDING → CANCEL + ACCEPT (IMPORTANT 🔥)
+  //   if (status == "pending") {
+  //     return Row(
+  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //       children: [
+  //         button(
+  //           title: "Cancel",
+  //           color: Colors.red,
+  //           onTap: () => showCancelDialog(bookingId),
+  //         ),
+  //         button(
+  //           title: "Accept",
+  //           color: Colors.green,
+  //           onTap: () async {
+  //             bool success = await provider.acceptBookingApi(
+  //               context: context,
+  //               id: bookingId,
+  //             );
+  //
+  //             if (success) {
+  //               ScaffoldMessenger.of(context).showSnackBar(
+  //                 const SnackBar(content: Text("Booking Accepted ✅")),
+  //               );
+  //             }
+  //           },
+  //         ),
+  //       ],
+  //     );
+  //   }
+  //
+  //   /// 🔹 2. ACCEPTED → START OTP
+  //   if (status == "accepted" && !isStartOtpVerified) {
+  //     return Center(
+  //       child: button(
+  //         title: "Verify Start OTP",
+  //         color: Colors.orange,
+  //         onTap: () => showOtpDialog(bookingId, "start"),
+  //       ),
+  //     );
+  //   }
+  //
+  //   /// 🔹 3. START OTP VERIFIED → AUTO START TRIP (handled in provider)
+  //   if (isStartOtpVerified && status != "started") {
+  //     return Center(
+  //       child: button(
+  //         title: "Start Ride",
+  //         color: Colors.green,
+  //         onTap: () async {
+  //           bool success = await provider.startTripApi(
+  //             context: context,
+  //             id: bookingId,
+  //           );
+  //
+  //           if (success) {
+  //             ScaffoldMessenger.of(context).showSnackBar(
+  //               const SnackBar(content: Text("Trip Started 🚗")),
+  //             );
+  //           }
+  //         },
+  //       ),
+  //     );
+  //   }
+  //
+  //   /// 🔹 4. TRIP STARTED → END OTP
+  //   if (status == "started" && !isEndOtpVerified) {
+  //     return Center(
+  //       child: button(
+  //         title: "Verify End OTP",
+  //         color: Colors.blue,
+  //         onTap: () => showOtpDialog(bookingId, "end"),
+  //       ),
+  //     );
+  //   }
+  //
+  //   /// 🔹 5. COMPLETED FLOW
+  //   if (isEndOtpVerified) {
+  //     return Container(
+  //       padding: const EdgeInsets.all(12),
+  //       decoration: BoxDecoration(
+  //         color: Colors.green.withOpacity(0.1),
+  //         borderRadius: BorderRadius.circular(10),
+  //       ),
+  //       child: const Center(
+  //         child: Text(
+  //           "Trip Completed ✅",
+  //           style: TextStyle(fontWeight: FontWeight.bold),
+  //         ),
+  //       ),
+  //     );
+  //   }
+  //
+  //   return const SizedBox();
+  // }
+  Widget buildActionButtons({
+    required String status, // driverStatus
+    required String tripStatus,
+    required String bookingId,
+    required NewBookingProvider provider,
+    required bool isStartOtpVerified,
+    required bool isEndOtpVerified,
+  }) {
+
+    /// 🔹 1. PENDING → CANCEL + ACCEPT
+    if (status == "pending") {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          button(
+            title: "Cancel",
+            color: Colors.red,
+            onTap: () => showCancelDialog(bookingId),
+          ),
+          button(
+            title: "Accept",
+            color: Colors.green,
+            onTap: () async {
+              bool success = await provider.acceptBookingApi(
+                context: context,
+                id: bookingId,
+              );
+
+              if (success) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Booking Accepted ✅")),
+                );
+              }
+            },
+          ),
+        ],
+      );
+    }
+
+    /// 🔹 2. ACCEPTED → START OTP
+    if (status == "accepted" && !isStartOtpVerified) {
+      return Center(
+        child: button(
+          title: "Verify Start OTP",
+          color: Colors.orange,
+          onTap: () => showOtpDialog(bookingId, "start"),
+        ),
+      );
+    }
+
+    /// 🔹 3. DRIVER ARRIVED → START RIDE
+    if (tripStatus == "arrived" && isStartOtpVerified) {
+      return Center(
+        child: button(
+          title: "Start Ride",
+          color: Colors.green,
+          onTap: () async {
+            bool success = await provider.startTripApi(
+              context: context,
+              id: bookingId,
+            );
+
+            if (success) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Trip Started 🚗")),
+              );
+            }
+          },
+        ),
+      );
+    }
+
+    /// 🔹 4. TRIP IN PROGRESS → END OTP
+    if (tripStatus == "in_progress" && !isEndOtpVerified) {
+      return Center(
+        child: button(
+          title: "Verify End OTP",
+          color: Colors.blue,
+          onTap: () => showOtpDialog(bookingId, "end"),
+        ),
+      );
+    }
+
+    /// 🔹 5. COMPLETED
+    if (tripStatus == "completed" || isEndOtpVerified) {
+      return Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.green.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: const Center(
+          child: Text(
+            "Trip Completed ✅",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
+      );
+    }
+
+    /// 🔹 6. CANCELLED
+    if (tripStatus == "cancelled") {
+      return const Center(
+        child: Text(
+          "Trip Cancelled ❌",
+          style: TextStyle(
+            color: Colors.red,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      );
+    }
+
+    return const SizedBox();
+  }
+  // Widget buildActionButtons({
+  //   required String status,
+  //   required String bookingId,
+  //   required NewBookingProvider provider,
+  //
+  // }) {
+  //
+  //   /// 🔹 PENDING
+  //   if (status == "pending") {
+  //     return Row(
+  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //       children: [
+  //         button(
+  //           title: "Cancel",
+  //           color: Colors.red,
+  //           onTap: () => showCancelDialog(bookingId),
+  //         ),
+  //         button(
+  //           title: "Accept",
+  //           color: Colors.green,
+  //           onTap: () async {
+  //             bool success = await provider.acceptBookingApi(
+  //               context: context,
+  //               id: bookingId,
+  //             );
+  //
+  //             if (success) {
+  //               ScaffoldMessenger.of(context).showSnackBar(
+  //                 const SnackBar(content: Text("Booking Accepted ✅")),
+  //               );
+  //
+  //               provider.getNewBooking(context: context);
+  //             }
+  //           },
+  //         ),
+  //       ],
+  //     );
+  //   }
+  //
+  //   /// 🔹 ACCEPTED → OTP
+  //   if (status == "accepted") {
+  //     return Row(
+  //       mainAxisAlignment: MainAxisAlignment.center,
+  //       children: [
+  //         button(
+  //           title: "Verify OTP",
+  //           color: Colors.orange,
+  //           onTap: () => showOtpDialog(bookingId, "start"),
+  //         )
+  //       ],
+  //     );
+  //   }
+  //   if (status == "started") {
+  //     return Row(
+  //       mainAxisAlignment: MainAxisAlignment.center,
+  //       children: [
+  //         button(
+  //           title: "Verify End OTP",
+  //           color: Colors.blue,
+  //           onTap: () => showOtpDialog(bookingId, "end"), // 🔥
+  //         )
+  //       ],
+  //     );
+  //   }
+  //
+  //   /// 🔹 OTP VERIFIED → START RIDE
+  //   if (status == "otp_verified") {
+  //     return button(
+  //       title: "Start Ride",
+  //       color: Colors.green,
+  //       onTap: () async {
+  //         bool success = await provider.startTripApi(
+  //           context: context,
+  //           id: bookingId,
+  //         );
+  //
+  //         if (success) {
+  //           navPush(context: context, action: StartRideScreen());
+  //         }
+  //       },
+  //     );
+  //   }
+  //
+  //   /// 🔹 STARTED
+  //   if (status == "started") {
+  //     return Container(
+  //       padding: const EdgeInsets.all(12),
+  //       decoration: BoxDecoration(
+  //         color: Colors.green.withOpacity(0.1),
+  //         borderRadius: BorderRadius.circular(10),
+  //       ),
+  //       child: const Center(
+  //         child: Text(
+  //           "Ride Started 🚗",
+  //           style: TextStyle(fontWeight: FontWeight.bold),
+  //         ),
+  //       ),
+  //     );
+  //   }
+  //
+  //   return const SizedBox();
+  // }
+
+  void showCancelDialog(String bookingId) {
+    TextEditingController reasonController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          title: const Text("Cancel Booking",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 18),),
+          content: TextField(
+            controller: reasonController,
+            decoration: const InputDecoration(
+              hintText: "Enter reason",
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Close"),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                await context.read<NewBookingProvider>().driverCancelApi(
+                  context: context,
+                  id: bookingId,
+                  reason: reasonController.text,
+                );
+
+                Navigator.pop(context);
+
+                context.read<NewBookingProvider>()
+                    .getNewBooking(context: context);
+              },
+              child: const Text("Submit"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
+
+  /// 🔢 OTP DIALOG
+  void showOtpDialog(String bookingId, String type) {
+    TextEditingController otpController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          title: Text("Enter OTP ($type)",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 18),),
+          content: TextField(
+            controller: otpController,
+            keyboardType: TextInputType.number,
+            maxLength: 4,
+            decoration: const InputDecoration(
+              hintText: "Enter 4-digit OTP",
+              border: OutlineInputBorder(),
+              counterText: "",
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                bool success = await context
+                    .read<NewBookingProvider>()
+                    .verifyBookingOtpApi(
+                  context: context,
+                  id: bookingId,
+                  otp: otpController.text,
+                  type: type, // 🔥 important
+                );
+
+                Navigator.pop(context);
+
+                if (success) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("OTP Verified ($type) ✅")),
+                  );
+                }
+              },
+              child: const Text("Verify"),
+            ),
+          ],
+        );
+      },
     );
   }
 }

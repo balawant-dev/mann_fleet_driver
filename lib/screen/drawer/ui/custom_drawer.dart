@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../../apiservice/services/secure_storage_service.dart';
 import '../../cms/ui/cMSContentScreen.dart';
+import '../../penalty/ui/penaltyScreen.dart';
 import '../../profileManagement/provider/profileDetailProvider.dart';
 import '../../profileManagement/screen/personal_profile_screen.dart';
 import '../../splash_screen/ui/splash_screen.dart';
@@ -129,14 +130,15 @@ class _CustomDrawerState extends State<CustomDrawer> {
                         icon: Icons.gavel_outlined,
                         title: "Deduction",
                         onTap: () {
+                          navPush(context: context, action: PenaltyScreen());
                           // TODO: Navigate to penalty screen
                         },
                       ),
-                      drawerItem(
-                        icon: Icons.payment_outlined,
-                        title: "Payment Method",
-                        onTap: () {},
-                      ),
+                      // drawerItem(
+                      //   icon: Icons.payment_outlined,
+                      //   title: "Payment Method",
+                      //   onTap: () {},
+                      // ),
                       drawerItem(
                         icon: Icons.currency_rupee,
                         title: "Refund Policy",
@@ -150,15 +152,23 @@ class _CustomDrawerState extends State<CustomDrawer> {
                           );
                         },
                       ),
-                      drawerItem(
-                        icon: Icons.support_agent,
-                        title: "Help & Support",
-                        onTap: () {},
-                      ),
+                      // drawerItem(
+                      //   icon: Icons.support_agent,
+                      //   title: "Help & Support",
+                      //   onTap: () {},
+                      // ),
                       drawerItem(
                         icon: Icons.info_outline,
                         title: "About us",
-                        onTap: () {},
+                        onTap: () {
+                          navPush(
+                            context: context,
+                            action: const CMSContentScreen(
+                              title: "About us",
+                              type: CMSContentType.terms,
+                            ),
+                          );
+                        },
                       ),
                       drawerItem(
                         icon: Icons.privacy_tip_outlined,

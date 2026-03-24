@@ -14,6 +14,10 @@ class ApiConstants {
   static const String booking = '/api/driver/booking';
   static const String profile = '/api/driver/profile';
   static const String getMyAssignedBookings = '/api/driver/getMyAssignedBookings';
+  static const String acceptBooking = '/api/driver/acceptBooking';
+  static const String startTrip = '/api/driver/startTrip';
+  static const String verifyBookingOtp = '/api/driver/verifyBookingOtp';
+  static const String driverCancelRequest = '/api/driver/driverCancelRequest';
   static const String bookingDetail = '/api/driver/booking';
   static const String vehicle = '/api/driver/vehicle';
   static const String segment = '/api/driver/segment';

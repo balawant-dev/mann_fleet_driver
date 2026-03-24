@@ -37,10 +37,15 @@ class ProfileRepo {
         "gender": gender,
 
         // ✅ Correct Image Upload
-        "profilePic": await MultipartFile.fromFile(
-          profilePic,
-          filename: profilePic.split('/').last,
-        ),
+        if (profilePic.isNotEmpty)
+          "profilePic": await MultipartFile.fromFile(
+            profilePic,
+            filename: profilePic.split('/').last,
+          ),
+        // "profilePic": await MultipartFile.fromFile(
+        //   profilePic,
+        //   filename: profilePic.split('/').last,
+        // ),
       });
 
       final response = await _api.patchMultipart(

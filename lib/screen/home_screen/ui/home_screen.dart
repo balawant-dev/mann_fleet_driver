@@ -11,6 +11,7 @@ import '../../../widget/navigator_method.dart';
 import '../../drawer/ui/custom_drawer.dart';
 
 import '../../profileManagement/screen/personal_profile_screen.dart';
+import '../provider/newBookingProvider.dart';
 import 'active_booking.dart';
 import 'new_booking.dart';
 class HomeScreen extends StatefulWidget {
@@ -52,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
   @override
   Widget build(BuildContext context) {
-    return Consumer<ProfileDetailProvider>(builder: (context, profilePro, child) {
+    return Consumer2<ProfileDetailProvider,NewBookingProvider>(builder: (context, profilePro,provider, child) {
       // if (profilePro.getProfileModel==null||profilePro.getProfileModel!.data==null) {
       //   return const Center(child: CircularProgressIndicator());
       // }
@@ -146,89 +147,94 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.all(15),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
+        body: RefreshIndicator(
+          onRefresh: () async {
+            await provider.getNewBooking(context: context);
+          },
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.all(15),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
 
-                    /// New Booking
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            selectedTab = 0;
-                          });
-                        },
-                        child: Container(
-                          alignment: Alignment.center,
-                          padding: EdgeInsets.only(bottom: 10),
-                          decoration: BoxDecoration(
-                            border: Border(
-                              bottom: BorderSide(
-                                color: selectedTab == 0
-                                    ? ColorResource.indigo
-                                    : Colors.transparent,
-                                width: 2,
+                      /// New Booking
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              selectedTab = 0;
+                            });
+                          },
+                          child: Container(
+                            alignment: Alignment.center,
+                            padding: EdgeInsets.only(bottom: 10),
+                            decoration: BoxDecoration(
+                              border: Border(
+                                bottom: BorderSide(
+                                  color: selectedTab == 0
+                                      ? ColorResource.indigo
+                                      : Colors.transparent,
+                                  width: 2,
+                                ),
                               ),
                             ),
-                          ),
-                          child: CustomText(
-                            "New Booking",
-                            size: 14,
-                            weight: FontWeight.w600,
-                            color: selectedTab == 0
-                                ? ColorResource.indigo
-                                : ColorResource.grayColor1,
+                            child: CustomText(
+                              "New Booking",
+                              size: 14,
+                              weight: FontWeight.w600,
+                              color: selectedTab == 0
+                                  ? ColorResource.indigo
+                                  : ColorResource.grayColor1,
+                            ),
                           ),
                         ),
                       ),
-                    ),
 
-                    /// Active Booking
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            selectedTab = 1;
-                          });
-                        },
-                        child: Container(
-                          alignment: Alignment.center,
-                          padding: EdgeInsets.only(bottom: 10),
-                          decoration: BoxDecoration(
-                            border: Border(
-                              bottom: BorderSide(
-                                color: selectedTab == 1
-                                    ? ColorResource.indigo
-                                    : Colors.transparent,
-                                width: 2,
+                      /// Active Booking
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              selectedTab = 1;
+                            });
+                          },
+                          child: Container(
+                            alignment: Alignment.center,
+                            padding: EdgeInsets.only(bottom: 10),
+                            decoration: BoxDecoration(
+                              border: Border(
+                                bottom: BorderSide(
+                                  color: selectedTab == 1
+                                      ? ColorResource.indigo
+                                      : Colors.transparent,
+                                  width: 2,
+                                ),
                               ),
                             ),
-                          ),
-                          child: CustomText(
-                            "Active Booking",
-                            size: 14,
-                            weight: FontWeight.w600,
-                            color: selectedTab == 1
-                                ? ColorResource.indigo
-                                : ColorResource.grayColor1,
+                            child: CustomText(
+                              "Active Booking",
+                              size: 14,
+                              weight: FontWeight.w600,
+                              color: selectedTab == 1
+                                  ? ColorResource.indigo
+                                  : ColorResource.grayColor1,
+                            ),
                           ),
                         ),
                       ),
-                    ),
 
-                  ],
-                ),
-                SizedBox(height: 20),
+                    ],
+                  ),
+                  SizedBox(height: 20),
 
-                selectedTab == 0
-                    ? NewBookingScreen()
-                    : ActiveBookingScreen()
-              ],
+                  selectedTab == 0
+                      ? NewBookingScreen()
+                      : ActiveBookingScreen()
+                ],
+              ),
             ),
           ),
         ),

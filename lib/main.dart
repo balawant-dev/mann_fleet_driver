@@ -4,8 +4,7 @@ import 'package:mann_fleet_driver/screen/auth/otp_screen/otpProvider/otpProvider
 import 'package:mann_fleet_driver/screen/auth/register/provider/registerProvider.dart';
 import 'package:mann_fleet_driver/screen/cms/viewModel/cmsPro.dart';
 import 'package:mann_fleet_driver/screen/home_screen/provider/newBookingProvider.dart';
-import 'package:mann_fleet_driver/screen/myBooking/provider/bookingDetailProvider.dart';
-import 'package:mann_fleet_driver/screen/pickup/provider/pickup_provider.dart';
+
 import 'package:mann_fleet_driver/screen/profileManagement/provider/compliance_provider.dart';
 import 'package:mann_fleet_driver/screen/profileManagement/provider/driving_credentials_provider.dart';
 import 'package:mann_fleet_driver/screen/profileManagement/provider/personal_profile_provider.dart';
@@ -38,12 +37,12 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => DrivingCredentialsProvider()),
         ChangeNotifierProvider(create: (_) => PersonalProfileProvider()),
         ChangeNotifierProvider(create: (_) => VehicleDetailsProvider()),
-        ChangeNotifierProvider(create: (_) => PickupProvider()),
+        // ChangeNotifierProvider(create: (_) => PickupProvider()),
         ChangeNotifierProvider(create: (_) => ProfileDetailProvider()),
         ChangeNotifierProvider(create: (_) => EditVehicleDetailsPro()),
         ChangeNotifierProvider(create: (_) => CMSProvider()),
         ChangeNotifierProvider(create: (_) => NewBookingProvider()),
-        ChangeNotifierProvider(create: (_) => BookingDetailProvider()),
+        // ChangeNotifierProvider(create: (_) => BookingDetailProvider()),
       ],
 
       child: MaterialApp(

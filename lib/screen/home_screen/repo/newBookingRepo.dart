@@ -9,9 +9,11 @@ import '../../../../../apiservice/network/api_service.dart';
 import '../../../../../apiservice/network/network_utils.dart';
 import '../../../../../apiservice/services/secure_storage_service.dart';
 import '../../auth/register/model/registerModel.dart';
+import '../../myBooking/model/bookingDetailModel.dart';
 import '../model/bookingAcceptedModel.dart';
 import '../model/bookingCancelModel.dart';
 import '../model/newBookingModel.dart';
+import '../model/pickupVerificationModel.dart';
 import '../model/startTripModel.dart';
 import '../model/verifyBookingOtpModel.dart';
 
@@ -159,6 +161,138 @@ class NewBookingRepo {
         showServerErrorScreen(
           context,
           onRetry: () => acceptBookingApi(context: context,id: id),
+        );
+        throw ServerException();
+      } else if (e.error is UnauthorizedException) {
+        await SecureStorageService.logout(context);
+        throw UnauthorizedException();
+      } else {
+        rethrow;
+      }
+    } catch (e) {
+      throw ApiException(0, e.toString());
+    }
+  }
+
+
+  Future<BookingDetailModel> getBookingDetailApi({required BuildContext context,required String id}) async {
+    try {
+      final response = await _api.get("${ApiConstants.bookingDetail}/${id}", requiresAuth: true);
+      //   await SecureStorageService.saveToken(response['token']);
+      return BookingDetailModel.fromJson(response);
+      //  return LoginModel.fromJson(response['user']);
+    } on DioException catch (e) {
+      if (e.error is NoInternetException) {
+        showNoInternetScreen(
+          context,
+          onRetry: () => getBookingDetailApi(context: context,id: id),
+        );
+        throw NoInternetException();
+      } else if (e.error is ServerException) {
+        showServerErrorScreen(
+          context,
+          onRetry: () => getBookingDetailApi(context: context,id: id),
+        );
+        throw ServerException();
+      } else if (e.error is UnauthorizedException) {
+        await SecureStorageService.logout(context);
+        throw UnauthorizedException();
+      } else {
+        rethrow;
+      }
+    } catch (e) {
+      throw ApiException(0, e.toString());
+    }
+  }
+
+  Future<PickupVerificationModel> pickupVerificationApi({
+    required String id,
+
+    required String frontViewImage,
+    required String backViewImage,
+    required String leftViewImage,
+    required String rightViewImage,
+    required String interiorImage,
+    required String speedometerImage,
+    required BuildContext context,
+  }) async {
+    try {
+
+      FormData formData = FormData.fromMap({
+        // "name": name,
+
+
+        if (frontViewImage.isNotEmpty)
+          "frontViewImage": await MultipartFile.fromFile(
+            frontViewImage,
+            filename: frontViewImage.split('/').last,
+          ),
+
+        if (backViewImage.isNotEmpty)
+          "backViewImage": await MultipartFile.fromFile(
+            backViewImage,
+            filename: backViewImage.split('/').last,
+          ),
+        if (leftViewImage.isNotEmpty)
+          "leftViewImage": await MultipartFile.fromFile(
+            leftViewImage,
+            filename: leftViewImage.split('/').last,
+          ),
+        if (rightViewImage.isNotEmpty)
+          "rightViewImage": await MultipartFile.fromFile(
+            rightViewImage,
+            filename: rightViewImage.split('/').last,
+          ),
+        if (interiorImage.isNotEmpty)
+          "interiorImage": await MultipartFile.fromFile(
+            interiorImage,
+            filename: interiorImage.split('/').last,
+          ), if (speedometerImage.isNotEmpty)
+          "speedometerImage": await MultipartFile.fromFile(
+            speedometerImage,
+            filename: speedometerImage.split('/').last,
+          ),
+
+      });
+
+      final response = await _api.patchMultipart(
+        "${ApiConstants.pickupVerification}/${id}",
+        data: formData, // 👈 important
+        requiresAuth: true,
+        isMultipart: true,
+      );
+
+      return PickupVerificationModel.fromJson(response);
+
+    } on DioException catch (e) {
+      if (e.error is NoInternetException) {
+        showNoInternetScreen(
+          context,
+          onRetry: () => pickupVerificationApi(
+            id: id,
+            context: context,
+          backViewImage: backViewImage,
+            frontViewImage: frontViewImage,
+            interiorImage: interiorImage,
+            leftViewImage: leftViewImage,
+            rightViewImage: rightViewImage,
+            speedometerImage: speedometerImage
+          ),
+        );
+        throw NoInternetException();
+      } else if (e.error is ServerException) {
+        showServerErrorScreen(
+          context,
+          onRetry: () => pickupVerificationApi(
+              id: id,
+              context: context,
+              backViewImage: backViewImage,
+              frontViewImage: frontViewImage,
+              interiorImage: interiorImage,
+              leftViewImage: leftViewImage,
+              rightViewImage: rightViewImage,
+              speedometerImage: speedometerImage
+          ),
         );
         throw ServerException();
       } else if (e.error is UnauthorizedException) {

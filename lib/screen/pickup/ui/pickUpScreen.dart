@@ -4,6 +4,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:mann_fleet_driver/widget/commonAppBar.dart';
 import 'package:provider/provider.dart';
+import '../../home_screen/provider/newBookingProvider.dart';
 import '../provider/pickup_provider.dart';
 
 
@@ -13,7 +14,7 @@ class PickupScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    final provider = Provider.of<PickupProvider>(context);
+    final provider = Provider.of<NewBookingProvider>(context);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -239,7 +240,7 @@ class PickupScreen extends StatelessWidget {
     );
   }
 
-  Widget _interiorCard(PickupProvider provider){
+  Widget _interiorCard(NewBookingProvider provider){
 
     return DottedBorder(
       options: RoundedRectDottedBorderOptions(
@@ -319,7 +320,7 @@ class PickupScreen extends StatelessWidget {
     );
   }
 
-  Widget _speedometerCard(PickupProvider provider){
+  Widget _speedometerCard(NewBookingProvider provider){
 
     return Container(
 

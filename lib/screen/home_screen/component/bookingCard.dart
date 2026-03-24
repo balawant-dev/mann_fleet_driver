@@ -43,14 +43,17 @@ class BookingCard extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: ColorResource.white,
+          color: const Color(0xFFF8FAFC),        // ← Changed: Soft elegant background
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: const Color(0xFFF1F5F9)),
+          border: Border.all(
+            color: const Color(0xFFE2E8F0),      // ← Changed: Cleaner border
+            width: 1.2,
+          ),
           boxShadow: const [
             BoxShadow(
-              color: Color(0x0C000000),
-              blurRadius: 4,
-              offset: Offset(0, 2),
+              color: Color(0x0A000000),           // ← Softer shadow
+              blurRadius: 8,
+              offset: Offset(0, 3),
             ),
           ],
         ),

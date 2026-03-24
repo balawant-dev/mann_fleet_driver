@@ -1,129 +1,13 @@
-//
-// import 'package:flutter/material.dart';
-//
-//
-//
-// import '../model/bookingAcceptedModel.dart';
-// import '../model/bookingCancelModel.dart';
-// import '../model/newBookingModel.dart';
-// import '../model/startTripModel.dart';
-// import '../model/verifyBookingOtpModel.dart';
-// import '../repo/newBookingRepo.dart';
-//
-//
-//
-// class NewBookingProvider extends ChangeNotifier {
-//   final api = NewBookingRepo();
-//
-//   NewBookingModel? newBookingModel;
-//   BookingAcceptedModel? bookingAcceptedModel;
-//   BookingCancelModel? bookingCancelModel;
-//   VerifyBookingOtpModel? verifyBookingOtpModel;
-//   StartTripModel?startTripModel;
-//
-//
-//   bool isLoading = false;
-//
-//   Future<void> getNewBooking({required BuildContext context}) async {
-//     try {
-//       isLoading = true;
-//       notifyListeners();
-//
-//       final res = await api.getNewBooking( context: context);
-//       newBookingModel = res;
-//       if(res!=null||res.status==true){
-//         print("Get Profile Successfully");
-//       }
-//
-//     } catch (e) {
-//       debugPrint("Error in Get Profile: $e");
-//     } finally {
-//       isLoading = false;
-//       notifyListeners();
-//     }
-//
-//   }  Future<void> acceptBookingApi({required BuildContext context,required String id}) async {
-//     try {
-//       isLoading = true;
-//       notifyListeners();
-//
-//       final res = await api.acceptBookingApi( context: context,id: id);
-//       bookingAcceptedModel = res;
-//       if(res!=null||res.status==true){
-//         print("Get acceptBookingApi Successfully");
-//       }
-//
-//     } catch (e) {
-//       debugPrint("Error in Get Profile: $e");
-//     } finally {
-//       isLoading = false;
-//       notifyListeners();
-//     }
-//
-//   }
-//   Future<void> driverCancelApi({required BuildContext context,required String id ,required String reason}) async {
-//     try {
-//       isLoading = true;
-//       notifyListeners();
-//
-//       final res = await api.driverCancelRequest(
-//           context: context, id: id, reason: reason);
-//       bookingCancelModel = res;
-//       if (res != null || res.status == true) {
-//         print("Get Profile Successfully");
-//       }
-//     } catch (e) {
-//       debugPrint("Error in Get Profile: $e");
-//     } finally {
-//       isLoading = false;
-//       notifyListeners();
-//     }
-//
-//     Future<void> startTripApi(
-//         {required BuildContext context, required String id }) async {
-//       try {
-//         isLoading = true;
-//         notifyListeners();
-//
-//         final res = await api.startTripApi(context: context, id: id);
-//         startTripModel = res;
-//         if (res != null || res.status == true) {
-//           print("Get Profile Successfully");
-//         }
-//       } catch (e) {
-//         debugPrint("Error in Get Profile: $e");
-//       } finally {
-//         isLoading = false;
-//         notifyListeners();
-//       }
-//     }
-//
-//
-//     Future<void> verifyBookingOtpApi(
-//         {required BuildContext context, required String id, required String otp}) async {
-//       try {
-//         isLoading = true;
-//         notifyListeners();
-//
-//         final res = await api.verifyBookingOtpApi(
-//             context: context, id: id, otp: otp);
-//         startTripModel = res;
-//         if (res != null || res.status == true) {
-//           print("Get Profile Successfully");
-//         }
-//       } catch (e) {
-//         debugPrint("Error in Get Profile: $e");
-//       } finally {
-//         isLoading = false;
-//         notifyListeners();
-//       }
-//     }
-//   }
-//
+
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import '../../myBooking/model/bookingDetailModel.dart';
 import '../model/bookingAcceptedModel.dart';
 import '../model/bookingCancelModel.dart';
 import '../model/newBookingModel.dart';
+import '../model/pickupVerificationModel.dart';
 import '../model/startTripModel.dart';
 import '../model/verifyBookingOtpModel.dart';
 import '../repo/newBookingRepo.dart';
@@ -292,4 +176,89 @@ class NewBookingProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+
+  final ImagePicker picker = ImagePicker();
+
+  File? front;
+  File? back;
+  File? left;
+  File? right;
+  File? interior;
+  File? speedometer;
+
+  Future pickImage(String type) async {
+
+    final XFile? picked = await picker.pickImage(source: ImageSource.camera);
+
+    if (picked == null) return;
+
+    File file = File(picked.path);
+
+    switch (type) {
+      case "front":
+        front = file;
+        break;
+      case "back":
+        back = file;
+        break;
+      case "left":
+        left = file;
+        break;
+      case "right":
+        right = file;
+        break;
+      case "interior":
+        interior = file;
+        break;
+      case "speedometer":
+        speedometer = file;
+        break;
+    }
+
+    notifyListeners();
+  }
+
+  BookingDetailModel? bookingDetailModel;
+  PickupVerificationModel? pickupVerificationModel;
+
+
+
+  bool isLoading2 = false;
+
+  Future<void> getNewBookingDetail({required BuildContext context,required String id}) async {
+    try {
+      isLoading2 = true;
+      notifyListeners();
+
+      final res = await api.getBookingDetailApi( context: context,id: id);
+      bookingDetailModel = res;
+      if(res!=null||res.status==true){
+        print("Get Profile Successfully");
+      }
+
+    } catch (e) {
+      debugPrint("Error in Get Profile: $e");
+    } finally {
+      isLoading2 = false;
+      notifyListeners();
+    }
+}  Future<void> pickupVerificationApi({required BuildContext context,required String id}) async {
+    try {
+      isLoading2 = true;
+      notifyListeners();
+
+      final res = await api.pickupVerificationApi( context: context,id: id,speedometerImage: ,rightViewImage: ,leftViewImage: ,interiorImage: ,frontViewImage: ,backViewImage: );
+      pickupVerificationModel = res;
+      if(res!=null||res.status==true){
+        print("Get Profile Successfully");
+      }
+
+    } catch (e) {
+      debugPrint("Error in Get Profile: $e");
+    } finally {
+      isLoading2 = false;
+      notifyListeners();
+    }
+}
 }

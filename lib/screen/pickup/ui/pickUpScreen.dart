@@ -9,7 +9,8 @@ import '../provider/pickup_provider.dart';
 
 
 class PickupScreen extends StatelessWidget {
-  const PickupScreen({super.key});
+  final String id;
+  const PickupScreen({super.key,required this.id});
 
   @override
   Widget build(BuildContext context) {
@@ -124,29 +125,65 @@ class PickupScreen extends StatelessWidget {
             _speedometerCard(provider),
 
             const SizedBox(height: 30),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                minimumSize: const Size(double.infinity, 50),
+              ),
+              onPressed: () async {
 
-            Container(
-              height: 50,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(30),
-              ),
-              alignment: Alignment.center,
-              child: const Text(
-                "Enter OTP to start the trip",
-                style: TextStyle(color: Colors.grey),
-              ),
+                final provider = context.read<NewBookingProvider>();
+
+                // ✅ Validation
+                if (provider.front == null ||
+                    provider.back == null ||
+                    provider.left == null ||
+                    provider.right == null ||
+                    provider.interior == null ||
+                    provider.speedometer == null) {
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Upload all images")),
+                  );
+                  return;
+                }
+
+                await provider.pickupVerificationApi(
+                  context: context,
+                  id: id,
+                );
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Pickup Verified ✅")),
+                );
+
+                Navigator.pop(context); // back to detail
+              },
+              child: const Text("Submit Verification"),
             ),
-
-            const SizedBox(height: 10),
-
-            const Center(
-              child: Text(
-                "3 VERIFICATION STEPS REMAINING",
-                style: TextStyle(fontSize: 12,color: Colors.grey),
-              ),
-            )
+            const SizedBox(height: 30),
+            // Container(
+            //   height: 50,
+            //   width: double.infinity,
+            //   decoration: BoxDecoration(
+            //     color: Colors.grey.shade300,
+            //     borderRadius: BorderRadius.circular(30),
+            //   ),
+            //   alignment: Alignment.center,
+            //   child: const Text(
+            //     "Enter OTP to start the trip",
+            //     style: TextStyle(color: Colors.grey),
+            //   ),
+            // ),
+            //
+            // const SizedBox(height: 10),
+            //
+            // const Center(
+            //   child: Text(
+            //     "3 VERIFICATION STEPS REMAINING",
+            //     style: TextStyle(fontSize: 12,color: Colors.grey),
+            //   ),
+            // )
 
           ],
         ),
@@ -232,93 +269,172 @@ class PickupScreen extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                     height: 1.33,
                   ),))),
-            )
+            ),
+
 
           ],
         ),
       ),
     );
   }
-
-  Widget _interiorCard(NewBookingProvider provider){
+  Widget _interiorCard(NewBookingProvider provider) {
+    final image = provider.interior;
 
     return DottedBorder(
-      options: RoundedRectDottedBorderOptions(
-        radius: const Radius.circular(24),
-        dashPattern: const [6, 3],
-        strokeWidth: 1.5,
-        color: const Color(0xFFF1F5F9),
-      ),
-      // borderType: BorderType.RRect,
-      // radius: const Radius.circular(16),
-      // dashPattern: const [6,3],
-
+          options: RoundedRectDottedBorderOptions(
+            radius: const Radius.circular(24),
+            dashPattern: const [6, 3],
+            strokeWidth: 1.5,
+            color: const Color(0xFFF1F5F9),
+          ),
+          // borderType: BorderType.RRect,
+          // radius: const Radius.circular(16),
+          // dashPattern: const [6,3],
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(16),
-        decoration: ShapeDecoration(
-          color: const Color(0xFFF1F5F9),
-          shape: RoundedRectangleBorder(
-            // side: BorderSide(
-            //   width: 2,
-            //   color: const Color(0xFFE2E8F0),
-            // ),
-            borderRadius: BorderRadius.circular(24),
-          ),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF8FAFC),
+          borderRadius: BorderRadius.circular(16),
         ),
-
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-
-            const Text(
-              "Interior View",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-
+            const Text("Interior View", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 6),
-
             const Text(
               "Take clear photo of Seats and dashboard",
-              style: TextStyle(color: Colors.grey,fontSize: 12),
+              style: TextStyle(color: Colors.grey, fontSize: 13),
+            ),
+            const SizedBox(height: 16),
+
+            // Image Display Area
+            Container(
+              height: 180,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: image == null
+                  ? const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.camera_alt, size: 50, color: Colors.grey),
+                    SizedBox(height: 8),
+                    Text("No Image", style: TextStyle(color: Colors.grey)),
+                  ],
+                ),
+              )
+                  : ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.file(image, fit: BoxFit.cover),
+              ),
             ),
 
-            const SizedBox(height: 10),
+            const SizedBox(height: 16),
 
             GestureDetector(
-
               onTap: () => provider.pickImage("interior"),
-              child: Container(  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  decoration: ShapeDecoration(
-                    color: const Color(0xFF03055E),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(32),
-                    ),
-                    shadows: [
-                      BoxShadow(
-                        color: Color(0x0C000000),
-                        blurRadius: 2,
-                        offset: Offset(0, 1),
-                        spreadRadius: 0,
-                      )
-                    ],
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF03055E),
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: Center(
+                  child: Text(
+                    image == null ? "Take Interior Photo" : "Retake Interior Photo",
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
                   ),
-                  child: Center(
-                    child: const Text("Take Photo", style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w700,
-                      height: 1.33,
-                    ),),
-                  )),
-            )
-
+                ),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
+  // Widget _interiorCard(NewBookingProvider provider){
+  //
+  //   return DottedBorder(
+  //     options: RoundedRectDottedBorderOptions(
+  //       radius: const Radius.circular(24),
+  //       dashPattern: const [6, 3],
+  //       strokeWidth: 1.5,
+  //       color: const Color(0xFFF1F5F9),
+  //     ),
+  //     // borderType: BorderType.RRect,
+  //     // radius: const Radius.circular(16),
+  //     // dashPattern: const [6,3],
+  //
+  //     child: Container(
+  //       width: double.infinity,
+  //       padding: const EdgeInsets.all(16),
+  //       decoration: ShapeDecoration(
+  //         color: const Color(0xFFF1F5F9),
+  //         shape: RoundedRectangleBorder(
+  //           // side: BorderSide(
+  //           //   width: 2,
+  //           //   color: const Color(0xFFE2E8F0),
+  //           // ),
+  //           borderRadius: BorderRadius.circular(24),
+  //         ),
+  //       ),
+  //
+  //       child: Column(
+  //         children: [
+  //
+  //           const Text(
+  //             "Interior View",
+  //             style: TextStyle(fontWeight: FontWeight.bold),
+  //           ),
+  //
+  //           const SizedBox(height: 6),
+  //
+  //           const Text(
+  //             "Take clear photo of Seats and dashboard",
+  //             style: TextStyle(color: Colors.grey,fontSize: 12),
+  //           ),
+  //
+  //           const SizedBox(height: 10),
+  //
+  //           GestureDetector(
+  //
+  //             onTap: () => provider.pickImage("interior"),
+  //             child: Container(  width: double.infinity,
+  //                 padding: const EdgeInsets.symmetric(vertical: 8),
+  //                 decoration: ShapeDecoration(
+  //                   color: const Color(0xFF03055E),
+  //                   shape: RoundedRectangleBorder(
+  //                     borderRadius: BorderRadius.circular(32),
+  //                   ),
+  //                   shadows: [
+  //                     BoxShadow(
+  //                       color: Color(0x0C000000),
+  //                       blurRadius: 2,
+  //                       offset: Offset(0, 1),
+  //                       spreadRadius: 0,
+  //                     )
+  //                   ],
+  //                 ),
+  //                 child: Center(
+  //                   child: const Text("Take Photo", style: TextStyle(
+  //                     color: Colors.white,
+  //                     fontSize: 12,
+  //                     fontFamily: 'Inter',
+  //                     fontWeight: FontWeight.w700,
+  //                     height: 1.33,
+  //                   ),),
+  //                 )),
+  //           )
+  //
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _speedometerCard(NewBookingProvider provider){
 

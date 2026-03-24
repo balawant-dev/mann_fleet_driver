@@ -219,15 +219,29 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
     }
 
     /// 🔹 2. ACCEPTED → START OTP
-    if (status == "accepted" && !isStartOtpVerified) {
+  if (status == "accepted") {
       return Center(
         child: button(
-          title: "Verify Start OTP",
-          color: Colors.orange,
-          onTap: () => showOtpDialog(bookingId, "start"),
+          title: "Go to Detail",
+          color: Colors.blue,
+          onTap: () {
+            navPush(
+              context: context,
+              action: BookingDetailScreen(id: bookingId),
+            );
+          },
         ),
       );
     }
+    // if (status == "accepted" && !isStartOtpVerified) {
+    //   return Center(
+    //     child: button(
+    //       title: "Verify Start OTP",
+    //       color: Colors.orange,
+    //       onTap: () => showOtpDialog(bookingId, "start"),
+    //     ),
+    //   );
+    // }
 
     /// 🔹 3. DRIVER ARRIVED → START RIDE
     if (tripStatus == "arrived" && isStartOtpVerified) {

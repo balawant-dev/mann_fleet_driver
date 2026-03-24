@@ -25,6 +25,13 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
       context.read<NewBookingProvider>()
           .getNewBookingDetail(context: context, id: widget.id);
     });}
+
+  Future<void> _onRefresh() async {
+    await context.read<NewBookingProvider>().getNewBookingDetail(
+      context: context,
+      id: widget.id,
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return Consumer<NewBookingProvider>(
@@ -57,7 +64,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
 
         return Scaffold(
           backgroundColor: const Color(0xffF3F5F7),
-          appBar: CommonAppBar(title: "My Booking",),
+          appBar: CommonAppBar(title: "Booking Detail",),
           // appBar: AppBar(
           //   backgroundColor: Colors.white,
           //   elevation: 0,
@@ -67,183 +74,203 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
           //       style: TextStyle(color: Colors.black)),
           // ),
 
-          body: Padding(
-            padding: const EdgeInsets.all(14),
-            child: Container(
+          body: RefreshIndicator(
+            onRefresh: _onRefresh,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: const Color(0xFFF1F5F9)),
-              ),
+              child: Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: const Color(0xFFF1F5F9)),
+                ),
 
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
 
-                  /// 🔹 DATE + BOOKING ID
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        children: [
-                          Row(
-                            children: [
-                              const Icon(Icons.calendar_today, size: 16),
-                              const SizedBox(width: 6),
-                              Text(date),
-                            ],
-                          ),
-                          const SizedBox(height: 6),
-                          Row(
-                            children: [
-                              const Icon(Icons.access_time, size: 16),
-                              const SizedBox(width: 6),
-                              Text(time),
-                            ],
-                          ),
-                        ],
-                      ),
-
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text("🕘 : $bookingId",
-                              style:
-                              const TextStyle(fontWeight: FontWeight.w700)),
-                          Text(tripType),
-                        ],
-                      )
-                    ],
-                  ),
-
-                  const Divider(height: 30),
-
-                  /// 🔹 PICKUP & DROP
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-
-                      /// timeline
-                      Column(
-                        children: [
-                          Container(
-                            width: 10,
-                            height: 10,
-                            decoration: const BoxDecoration(
-                                color: Colors.orange, shape: BoxShape.circle),
-                          ),
-                          Container(height: 35, width: 2, color: Colors.grey),
-                          Container(
-                            width: 10,
-                            height: 10,
-                            decoration: const BoxDecoration(
-                                color: Colors.red, shape: BoxShape.circle),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(width: 10),
-
-                      /// address
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                    /// 🔹 DATE + BOOKING ID
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
                           children: [
-                            Text(pickup,
-                                style:
-                                const TextStyle(fontWeight: FontWeight.w700)),
-                            const SizedBox(height: 20),
-                            Text(drop,
-                                style:
-                                const TextStyle(fontWeight: FontWeight.w700)),
+                            Row(
+                              children: [
+                                const Icon(Icons.calendar_today, size: 16),
+                                const SizedBox(width: 6),
+                                Text(date),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            Row(
+                              children: [
+                                const Icon(Icons.access_time, size: 16),
+                                const SizedBox(width: 6),
+                                Text(time),
+                              ],
+                            ),
                           ],
                         ),
-                      ),
-                    ],
-                  ),
 
-                  const SizedBox(height: 20),
-
-                  /// 🔹 PARKING / TOLL / TAX
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade200),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Row(
-                      children: [
-                        _infoBox("Parking", "Extra"),
-                        _divider(),
-                        _infoBox("Toll",
-                            data?.pricingSnapshot != null ? "Included" : "Included"),
-                        _divider(),
-                        _infoBox("Tax",
-                            data?.pricingSnapshot != null ? "Included" : "Included"),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text("🕘 : $bookingId",
+                                style:
+                                const TextStyle(fontWeight: FontWeight.w700)),
+                            Text(tripType),
+                          ],
+                        )
                       ],
                     ),
-                  ),
 
-                  const SizedBox(height: 20),
+                    const Divider(height: 30),
 
-                  /// 🔹 KM
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Column(
-                        children: [
-                          Text("$totalKm",
-                              style: const TextStyle(
-                                  fontSize: 24, fontWeight: FontWeight.bold)),
-                          const Text("Total KM"),
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          Text("$extraKm",
-                              style: const TextStyle(
-                                  fontSize: 24, fontWeight: FontWeight.bold)),
-                          const Text("Per Km Rate"),
-                        ],
-                      ),
-                    ],
-                  ),
+                    /// 🔹 PICKUP & DROP
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
 
-                  const SizedBox(height: 20),
-
-                  /// 🔹 CAB
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 6),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.green),
-                          borderRadius: BorderRadius.circular(20),
+                        /// timeline
+                        Column(
+                          children: [
+                            Container(
+                              width: 10,
+                              height: 10,
+                              decoration: const BoxDecoration(
+                                  color: Colors.orange, shape: BoxShape.circle),
+                            ),
+                            Container(height: 35, width: 2, color: Colors.grey),
+                            Container(
+                              width: 10,
+                              height: 10,
+                              decoration: const BoxDecoration(
+                                  color: Colors.red, shape: BoxShape.circle),
+                            ),
+                          ],
                         ),
-                        child: Text(cabType,
-                            style: const TextStyle(color: Colors.green)),
+
+                        const SizedBox(width: 10),
+
+                        /// address
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(pickup,
+                                  style:
+                                  const TextStyle(fontWeight: FontWeight.w700)),
+                              const SizedBox(height: 20),
+                              Text(drop,
+                                  style:
+                                  const TextStyle(fontWeight: FontWeight.w700)),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    /// 🔹 PARKING / TOLL / TAX
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade200),
+                        borderRadius: BorderRadius.circular(14),
                       ),
-                      const SizedBox(width: 10),
-                      Expanded(child: Text(carInfo)),
-                    ],
-                  ),
+                      child: Row(
+                        children: [
+                          _infoBox("Parking", "Extra"),
+                          _divider(),
+                          _infoBox("Toll",
+                              data?.pricingSnapshot != null ? "Included" : "Included"),
+                          _divider(),
+                          _infoBox("Tax",
+                              data?.pricingSnapshot != null ? "Included" : "Included"),
+                        ],
+                      ),
+                    ),
 
-                  const SizedBox(height: 25),
+                    const SizedBox(height: 20),
 
-                  /// 🔹 BUTTON
-                  CommonAppButton(
-                    text: "Reporting to client",
-                    backgroundColor: Colors.blue.shade200,
-                    textColor: Colors.black,
-                    onPressed: () {
-                      navPush(context: context, action: PickupScreen());
-                    },
-                  ),        const SizedBox(height: 25), CommonAppButton(
-                    text: "End the trip",
-                    onPressed: () {},
-                  ),
-                ],
+                    /// 🔹 KM
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Column(
+                          children: [
+                            Text("$totalKm",
+                                style: const TextStyle(
+                                    fontSize: 24, fontWeight: FontWeight.bold)),
+                            const Text("Total KM"),
+                          ],
+                        ),
+                        Column(
+                          children: [
+                            Text("$extraKm",
+                                style: const TextStyle(
+                                    fontSize: 24, fontWeight: FontWeight.bold)),
+                            const Text("Per Km Rate"),
+                          ],
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    /// 🔹 CAB
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 6),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.green),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(cabType,
+                              style: const TextStyle(color: Colors.green)),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(child: Text(carInfo)),
+                      ],
+                    ),
+
+                    const SizedBox(height: 25),
+
+                    /// 🔹 BUTTON
+                    buildMainButton(
+                      status: data?.driverResponse?.status ?? "",
+
+                      tripStatus: data?.tripStatus ?? "",
+                      isStartOtpVerified: data?.tripStartOtpVerify ?? false,
+                      isEndOtpVerified: data?.tripEndOtpVerify ?? false,
+                      // pickupDone: data?.pickupVerified ?? false, // 👈 backend flag
+                      // isStartOtpVerified: true,
+                      // isEndOtpVerified:true,
+                      // tripStatus: "arrived",
+
+                      pickupDone:  data?.pickupVerification ?? false, // 👈 backend flag
+
+                    ),
+                    // CommonAppButton(
+                    //   text: "Reporting to client",
+                    //   backgroundColor: Colors.blue.shade200,
+                    //   textColor: Colors.black,
+                    //   onPressed: () {
+                    //     navPush(context: context, action: PickupScreen());
+                    //   },
+                    // ),
+                    //
+                    const SizedBox(height: 25), CommonAppButton(
+                      text: "End the trip",
+                      onPressed: () {},
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -251,7 +278,81 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
       },
     );
   }
+  Widget buildMainButton({
+    required String status,
+    required String tripStatus,
+    required bool isStartOtpVerified,
+    required bool isEndOtpVerified,
+    required bool pickupDone,
+  }) {
+    print(">>>>>>>status>>>>>>>>>>>>>>>>>${status}");
+    print(">>>>>>>tripStatus>>>>>>>>>>>>>>>>>${tripStatus}");
+    print(">>>>>>>isStartOtpVerified>>>>>>>>>>>>>>>>>${isStartOtpVerified}");
+    print(">>>>>>>isEndOtpVerified>>>>>>>>>>>>>>>>>${isEndOtpVerified}");
+    print(">>>>>>>pickupDone>>>>>>>>>>>>>>>>>${pickupDone}");
 
+    /// 🔹 1. Pickup Pending
+    if (status == "accepted" && !pickupDone) {
+      return CommonAppButton(
+        text: "Reporting to Client",
+        onPressed: () {
+          navPush(
+            context: context,
+            action: PickupScreen(id: widget.id),
+          );
+        },
+      );
+    }
+
+    /// 🔹 2. Start OTP
+    if (pickupDone && !isStartOtpVerified) {
+      return CommonAppButton(
+        text: "Verify Start OTP",
+        onPressed: () => showOtpDialog(widget.id, "start"),
+      );
+    }
+
+    /// 🔹 3. Start Ride
+    if (tripStatus == "arrived" && isStartOtpVerified) {
+      return CommonAppButton(
+        text: "Start Ride",
+        onPressed: () async {
+          bool success = await context
+              .read<NewBookingProvider>()
+              .startTripApi(
+            context: context,
+            id: widget.id,
+          );
+
+          if (success) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Trip Started 🚗")),
+            );
+          }
+        },
+      );
+    }
+
+    /// 🔹 4. End OTP
+    if (tripStatus == "in_progress" && !isEndOtpVerified) {
+      return CommonAppButton(
+        text: "Verify End OTP",
+        onPressed: () => showOtpDialog(widget.id, "end"),
+      );
+    }
+
+    /// 🔹 5. Completed
+    if (tripStatus == "completed" || isEndOtpVerified) {
+      return const Text("Trip Completed ✅");
+    }
+
+    /// 🔹 6. Cancelled
+    if (tripStatus == "cancelled") {
+      return const Text("Trip Cancelled ❌");
+    }
+
+    return const SizedBox();
+  }
 
   Widget _divider() {
     return Container(
@@ -285,6 +386,55 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
           ],
         ),
       ),
+    );
+  }
+  void showOtpDialog(String bookingId, String type) {
+    TextEditingController otpController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          title: Text("Enter OTP ($type)",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 18),),
+          content: TextField(
+            controller: otpController,
+            keyboardType: TextInputType.number,
+            maxLength: 4,
+            decoration: const InputDecoration(
+              hintText: "Enter 4-digit OTP",
+              border: OutlineInputBorder(),
+              counterText: "",
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                bool success = await context
+                    .read<NewBookingProvider>()
+                    .verifyBookingOtpApi(
+                  context: context,
+                  id: bookingId,
+                  otp: otpController.text,
+                  type: type, // 🔥 important
+                );
+
+                Navigator.pop(context);
+
+                if (success) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("OTP Verified ($type) ✅")),
+                  );
+                }
+              },
+              child: const Text("Verify"),
+            ),
+          ],
+        );
+      },
     );
   }
 }

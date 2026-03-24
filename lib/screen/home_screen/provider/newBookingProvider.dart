@@ -122,6 +122,7 @@ class NewBookingProvider extends ChangeNotifier {
       startTripModel = res;
 
       if (res != null && res.status == true) {
+        getNewBookingDetail(context: context,id: id);
         getNewBooking(context: context);
         debugPrint("Trip started successfully for booking $id");
         return true;
@@ -161,6 +162,7 @@ class NewBookingProvider extends ChangeNotifier {
 
       if (res != null && res.status == true) {
         // startTripApi(context: context,id: id);
+        getNewBookingDetail(context: context,id: id);
         getNewBooking(context: context);
         debugPrint("OTP verified successfully for booking $id");
         return true;
@@ -243,22 +245,39 @@ class NewBookingProvider extends ChangeNotifier {
       isLoading2 = false;
       notifyListeners();
     }
-}  Future<void> pickupVerificationApi({required BuildContext context,required String id}) async {
+}  Future<void> pickupVerificationApi({
+    required BuildContext context,
+    required String id,
+  }) async {
     try {
       isLoading2 = true;
       notifyListeners();
+      debugPrint("frontViewImage: ${front?.path ?? ""}");
+      debugPrint("backViewImage: ${back?.path ?? ""}");
+      debugPrint("leftViewImage: ${left?.path ?? ""}");
+      debugPrint("rightViewImage: ${right?.path ?? ""}");
+      debugPrint("interiorImage: ${interior?.path ?? ""}");
+      debugPrint("speedometerImage: ${speedometer?.path ?? ""}");
 
-      final res = await api.pickupVerificationApi( context: context,id: id,speedometerImage: ,rightViewImage: ,leftViewImage: ,interiorImage: ,frontViewImage: ,backViewImage: );
+      final res = await api.pickupVerificationApi(
+        context: context,
+        id: id,
+        frontViewImage: front?.path ?? "",
+        backViewImage: back?.path ?? "",
+        leftViewImage: left?.path ?? "",
+        rightViewImage: right?.path ?? "",
+        interiorImage: interior?.path ?? "",
+        speedometerImage: speedometer?.path ?? "",
+      );
+
       pickupVerificationModel = res;
-      if(res!=null||res.status==true){
-        print("Get Profile Successfully");
-      }
+      getNewBookingDetail(context: context,id: id);
 
     } catch (e) {
-      debugPrint("Error in Get Profile: $e");
+      debugPrint("Error: $e");
     } finally {
       isLoading2 = false;
       notifyListeners();
     }
-}
+  }
 }

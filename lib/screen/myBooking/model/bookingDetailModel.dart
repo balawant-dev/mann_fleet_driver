@@ -326,6 +326,7 @@ class BookingData {
   String? tripEndOtp;
   bool? tripEndOtpVerify;
   bool? tripStartOtpVerify;
+  bool? pickupVerification;
 
   BookingData({
     this.pickup,
@@ -364,6 +365,7 @@ class BookingData {
     this.tripEndOtp,
     this.tripEndOtpVerify,
     this.tripStartOtpVerify,
+    this.pickupVerification,
   });
 
   BookingData.fromJson(Map<String, dynamic> json) {
@@ -404,6 +406,7 @@ class BookingData {
     tripEndOtp = json['tripEndOtp'];
     tripEndOtpVerify = json['tripEndOtpVerify'];
     tripStartOtpVerify = json['tripStartOtpVerify'];
+    pickupVerification = json['pickupVerification'];
   }
 
   Map<String, dynamic> toJson() {
@@ -444,6 +447,7 @@ class BookingData {
       'tripEndOtp': tripEndOtp,
       'tripEndOtpVerify': tripEndOtpVerify,
       'tripStartOtpVerify': tripStartOtpVerify,
+      'pickupVerification': pickupVerification,
     };
   }
 }

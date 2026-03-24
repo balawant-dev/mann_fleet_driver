@@ -255,7 +255,7 @@ class NewBookingRepo {
 
       });
 
-      final response = await _api.patchMultipart(
+      final response = await _api.postMultipart(
         "${ApiConstants.pickupVerification}/${id}",
         data: formData, // 👈 important
         requiresAuth: true,

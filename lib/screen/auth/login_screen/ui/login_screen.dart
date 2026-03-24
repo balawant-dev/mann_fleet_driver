@@ -105,7 +105,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                           /// Mobile TextField
                           Expanded(
-                            child: TextField(
+                            child: TextFormField(
                               controller: provider.mobileNumberController,
                               keyboardType: TextInputType.phone,
                               textAlignVertical: TextAlignVertical.center,
@@ -119,6 +119,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               decoration: const InputDecoration(
                                 hintText: "Enter your Mobile number",
                                 hintStyle: TextStyle(fontSize: 14),
+
                                 // Sabhi borders ko explicitly hatane ke liye:
                                 border: InputBorder.none,
                                 enabledBorder: InputBorder.none,

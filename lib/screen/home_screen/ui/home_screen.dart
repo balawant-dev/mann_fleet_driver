@@ -12,7 +12,7 @@ import '../../drawer/ui/custom_drawer.dart';
 
 import '../../profileManagement/screen/personal_profile_screen.dart';
 import '../provider/newBookingProvider.dart';
-import 'active_booking.dart';
+
 import 'new_booking.dart';
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -157,82 +157,8 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
+                  NewBookingScreen()
 
-                      /// New Booking
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              selectedTab = 0;
-                            });
-                          },
-                          child: Container(
-                            alignment: Alignment.center,
-                            padding: EdgeInsets.only(bottom: 10),
-                            decoration: BoxDecoration(
-                              border: Border(
-                                bottom: BorderSide(
-                                  color: selectedTab == 0
-                                      ? ColorResource.indigo
-                                      : Colors.transparent,
-                                  width: 2,
-                                ),
-                              ),
-                            ),
-                            child: CustomText(
-                              "New Booking",
-                              size: 14,
-                              weight: FontWeight.w600,
-                              color: selectedTab == 0
-                                  ? ColorResource.indigo
-                                  : ColorResource.grayColor1,
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      /// Active Booking
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              selectedTab = 1;
-                            });
-                          },
-                          child: Container(
-                            alignment: Alignment.center,
-                            padding: EdgeInsets.only(bottom: 10),
-                            decoration: BoxDecoration(
-                              border: Border(
-                                bottom: BorderSide(
-                                  color: selectedTab == 1
-                                      ? ColorResource.indigo
-                                      : Colors.transparent,
-                                  width: 2,
-                                ),
-                              ),
-                            ),
-                            child: CustomText(
-                              "Active Booking",
-                              size: 14,
-                              weight: FontWeight.w600,
-                              color: selectedTab == 1
-                                  ? ColorResource.indigo
-                                  : ColorResource.grayColor1,
-                            ),
-                          ),
-                        ),
-                      ),
-
-                    ],
-                  ),
-                  SizedBox(height: 20),
-
-                  selectedTab == 0
-                      ? NewBookingScreen()
-                      : ActiveBookingScreen()
                 ],
               ),
             ),

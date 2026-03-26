@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../../widget/commonAppBar.dart';
 import '../../../widget/commonAppButton.dart';
 import '../../../widget/commonTextFormField.dart';
+import '../../../widget/motionToastHelper.dart';
 import '../provider/driving_credentials_provider.dart';
 import '../provider/profileDetailProvider.dart';
 //
@@ -236,11 +237,21 @@ class _DrivingCredentialsScreenState
               text: "Save",
               onPressed: () async {
                 if (provider.dlNumber.text.isEmpty) {
-                  _error(context, "Enter DL Number");
+                  ToastHelper.show(
+                    context,
+                    message: "Enter DL Number",
+                    type: ToastType.warning,
+                  );
+                  // _error(context, "Enter DL Number");
                   return;
                 }
                 if (provider.dlExpiry.text.isEmpty) {
-                  _error(context, "Select Expiry Date");
+                  ToastHelper.show(
+                    context,
+                    message: "Select Expiry Date",
+                    type: ToastType.warning,
+                  );
+                  // _error(context, "Select Expiry Date");
                   return;
                 }
 

@@ -4,6 +4,7 @@ import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mann_fleet_driver/screen/profileManagement/provider/profileDetailProvider.dart';
 
+import '../../../widget/motionToastHelper.dart';
 import '../../auth/register/model/registerModel.dart';
 import '../model/getProfileModel.dart';
 import '../repo/profileRepo.dart';
@@ -135,10 +136,15 @@ class PersonalProfileProvider extends ChangeNotifier {
 
         /// 🔥 STEP 3: UI UPDATE (Prefill again)
         setProfileData(profileProvider.getProfileModel?.data?.driver);
+        ToastHelper.show(
+context,
+message: "Profile Updated Successfully",
+type: ToastType.success,
+);
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Profile Updated Successfully")),
-        );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   const SnackBar(content: Text("Profile Updated Successfully")),
+        // );
         // navPushBottomRemove(context: context, action: MainScreen(), duration: 2);
       }
 

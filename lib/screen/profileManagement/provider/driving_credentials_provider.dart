@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../widget/motionToastHelper.dart';
 import '../../../widget/showLoaderFunction.dart';
 import '../model/getProfileModel.dart';
 import '../repo/profileRepo.dart';
@@ -77,9 +78,14 @@ class DrivingCredentialsProvider extends ChangeNotifier {
       Navigator.pop(context);
 
       if (res.status == true) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Updated Successfully ✅")),
+        ToastHelper.show(
+          context,
+          message: "Updated Successfully ✅",
+          type: ToastType.success,
         );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   const SnackBar(content: Text("Updated Successfully ✅")),
+        // );
       }
 
     } catch (e) {

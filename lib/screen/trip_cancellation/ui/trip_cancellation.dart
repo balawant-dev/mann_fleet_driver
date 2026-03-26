@@ -3,8 +3,10 @@ import 'package:mann_fleet_driver/util/color/app_colors.dart';
 import 'package:mann_fleet_driver/widget/navigator_method.dart';
 import '../../../widget/commonAppBar.dart';
 import '../../../widget/commonAppButton.dart';
+import '../../../widget/motionToastHelper.dart';
 import '../../home_screen/provider/newBookingProvider.dart';
 import 'package:provider/provider.dart';
+
 class TripCancellationScreen extends StatefulWidget {
   final String bookingId;
   final String? pickupAddress;
@@ -12,6 +14,7 @@ class TripCancellationScreen extends StatefulWidget {
   final String? bookingDateTime;
   final String? fareEstimate;
   final String? passengerInfo;
+  final String? bookingNumber;
 
   const TripCancellationScreen({
     super.key,
@@ -21,6 +24,7 @@ class TripCancellationScreen extends StatefulWidget {
     this.bookingDateTime,
     this.fareEstimate,
     this.passengerInfo,
+    this.bookingNumber,
   });
 
   @override
@@ -74,7 +78,8 @@ class _TripCancellationScreenState extends State<TripCancellationScreen> {
         child: RadioListTile<String>(
           value: title,
           groupValue: selectedReason,
-          onChanged: null, // Handled by GestureDetector
+          onChanged: null,
+          // Handled by GestureDetector
           title: Text(
             title,
             style: TextStyle(
@@ -95,65 +100,73 @@ class _TripCancellationScreenState extends State<TripCancellationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-      appBar: const CommonAppBar(
-        title: 'Cancel Trip',
-        isBack: false,
-      ),
+      backgroundColor: Colors.white,
+      appBar: const CommonAppBar(title: 'Cancel Trip', isBack: false),
       bottomSheet: Container(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
         color: Colors.white,
         child: CommonAppButton(
           text: 'Confirm Cancellation',
           // enabled: _canSubmit,
-          onPressed: _canSubmit
-              ? ()async {
-            final reason = selectedReason == "Other"
-                ? _otherReasonController.text.trim()
-                : selectedReason;
+          onPressed:
+              _canSubmit
+                  ? () async {
+                    final reason =
+                        selectedReason == "Other"
+                            ? _otherReasonController.text.trim()
+                            : selectedReason;
 
-            if (reason == null || reason.isEmpty) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Please select or enter a reason")),
-              );
-              return;
-            }
+                    if (reason == null || reason.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Please select or enter a reason"),
+                        ),
+                      );
+                      return;
+                    }
 
-            final provider = context.read<NewBookingProvider>();
+                    final provider = context.read<NewBookingProvider>();
 
-            bool success = await provider.driverCancelApi(
-              context: context,
-              id: widget.bookingId,
-              reason: reason! +
-                  (_reviewController.text.trim().isNotEmpty
-                      ? " - ${_reviewController.text.trim()}"
-                      : ""),
-            );
+                    bool success = await provider.driverCancelApi(
+                      context: context,
+                      id: widget.bookingId,
+                      reason:
+                          reason! +
+                          (_reviewController.text.trim().isNotEmpty
+                              ? " - ${_reviewController.text.trim()}"
+                              : ""),
+                    );
 
-            if (success) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Trip Cancelled Successfully ❌")),
-              );
+                    if (success) {
+                      //
+                      ToastHelper.show(
+                        context,
+                        message: "Trip Cancelled Successfully ❌",
+                        type: ToastType.success,
+                      );
+                      // ScaffoldMessenger.of(context).showSnackBar(
+                      //   const SnackBar(content: Text("Trip Cancelled Successfully ❌")),
+                      // );
 
-              // navPop(context: context);
-            }
+                      // navPop(context: context);
+                    }
 
-            // TODO: Call cancel API here
-            // Example:
-            // context.read<NewBookingProvider>().driverCancelApi(
-            //   context: context,
-            //   id: widget.bookingId,
-            //   reason: reason + (review.isNotEmpty ? " - $review" : ""),
-            // );
+                    // TODO: Call cancel API here
+                    // Example:
+                    // context.read<NewBookingProvider>().driverCancelApi(
+                    //   context: context,
+                    //   id: widget.bookingId,
+                    //   reason: reason + (review.isNotEmpty ? " - $review" : ""),
+                    // );
 
-            print("Cancelling booking ${widget.bookingId}");
-            print("Reason: $reason");
-            print("Additional note: ${_reviewController.text.trim()}");
+                    print("Cancelling booking ${widget.bookingId}");
+                    print("Reason: $reason");
+                    print("Additional note: ${_reviewController.text.trim()}");
 
-            // For demo: pop with success
-            // navPop(context: context);
-          }
-              : null,
+                    // For demo: pop with success
+                    // navPop(context: context);
+                  }
+                  : null,
         ),
       ),
       body: SingleChildScrollView(
@@ -166,11 +179,19 @@ class _TripCancellationScreenState extends State<TripCancellationScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFF1F5F9)),
+                  color: const Color(0xFFF8FAFC),
+                  // ← Changed: Soft elegant background
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: const Color(0xFFE2E8F0), // ← Changed: Cleaner border
+                    width: 1.2,
+                  ),
                   boxShadow: const [
-                    BoxShadow(color: Color(0x0C000000), blurRadius: 6, offset: Offset(0, 2)),
+                    BoxShadow(
+                      color: Color(0x0A000000), // ← Softer shadow
+                      blurRadius: 8,
+                      offset: Offset(0, 3),
+                    ),
                   ],
                 ),
                 child: Column(
@@ -182,10 +203,16 @@ class _TripCancellationScreenState extends State<TripCancellationScreen> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text("BOOKING ID", style: TextStyle(fontSize: 12, color: Colors.grey)),
+                            const Text(
+                              "BOOKING ID",
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
+                            ),
                             const SizedBox(height: 4),
                             Text(
-                              "#${widget.bookingId}",
+                              "${widget.bookingNumber}",
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -197,11 +224,20 @@ class _TripCancellationScreenState extends State<TripCancellationScreen> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            const Text("DATE & TIME", style: TextStyle(fontSize: 12, color: Colors.grey)),
+                            const Text(
+                              "DATE & TIME",
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
+                            ),
                             const SizedBox(height: 4),
                             Text(
                               widget.bookingDateTime ?? "—",
-                              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ],
                         ),
@@ -212,9 +248,15 @@ class _TripCancellationScreenState extends State<TripCancellationScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Column(
-                          children:  [
+                          children: [
                             Icon(Icons.circle, size: 12, color: Colors.orange),
-                            SizedBox(height: 28, child: VerticalDivider(color: Colors.grey.shade300, thickness: 2)),
+                            SizedBox(
+                              height: 28,
+                              child: VerticalDivider(
+                                color: Colors.grey.shade300,
+                                thickness: 2,
+                              ),
+                            ),
                             Icon(Icons.circle, size: 12, color: Colors.red),
                           ],
                         ),
@@ -223,11 +265,35 @@ class _TripCancellationScreenState extends State<TripCancellationScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text("PICKUP", style: TextStyle(fontSize: 12, color: Colors.grey)),
-                              Text(widget.pickupAddress ?? "—", style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                              const Text(
+                                "PICKUP",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              Text(
+                                widget.pickupAddress ?? "—",
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                               const SizedBox(height: 16),
-                              const Text("DROPOFF", style: TextStyle(fontSize: 12, color: Colors.grey)),
-                              Text(widget.dropoffAddress ?? "—", style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                              const Text(
+                                "DROPOFF",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              Text(
+                                widget.dropoffAddress ?? "—",
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -239,18 +305,38 @@ class _TripCancellationScreenState extends State<TripCancellationScreen> {
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.people_alt_outlined, size: 20, color: ColorResource.indigo),
+                            const Icon(
+                              Icons.people_alt_outlined,
+                              size: 20,
+                              color: ColorResource.indigo,
+                            ),
                             const SizedBox(width: 8),
-                            Text(widget.passengerInfo ?? "—", style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                            Text(
+                              widget.passengerInfo ?? "—",
+                              style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ],
                         ),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            const Text("EST. FARE", style: TextStyle(fontSize: 12, color: Colors.grey)),
+                            const Text(
+                              "EST. FARE",
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
+                            ),
                             Text(
                               widget.fareEstimate ?? "—",
-                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green),
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.green,
+                              ),
                             ),
                           ],
                         ),
@@ -262,7 +348,10 @@ class _TripCancellationScreenState extends State<TripCancellationScreen> {
 
               const SizedBox(height: 24),
 
-              const Text("Reason for Cancellation", style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+              const Text(
+                "Reason for Cancellation",
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 16),
 
               ...reasons.map(_reasonTile),
@@ -273,8 +362,13 @@ class _TripCancellationScreenState extends State<TripCancellationScreen> {
                   controller: _otherReasonController,
                   decoration: InputDecoration(
                     hintText: "Please specify the reason...",
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                   ),
                 ),
               ],
@@ -287,7 +381,9 @@ class _TripCancellationScreenState extends State<TripCancellationScreen> {
                 minLines: 3,
                 decoration: InputDecoration(
                   hintText: "Additional comments (optional)",
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   filled: true,
                   fillColor: Colors.grey.shade50,
                 ),
@@ -305,12 +401,16 @@ class _TripCancellationScreenState extends State<TripCancellationScreen> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: const [
-                    Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 24),
+                    Icon(
+                      Icons.warning_amber_rounded,
+                      color: Colors.orange,
+                      size: 24,
+                    ),
                     SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         "Frequent cancellations may lower your driver rating and affect eligibility for premium/priority rides in the future.\n\n"
-                            "बार-बार रद्द करने से आपकी रेटिंग कम हो सकती है और प्रीमियम बुकिंग्स में प्राथमिकता प्रभावित हो सकती है।",
+                        "बार-बार रद्द करने से आपकी रेटिंग कम हो सकती है और प्रीमियम बुकिंग्स में प्राथमिकता प्रभावित हो सकती है।",
                         style: TextStyle(fontSize: 13, height: 1.4),
                       ),
                     ),

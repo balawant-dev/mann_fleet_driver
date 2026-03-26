@@ -9,9 +9,11 @@ import '../../../../../apiservice/network/api_service.dart';
 import '../../../../../apiservice/network/network_utils.dart';
 import '../../../../../apiservice/services/secure_storage_service.dart';
 import '../../auth/register/model/registerModel.dart';
-import '../../myBooking/model/bookingDetailModel.dart';
+
+import '../../bookingDetail/model/bookingDetailModel.dart';
 import '../model/bookingAcceptedModel.dart';
 import '../model/bookingCancelModel.dart';
+import '../model/getBannerModel.dart';
 import '../model/newBookingModel.dart';
 import '../model/pickupVerificationModel.dart';
 import '../model/startTripModel.dart';
@@ -24,7 +26,35 @@ class NewBookingRepo {
 
 
 
-  Future<NewBookingModel> getNewBooking({required BuildContext context}) async {
+  Future<GetBannerModel> getBannerApi({required BuildContext context}) async {
+    try {
+      final response = await _api.get(ApiConstants.banner, requiresAuth: true);
+      //   await SecureStorageService.saveToken(response['token']);
+      return GetBannerModel.fromJson(response);
+      //  return LoginModel.fromJson(response['user']);
+    } on DioException catch (e) {
+      if (e.error is NoInternetException) {
+        showNoInternetScreen(
+          context,
+          onRetry: () => getBannerApi(context: context),
+        );
+        throw NoInternetException();
+      } else if (e.error is ServerException) {
+        showServerErrorScreen(
+          context,
+          onRetry: () => getBannerApi(context: context),
+        );
+        throw ServerException();
+      } else if (e.error is UnauthorizedException) {
+        await SecureStorageService.logout(context);
+        throw UnauthorizedException();
+      } else {
+        rethrow;
+      }
+    } catch (e) {
+      throw ApiException(0, e.toString());
+    }
+  }   Future<NewBookingModel> getNewBooking({required BuildContext context}) async {
     try {
       final response = await _api.get(ApiConstants.getMyAssignedBookings, requiresAuth: true);
       //   await SecureStorageService.saveToken(response['token']);
@@ -52,7 +82,9 @@ class NewBookingRepo {
     } catch (e) {
       throw ApiException(0, e.toString());
     }
-  }  Future<BookingCancelModel> driverCancelRequest({required BuildContext context,required String id,required String reason}) async {
+  }
+
+  Future<BookingCancelModel> driverCancelRequest({required BuildContext context,required String id,required String reason}) async {
     try {
       final response = await _api.post("${ApiConstants.driverCancelRequest}/${id}", requiresAuth: true,data: {"reason":reason});
       //   await SecureStorageService.saveToken(response['token']);

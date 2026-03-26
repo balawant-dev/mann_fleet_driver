@@ -7,12 +7,14 @@ import 'package:mann_fleet_driver/util/image_resource/image_resource.dart';
 import 'package:mann_fleet_driver/widget/custom_text.dart';
 import 'package:mann_fleet_driver/widget/navigator_method.dart';
 
-import '../../myBooking/ui/myBookingScreen.dart';
+import '../../bookingDetail/ui/bookingDetailScreen.dart';
+
 
 import '../../trip_cancellation/ui/trip_cancellation.dart';
 import '../component/bookingCard.dart';
 import '../provider/newBookingProvider.dart';
 import 'package:provider/provider.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 
 class NewBookingScreen extends StatefulWidget {
   const NewBookingScreen({super.key});
@@ -22,10 +24,12 @@ class NewBookingScreen extends StatefulWidget {
 }
 
 class _NewBookingScreenState extends State<NewBookingScreen> {
+  int currentIndex = 0;
   @override
   void initState() {
     super.initState();
     Future.microtask(() {
+      context.read<NewBookingProvider>().getBannerApi(context: context);
       context.read<NewBookingProvider>().getNewBooking(context: context);
     });
   }
@@ -54,18 +58,86 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
         if (bookings.isEmpty) {
           return const Center(child: Text("No bookings available"));
         }
-
+        final banners = provider.getBannerModel?.data ?? [];
 
         return Stack(
           children: [
             SingleChildScrollView(
               child: Column(
-                children: [      CustomImageView(
-                  imagePath: AppImages.banner,
-                  height: 150,
-                  width: MediaQuery.of(context).size.width,
-                  fit: BoxFit.cover,
-                ),
+                children: [
+                  if (provider.getBannerModel != null &&
+                      provider.getBannerModel!.data!.isNotEmpty)
+                    Column(
+                      children: [
+                        CarouselSlider(
+                          options: CarouselOptions(
+                            height: 150,
+                            autoPlay: true,
+                            enlargeCenterPage: true,
+                            viewportFraction: 0.95,
+                            onPageChanged: (index, reason) {
+                              setState(() {
+                                currentIndex = index;
+                              });
+                            },
+                          ),
+                          items: provider.getBannerModel!.data!.map((item) {
+                            return ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: CustomImageView(
+                                imagePath: item.image,
+                                width: MediaQuery.of(context).size.width,
+                                fit: BoxFit.cover,
+                                imageType: ImageType.network,
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                        const SizedBox(height: 10),    Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(banners.length, (index) {
+                            bool isActive = index == currentIndex;
+
+                            return AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
+                              margin: const EdgeInsets.symmetric(horizontal: 4),
+                              height: 8,
+                              width: isActive ? 20 : 8,
+                              decoration: BoxDecoration(
+                                color: isActive
+                                    ? ColorResource.primaryColor
+                                    : Colors.grey.shade300,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            );
+                          }),
+                        ),
+
+                        // AnimatedSmoothIndicator(
+                        //   activeIndex: currentIndex,
+                        //   count: provider.getBannerModel!.data!.length,
+                        //   effect: ExpandingDotsEffect(
+                        //     dotHeight: 8,
+                        //     dotWidth: 8,
+                        //     expansionFactor: 3,
+                        //     spacing: 6,
+                        //     radius: 20,
+                        //     dotColor: Colors.grey.shade300,
+                        //     activeDotColor: ColorResource.indigo,
+                        //   ),
+                        // ),
+                      ],
+                    ),
+
+                  // const SizedBox(height: 10),
+
+                //   CustomImageView(
+                //   //                  imagePath: AppImages.banner,
+                //   imagePath: provider.getBannerModel!.data!.first.image,
+                //   height: 150,
+                //   width: MediaQuery.of(context).size.width,
+                //   fit: BoxFit.cover,
+                // ),
 
                   const SizedBox(height: 10),
                   ListView.builder(
@@ -210,6 +282,9 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
               navPush(
                 context: context,
                 action: TripCancellationScreen(
+                  bookingNumber: provider.newBookingModel?.data
+                      ?.firstWhere((e) => e.id.toString() == bookingId)
+                      .bookingNumber,
                   bookingId: bookingId,
                   pickupAddress: provider.newBookingModel?.data
                       ?.firstWhere((e) => e.id.toString() == bookingId)

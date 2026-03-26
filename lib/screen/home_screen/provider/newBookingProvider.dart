@@ -3,9 +3,13 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../myBooking/model/bookingDetailModel.dart';
+import 'package:mann_fleet_driver/widget/navigator_method.dart';
+import '../../../widget/showLoaderFunction.dart';
+
+import '../../bookingDetail/model/bookingDetailModel.dart';
 import '../model/bookingAcceptedModel.dart';
 import '../model/bookingCancelModel.dart';
+import '../model/getBannerModel.dart';
 import '../model/newBookingModel.dart';
 import '../model/pickupVerificationModel.dart';
 import '../model/startTripModel.dart';
@@ -20,10 +24,32 @@ class NewBookingProvider extends ChangeNotifier {
   BookingCancelModel? bookingCancelModel;
   VerifyBookingOtpModel? verifyBookingOtpModel;
   StartTripModel? startTripModel;
+  GetBannerModel? getBannerModel;
 
   bool isLoading = false;
 
   // ── Get pending / assigned bookings ────────────────────────────────────────
+  Future<void> getBannerApi({required BuildContext context}) async {
+    try {
+      isLoading = true;
+      notifyListeners();
+
+      final res = await api.getBannerApi(context: context);
+      getBannerModel = res;
+
+      if (res != null && res.status == true) {
+        debugPrint("getBannerApis fetched successfully");
+      } else {
+        debugPrint("Failed to fetch getBannerApis");
+      }
+    } catch (e) {
+      debugPrint("Error fetching new bookings: $e");
+      // TODO: show error toast/snackbar here
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }  // ── Get pending / assigned bookings ────────────────────────────────────────
   Future<void> getNewBooking({required BuildContext context}) async {
     try {
       isLoading = true;
@@ -84,12 +110,13 @@ class NewBookingProvider extends ChangeNotifier {
     try {
       // isLoading = true;
       notifyListeners();
-
+      showLoader(context);
       final res = await api.driverCancelRequest(
         context: context,
         id: id,
         reason: reason,
       );
+      navPop(context: context);
       bookingCancelModel = res;
 
       if (res != null && res.status == true) {

@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="mann_fleet_driver"
+        android:label="Mann Fleet Driver"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

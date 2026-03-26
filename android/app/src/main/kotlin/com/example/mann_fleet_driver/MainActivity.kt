@@ -1,4 +1,4 @@
-package com.example.mann_fleet_driver
+package com.driver.mannfleet
 
 import io.flutter.embedding.android.FlutterActivity
 

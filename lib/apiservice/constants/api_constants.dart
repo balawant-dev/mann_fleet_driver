@@ -9,11 +9,12 @@ class ApiConstants {
   static const String verifyOtp = '/api/driver/verifyOtp';
 
   static const String signUp = '/api/driver/signUp';
-  static const String banner = '/api/driver/banner';
+  // static const String banner = '/api/driver/banner';
   static const String bookingEstimate = '/api/driver/bookingEstimate';
   static const String booking = '/api/driver/booking';
   static const String profile = '/api/driver/profile';
   static const String getMyAssignedBookings = '/api/driver/getMyAssignedBookings';
+  static const String banner = '/api/driver/banner?type=driver';
   static const String acceptBooking = '/api/driver/acceptBooking';
   static const String startTrip = '/api/driver/startTrip';
   static const String verifyBookingOtp = '/api/driver/verifyBookingOtp';

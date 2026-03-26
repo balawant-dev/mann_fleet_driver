@@ -47,8 +47,8 @@
 //
 //     /// 📩 FOREGROUND message
 //     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-//       final notification = message.notification;
-//       if (notification != null) {
+//       final notification= message.notification;
+//       if (notification!= null) {
 //         AwesomeNotifications().createNotification(
 //           content: NotificationContent(
 //             id: DateTime.now().millisecondsSinceEpoch ~/ 1000,

@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import '../../../widget/navigator_method.dart';
 import '../../drawer/ui/custom_drawer.dart';
 
+import '../../notification/ui/notificationScreen.dart';
 import '../../profileManagement/screen/personal_profile_screen.dart';
 import '../provider/newBookingProvider.dart';
 
@@ -111,11 +112,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               Spacer(),
-              CustomImageView(
-                imagePath: AppIcons.bellIcon,
-                fit: BoxFit.cover,
-                width: 17,
-                height: 20,
+              GestureDetector(
+                onTap: (){
+                  navPush(context: context, action: NotificationScreen());
+                },
+                child: CustomImageView(
+                  imagePath: AppIcons.bellIcon,
+                  fit: BoxFit.cover,
+                  width: 17,
+                  height: 20,
+                ),
               ),
               SizedBox(width: 20,),
               Container(

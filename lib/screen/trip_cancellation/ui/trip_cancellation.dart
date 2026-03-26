@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:mann_fleet_driver/util/color/app_colors.dart';
+import 'package:mann_fleet_driver/widget/navigator_method.dart';
 import '../../../widget/commonAppBar.dart';
 import '../../../widget/commonAppButton.dart';
-
+import '../../home_screen/provider/newBookingProvider.dart';
+import 'package:provider/provider.dart';
 class TripCancellationScreen extends StatefulWidget {
   final String bookingId;
   final String? pickupAddress;
@@ -96,7 +98,7 @@ class _TripCancellationScreenState extends State<TripCancellationScreen> {
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: const CommonAppBar(
         title: 'Cancel Trip',
-        isBack: true,
+        isBack: false,
       ),
       bottomSheet: Container(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
@@ -105,7 +107,7 @@ class _TripCancellationScreenState extends State<TripCancellationScreen> {
           text: 'Confirm Cancellation',
           // enabled: _canSubmit,
           onPressed: _canSubmit
-              ? () {
+              ? ()async {
             final reason = selectedReason == "Other"
                 ? _otherReasonController.text.trim()
                 : selectedReason;
@@ -115,6 +117,25 @@ class _TripCancellationScreenState extends State<TripCancellationScreen> {
                 const SnackBar(content: Text("Please select or enter a reason")),
               );
               return;
+            }
+
+            final provider = context.read<NewBookingProvider>();
+
+            bool success = await provider.driverCancelApi(
+              context: context,
+              id: widget.bookingId,
+              reason: reason! +
+                  (_reviewController.text.trim().isNotEmpty
+                      ? " - ${_reviewController.text.trim()}"
+                      : ""),
+            );
+
+            if (success) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Trip Cancelled Successfully ❌")),
+              );
+
+              // navPop(context: context);
             }
 
             // TODO: Call cancel API here
@@ -130,7 +151,7 @@ class _TripCancellationScreenState extends State<TripCancellationScreen> {
             print("Additional note: ${_reviewController.text.trim()}");
 
             // For demo: pop with success
-            Navigator.pop(context, true);
+            // navPop(context: context);
           }
               : null,
         ),

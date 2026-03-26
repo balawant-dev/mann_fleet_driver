@@ -9,6 +9,7 @@ import 'package:mann_fleet_driver/widget/navigator_method.dart';
 
 import '../../myBooking/ui/myBookingScreen.dart';
 
+import '../../trip_cancellation/ui/trip_cancellation.dart';
 import '../component/bookingCard.dart';
 import '../provider/newBookingProvider.dart';
 import 'package:provider/provider.dart';
@@ -33,7 +34,16 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
     return Consumer<NewBookingProvider>(
       builder: (context, provider, child) {
         if (provider.newBookingModel==null||provider.newBookingModel!.data==null) {
-          return const Center(child: CircularProgressIndicator());
+          return  SizedBox(
+            height:MediaQuery.of(context).size.height*0.7,
+            width: MediaQuery.of(context).size.width,
+            child: Center(child:     ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Image.asset(
+                "assets/images/upcommingBooking.gif",
+              ),
+            ),),
+          );
         }
         // if (provider.isLoading) {
         //   return const Center(child: CircularProgressIndicator());
@@ -196,8 +206,36 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
           button(
             title: "Cancel",
             color: Colors.red,
-            onTap: () => showCancelDialog(bookingId),
+            onTap: () {
+              navPush(
+                context: context,
+                action: TripCancellationScreen(
+                  bookingId: bookingId,
+                  pickupAddress: provider.newBookingModel?.data
+                      ?.firstWhere((e) => e.id.toString() == bookingId)
+                      .pickup?.address,
+                  dropoffAddress: provider.newBookingModel?.data
+                      ?.firstWhere((e) => e.id.toString() == bookingId)
+                      .dropoff?.address,
+                  bookingDateTime: provider.newBookingModel?.data
+                      ?.firstWhere((e) => e.id.toString() == bookingId)
+                      .scheduledAtIST,
+                  fareEstimate: provider.newBookingModel?.data
+                      ?.firstWhere((e) => e.id.toString() == bookingId)
+                      .estimatedFare
+                      ?.toString(),
+                  passengerInfo: provider.newBookingModel?.data
+                      ?.firstWhere((e) => e.id.toString() == bookingId)
+                      .user?.name,
+                ),
+              );
+            },
           ),
+          // button(
+          //   title: "Cancel",
+          //   color: Colors.red,
+          //   onTap: () => showCancelDialog(bookingId),
+          // ),
           button(
             title: "Accept",
             color: Colors.green,

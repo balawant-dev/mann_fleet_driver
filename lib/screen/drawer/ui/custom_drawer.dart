@@ -197,7 +197,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                           );
                         },
                       ),     drawerItem(
-                        icon: Icons.description_outlined,
+                        icon: Icons.fact_check_outlined,
                         title: "Attendance Punch",
                         onTap: () {
                           navPush(

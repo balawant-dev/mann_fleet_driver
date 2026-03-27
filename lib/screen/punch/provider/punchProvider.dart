@@ -154,7 +154,7 @@ class PunchProvider extends ChangeNotifier {
 
       final res = await api.getPunchHistoryApi(context: context);
       getPunchHistoryModel = res;
-      if (res != null || res.success == true) {
+      if (res != null || res.status == true) {
         print(" postPunchInApi Successfully");
       }
     } catch (e) {

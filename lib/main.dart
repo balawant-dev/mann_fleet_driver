@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:mann_fleet_driver/screen/auth/login_screen/provider/loginProvider.dart';
 import 'package:mann_fleet_driver/screen/auth/otp_screen/otpProvider/otpProvider.dart';
@@ -5,7 +6,6 @@ import 'package:mann_fleet_driver/screen/auth/register/provider/registerProvider
 import 'package:mann_fleet_driver/screen/cms/viewModel/cmsPro.dart';
 import 'package:mann_fleet_driver/screen/home_screen/provider/newBookingProvider.dart';
 import 'package:mann_fleet_driver/screen/notification/provider/notificationPro.dart';
-
 import 'package:mann_fleet_driver/screen/profileManagement/provider/compliance_provider.dart';
 import 'package:mann_fleet_driver/screen/profileManagement/provider/driving_credentials_provider.dart';
 import 'package:mann_fleet_driver/screen/profileManagement/provider/personal_profile_provider.dart';
@@ -17,9 +17,20 @@ import 'package:mann_fleet_driver/screen/splash_screen/ui/splash_screen.dart';
 import 'package:mann_fleet_driver/util/theame/app_theme.dart';
 import 'package:provider/provider.dart';
 
+import 'apiservice/services/firebaseService.dart';
+import 'firebase_options.dart';
 
 
-void main() {
+
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  /// Initialize Firebase Service
+  await FirebaseService.init();
   runApp(const MyApp());
 }
 

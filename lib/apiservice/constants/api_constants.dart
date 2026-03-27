@@ -26,6 +26,12 @@ class ApiConstants {
   static const String segment = '/api/driver/segment';
   static const String termsConditions = '/api/driver/termsConditions';
   static const String privacyPolicy = '/api/driver/privacyPolicy';
+  static const String punchIn = '/api/driver/punch/in';
+  static const String punchOut = '/api/driver/punch/out';
+  static const String punchStatus = '/api/driver/punch/status';
+  static const String punchHistory = '/api/driver/punch/history';
+  static const String punchMyPunchRegion = '/api/driver/punch/myPunchRegion';
+
   static const String aboutUs = '/api/driver/aboutUs';
   static const String refundPolicy = '/api/driver/refundPolicy';
 

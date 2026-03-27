@@ -8,6 +8,7 @@ import '../../cms/ui/cMSContentScreen.dart';
 import '../../penalty/ui/penaltyScreen.dart';
 import '../../profileManagement/provider/profileDetailProvider.dart';
 import '../../profileManagement/screen/personal_profile_screen.dart';
+import '../../punch/ui/punchScreen.dart';
 import '../../splash_screen/ui/splash_screen.dart';
 
 class CustomDrawer extends StatefulWidget {
@@ -192,6 +193,17 @@ class _CustomDrawerState extends State<CustomDrawer> {
                             action: const CMSContentScreen(
                               title: "Terms & Conditions",
                               type: CMSContentType.terms,
+                            ),
+                          );
+                        },
+                      ),     drawerItem(
+                        icon: Icons.description_outlined,
+                        title: "Attendance Punch",
+                        onTap: () {
+                          navPush(
+                            context: context,
+                            action: const PunchScreen(
+
                             ),
                           );
                         },

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mann_fleet_driver/screen/profileManagement/screen/profileManagementScreen.dart';
+import 'package:mann_fleet_driver/widget/commonAppBar.dart';
 
 import '../../util/color/app_colors.dart';
 import '../../util/image_resource/image_resource.dart';
@@ -24,9 +26,10 @@ class _MainScreenState extends State<MainScreen> {
   final List<Widget> pages = [
     const HomeScreen(),
     const MyBookingScreenss(),
-    const PerformanceScreen(),
+    // const PerformanceScreen(),
     //const PickupScreen(),
-    const ProfileReviewScreen(),
+    // const ProfileReviewScreen(),
+    ProfileManagementScreen()
 
   ];
 
@@ -69,15 +72,15 @@ class _MainScreenState extends State<MainScreen> {
               unSelectedIcon: "assets/icon/bottom_u_1.png",
             ),
 
-            bottomItem(
-              index: 2,
-              label: "Performance",
-              selectedIcon: "assets/icon/bottom_s_4.png",
-              unSelectedIcon: "assets/icon/bottom_u_4.png",
-            ),
+            // bottomItem(
+            //   index: 2,
+            //   label: "Performance",
+            //   selectedIcon: "assets/icon/bottom_s_4.png",
+            //   unSelectedIcon: "assets/icon/bottom_u_4.png",
+            // ),
 
             bottomItem(
-              index: 3,
+              index: 2,
               label: "Profile",
               selectedIcon: "assets/icon/bottom_s_5.png",
               unSelectedIcon: "assets/icon/bottom_u_5.png",
@@ -138,8 +141,57 @@ class _MyBookingScreenssState extends State<MyBookingScreenss> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: CommonAppBar(
+        title:"Trip History",
+
+      ),
       body: Center(
-        child: Text("My Booking Screen"),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.history,
+                size: 80,
+                color: Colors.grey,
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                "Trip History Coming Soon",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                "We are working on this feature.\nSoon you will be able to see all your past trips here.",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Text(
+                  "Stay Tuned 🚀",
+                  style: TextStyle(
+                    color: Colors.blue,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -9,6 +9,7 @@ import 'package:pinput/pinput.dart';
 import '../../../../apiservice/services/secure_storage_service.dart';
 import '../../../../util/color/app_colors.dart';
 import '../../../../widget/commonAppButton.dart';
+import '../../../../widget/motionToastHelper.dart';
 import '../../../../widget/showLoaderFunction.dart';
 import '../../../bottomBar/bottomBar.dart';
 import '../../../home_screen/ui/home_screen.dart';
@@ -73,16 +74,26 @@ class _OtpScreenState extends State<OtpScreen> {
       });
 
       startTimer();
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("OTP Resent Successfully")),
+      ToastHelper.show(
+        context,
+        message:"OTP Resent Successfully",
+        type: ToastType.success,
       );
+
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(content: Text("OTP Resent Successfully")),
+      // );
 
     } else {
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Failed to resend OTP")),
+      ToastHelper.show(
+        context,
+        message:"Failed to resend OTP",
+        type: ToastType.error,
       );
+
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(content: Text("Failed to resend OTP")),
+      // );
     }
   }
 

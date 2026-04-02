@@ -7,6 +7,7 @@ import 'package:mann_fleet_driver/util/image_resource/image_resource.dart';
 import 'package:mann_fleet_driver/widget/custom_text.dart';
 import 'package:mann_fleet_driver/widget/navigator_method.dart';
 
+import '../../../widget/motionToastHelper.dart';
 import '../../bookingDetail/ui/bookingDetailScreen.dart';
 
 
@@ -321,9 +322,14 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
               );
 
               if (success) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Booking Accepted ✅")),
+                ToastHelper.show(
+                  context,
+                  message:"Booking Accepted ✅",
+                  type: ToastType.success,
                 );
+                // ScaffoldMessenger.of(context).showSnackBar(
+                //   const SnackBar(content: Text("Booking Accepted ✅")),
+                // );
               }
             },
           ),
@@ -369,9 +375,14 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
             );
 
             if (success) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Trip Started 🚗")),
+              ToastHelper.show(
+                context,
+                message:"Trip Started 🚗",
+                type: ToastType.success,
               );
+              // ScaffoldMessenger.of(context).showSnackBar(
+              //   const SnackBar(content: Text("Trip Started 🚗")),
+              // );
             }
           },
         ),
@@ -503,9 +514,14 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
                 Navigator.pop(context);
 
                 if (success) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("OTP Verified ($type) ✅")),
+                  ToastHelper.show(
+                    context,
+                    message:"OTP Verified ($type) ✅",
+                    type: ToastType.success,
                   );
+                  // ScaffoldMessenger.of(context).showSnackBar(
+                  //   SnackBar(content: Text("OTP Verified ($type) ✅")),
+                  // );
                 }
               },
               child: const Text("Verify"),

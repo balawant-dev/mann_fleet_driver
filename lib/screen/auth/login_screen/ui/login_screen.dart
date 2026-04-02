@@ -7,6 +7,7 @@ import 'package:mann_fleet_driver/widget/navigator_method.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../util/color/app_colors.dart';
+import '../../../../widget/motionToastHelper.dart';
 import '../../../../widget/showLoaderFunction.dart';
 import '../../../cms/ui/cMSContentScreen.dart';
 import '../../otp_screen/ui/otp_screen.dart';
@@ -168,12 +169,12 @@ class _LoginScreenState extends State<LoginScreen> {
                           );
 
                         } else {
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("Failed to send OTP"),
-                            ),
+                          ToastHelper.show(
+                            context,
+                            message:"Failed to send OTP",
+                            type: ToastType.error,
                           );
+
 
                         }
 

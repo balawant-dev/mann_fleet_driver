@@ -6,6 +6,7 @@ import '../../../../util/color/app_colors.dart';
 import '../../../../widget/commonAppBar.dart';
 import '../../../../widget/commonAppButton.dart';
 import '../../../../widget/commonTextFormField.dart';
+import '../../../../widget/motionToastHelper.dart';
 import '../../../../widget/navigator_method.dart';
 import '../../../../widget/showLoaderFunction.dart';
 import '../../../bottomBar/bottomBar.dart';
@@ -150,9 +151,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   onPressed: () async {
 
                     if (provider.profileImage == null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Please select profile image")),
+                      ToastHelper.show(
+                        context,
+                        message:"Please select profile image",
+                        type: ToastType.error,
                       );
+                      // ScaffoldMessenger.of(context).showSnackBar(
+                      //   const SnackBar(content: Text("Please select profile image")),
+                      // );
                       return;
                     }
 
@@ -160,6 +166,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         provider.emailController.text.isEmpty ||
                         provider.mobileController.text.length != 10 ||
                         provider.licenceController.text.isEmpty) {
+                      ToastHelper.show(
+                        context,
+                        message:"Please fill all fields correctly",
+                        type: ToastType.error,
+                      );
 
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text("Please fill all fields correctly")),
@@ -190,12 +201,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       );
 
                     } else {
-
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Registration failed. Please try again."),
-                        ),
+                      ToastHelper.show(
+                        context,
+                        message:"Registration failed. Please try again.",
+                        type: ToastType.error,
                       );
+                      //
+                      // ScaffoldMessenger.of(context).showSnackBar(
+                      //   const SnackBar(
+                      //     content: Text("Registration failed. Please try again."),
+                      //   ),
+                      // );
 
                     }
                   },

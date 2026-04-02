@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
@@ -18,6 +20,7 @@ class FuelEntryProvider extends ChangeNotifier {
   final fuelQtyController = TextEditingController();
   final fuelPriceController = TextEditingController();
   final fuelAmountController = TextEditingController();
+  final invoiceNumberController = TextEditingController();
 
   // Location
   String lat = "";
@@ -66,17 +69,195 @@ class FuelEntryProvider extends ChangeNotifier {
   /// Pick Image
   Future<void> pickImage(String type, ImageSource source) async {
     final picked = await picker.pickImage(source: source);
-    if (picked != null) {
-      final file = File(picked.path);
 
+    if (picked != null) {
+      File file = File(picked.path);
+
+      /// ✂️ CROP IMAGE
+      CroppedFile? cropped = await ImageCropper().cropImage(
+        sourcePath: file.path,
+        uiSettings: [
+          AndroidUiSettings(toolbarTitle: "Crop Image"),
+          IOSUiSettings(title: "Crop Image"),
+        ],
+      );
+
+      if (cropped != null) {
+        file = File(cropped.path);
+      }
+
+      /// SET IMAGE
       if (type == "odometer") odometerImage = file;
       if (type == "start") startImage = file;
       if (type == "end") endImage = file;
-      if (type == "bill") billImage = file;
+
+      /// 🧾 BILL IMAGE (MAIN LOGIC 🔥)
+      if (type == "bill") {
+        billImage = file;
+
+        await scanBillOCR(file); // 🔥 AUTO SCAN
+      }
 
       notifyListeners();
     }
   }
+  Future<void> scanBillOCR(File file) async {
+    try {
+      final inputImage = InputImage.fromFile(file);
+      final textRecognizer = TextRecognizer();
+
+      final RecognizedText recognizedText =
+      await textRecognizer.processImage(inputImage);
+
+      textRecognizer.close();
+
+      extractDataAdvanced(recognizedText.text);
+    } catch (e) {
+      debugPrint("OCR Error: $e");
+    }
+  }
+  void extractDataAdvanced(String text) {
+    List<String> invoiceKeys = [
+      "invoice no",
+      "invoice number",
+      "invoice",
+      "bill no",
+      "bill number",
+      "receipt no",
+      "receipt",
+      "txn no",
+      "transaction no",
+      "inv no",
+      "inv",
+      "invoice#",
+      "bill#",
+      "receipt#"
+    ];
+
+    List<String> amountKeys = [
+      "total amount",
+      "total amt",
+      "total",
+      "amount",
+      "amt",
+      "net amount",
+      "sale amount",
+      "grand total",
+      "payable amount",
+      "rs",
+      "rs.",
+      "inr",
+      "₹"
+    ];
+
+    // List<String> invoiceKeys = [
+    //   "invoice no",
+    //   "inv no",
+    //   "bill no",
+    // ];
+    //
+    // List<String> amountKeys = [
+    //   "total amt",
+    //   "total amount",
+    //   "net amt",
+    //   "payable",
+    // ];
+
+    String foundInvoice = "";
+    String foundAmount = "";
+
+    List<String> lines = text.split('\n');
+
+    /// 🔍 INVOICE
+    for (int i = 0; i < lines.length; i++) {
+      String line = lines[i];
+      String l = line.toLowerCase();
+
+      for (String key in invoiceKeys) {
+        if (l.contains(key) && foundInvoice.isEmpty) {
+
+          int index = l.indexOf(key);
+          String after = line.substring(index + key.length);
+
+          RegExp reg = RegExp(r'[:\-\s]*([A-Z0-9\-]{4,})');
+          final match = reg.firstMatch(after);
+
+          if (match != null) {
+            String val = match.group(1)!;
+
+            if (!RegExp(r'^\d+$').hasMatch(val)) {
+              foundInvoice = val;
+              break;
+            }
+          }
+
+          /// next line fallback
+          if (i + 1 < lines.length) {
+            final nextMatch =
+            RegExp(r'([A-Z0-9\-]{4,})').firstMatch(lines[i + 1]);
+
+            if (nextMatch != null) {
+              foundInvoice = nextMatch.group(1)!;
+              break;
+            }
+          }
+        }
+      }
+    }
+
+    /// 💰 AMOUNT
+    List<double> amounts = [];
+
+    for (int i = 0; i < lines.length; i++) {
+      String line = lines[i];
+      String l = line.toLowerCase();
+
+      for (String key in amountKeys) {
+        if (l.contains(key)) {
+          RegExp reg = RegExp(r'(\d+\.?\d{0,2})');
+
+          Iterable<Match> matches = reg.allMatches(line);
+
+          for (var m in matches) {
+            double val = double.tryParse(m.group(0)!) ?? 0;
+
+            if (val > 100 && val < 10000) {
+              amounts.add(val);
+            }
+          }
+        }
+      }
+    }
+
+    if (amounts.isNotEmpty) {
+      amounts.sort();
+      foundAmount = amounts.last.toStringAsFixed(2);
+    }
+
+    /// ✅ AUTO FILL (IMPORTANT 🔥)
+    if (foundInvoice.isNotEmpty) {
+      invoiceNumberController.text = foundInvoice;
+    }
+
+    if (foundAmount.isNotEmpty) {
+      fuelAmountController.text = foundAmount;
+    }
+
+    notifyListeners();
+  }
+  // Future<void> pickImage(String type, ImageSource source) async {
+  //   final picked = await picker.pickImage(source: source);
+  //   if (picked != null) {
+  //     final file = File(picked.path);
+  //
+  //     if (type == "odometer") odometerImage = file;
+  //     if (type == "start") startImage = file;
+  //     if (type == "end") endImage = file;
+  //     if (type == "bill") billImage = file;
+  //
+  //     notifyListeners();
+  //   }
+  // }
 
   /// Auto Calculate Amount
   void calculateAmount() {
@@ -130,6 +311,7 @@ class FuelEntryProvider extends ChangeNotifier {
         carNumber: vehicleController.text,
         fuelType: fuelTypeController.text,
         locationAddress: addressController.text,
+        invoiceNumber:invoiceNumberController.text,//ye bhi
         locationLat: lat,
         locationLng: lng,
         odometerReading: odometerController.text,

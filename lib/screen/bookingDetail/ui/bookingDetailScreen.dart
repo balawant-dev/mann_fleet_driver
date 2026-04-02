@@ -3,6 +3,7 @@ import 'package:mann_fleet_driver/widget/commonAppButton.dart';
 import 'package:mann_fleet_driver/widget/navigator_method.dart';
 
 import '../../../widget/commonAppBar.dart';
+import '../../../widget/motionToastHelper.dart';
 import '../../home_screen/provider/newBookingProvider.dart';
 import '../../pickup/ui/pickUpScreen.dart';
 
@@ -275,10 +276,11 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                     //   },
                     // ),
                     //
-                    const SizedBox(height: 25), CommonAppButton(
-                      text: "End the trip",
-                      onPressed: () {},
-                    ),
+                    const SizedBox(height: 25),
+                    // CommonAppButton(
+                    //   text: "End the trip",
+                    //   onPressed: () {},
+                    // ),
                   ],
                 ),
               ),
@@ -335,9 +337,14 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
           );
 
           if (success) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Trip Started 🚗")),
+            ToastHelper.show(
+              context,
+              message:"Trip Started 🚗",
+              type: ToastType.success,
             );
+            // ScaffoldMessenger.of(context).showSnackBar(
+            //   const SnackBar(content: Text("Trip Started 🚗")),
+            // );
           }
         },
       );
@@ -435,9 +442,14 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                 Navigator.pop(context);
 
                 if (success) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("OTP Verified ($type) ✅")),
+                  ToastHelper.show(
+                    context,
+                    message:"OTP Verified ($type) ✅",
+                    type: ToastType.success,
                   );
+                  // ScaffoldMessenger.of(context).showSnackBar(
+                  //   SnackBar(content: Text("OTP Verified ($type) ✅")),
+                  // );
                 }
               },
               child: const Text("Verify"),

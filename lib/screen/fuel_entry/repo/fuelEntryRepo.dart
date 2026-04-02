@@ -23,6 +23,7 @@ class FuelEntryRepo {
     required String fuelQuantity,
     required String fuelAmount,
     required String fuelPrice,
+    required String invoiceNumber,
     required String odometerMeterImage,
     required String startFuelMeterImage,
     required String endFuelMeterImage,
@@ -43,6 +44,7 @@ class FuelEntryRepo {
         "fuelQuantity": fuelQuantity,
         "fuelAmount": fuelAmount,
         "fuelPrice": fuelPrice,
+        "invoiceNumber": invoiceNumber,
 
         // ✅ Correct Image Upload
         if (odometerMeterImage.isNotEmpty)
@@ -87,6 +89,7 @@ class FuelEntryRepo {
           onRetry: () => fuelEntryAPi(
 
             context: context,
+              invoiceNumber:invoiceNumber,
             fuelType: fuelType,
             carNumber: carNumber,
             billImage: billImage,
@@ -110,6 +113,7 @@ class FuelEntryRepo {
               context: context,
               fuelType: fuelType,
               carNumber: carNumber,
+              invoiceNumber:invoiceNumber,
               billImage: billImage,
               endFuelMeterImage: endFuelMeterImage,
               fuelAmount: fuelAmount,

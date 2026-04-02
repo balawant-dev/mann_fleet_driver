@@ -5,6 +5,7 @@ import 'package:mann_fleet_driver/widget/commonAppBar.dart';
 import '../../util/color/app_colors.dart';
 import '../../util/image_resource/image_resource.dart';
 
+import '../billScanner/ui/billScannerScreen.dart';
 import '../home_screen/ui/home_screen.dart';
 
 import '../performance/ui/performanceScreen.dart';
@@ -25,6 +26,7 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> pages = [
     const HomeScreen(),
+    // BillScannerScreen(),
     const MyBookingScreenss(),
     // const PerformanceScreen(),
     //const PickupScreen(),

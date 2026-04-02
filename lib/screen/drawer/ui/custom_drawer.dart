@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../../apiservice/services/secure_storage_service.dart';
 import '../../cms/ui/cMSContentScreen.dart';
+import '../../fuel_entry/ui/fuel_entry_screen.dart';
 import '../../penalty/ui/penaltyScreen.dart';
 import '../../profileManagement/provider/profileDetailProvider.dart';
 import '../../profileManagement/screen/personal_profile_screen.dart';
@@ -196,13 +197,25 @@ class _CustomDrawerState extends State<CustomDrawer> {
                             ),
                           );
                         },
-                      ),     drawerItem(
+                      ),
+                      drawerItem(
                         icon: Icons.fact_check_outlined,
                         title: "Attendance Punch",
                         onTap: () {
                           navPush(
                             context: context,
                             action: const PunchScreen(
+
+                            ),
+                          );
+                        },
+                      ),         drawerItem(
+                        icon: Icons.fact_check_outlined,
+                        title: "Fuel Entry",
+                        onTap: () {
+                          navPush(
+                            context: context,
+                            action:  FuelEntryScreen(
 
                             ),
                           );

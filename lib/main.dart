@@ -4,6 +4,7 @@ import 'package:mann_fleet_driver/screen/auth/login_screen/provider/loginProvide
 import 'package:mann_fleet_driver/screen/auth/otp_screen/otpProvider/otpProvider.dart';
 import 'package:mann_fleet_driver/screen/auth/register/provider/registerProvider.dart';
 import 'package:mann_fleet_driver/screen/cms/viewModel/cmsPro.dart';
+import 'package:mann_fleet_driver/screen/fuel_entry/pro/fuelEntryPro.dart';
 import 'package:mann_fleet_driver/screen/home_screen/provider/newBookingProvider.dart';
 import 'package:mann_fleet_driver/screen/notification/provider/notificationPro.dart';
 import 'package:mann_fleet_driver/screen/profileManagement/provider/compliance_provider.dart';
@@ -56,7 +57,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => EditVehicleDetailsPro()),
         ChangeNotifierProvider(create: (_) => CMSProvider()),
         ChangeNotifierProvider(create: (_) => NewBookingProvider()),
-        // ChangeNotifierProvider(create: (_) => BookingDetailProvider()),
+        ChangeNotifierProvider(create: (_) => FuelEntryProvider()),
       ],
 
       child: MaterialApp(

@@ -161,7 +161,9 @@ class ProfileRepo {
     } catch (e) {
       throw ApiException(0, e.toString());
     }
-  }Future<RegisterModel> updateComplianceFull({
+  }
+
+  Future<RegisterModel> updateComplianceFull({
     required File? adhaarFront,
     required File? adhaarBack,
     required File? panFront,

@@ -37,6 +37,7 @@ class CommonTextFormField extends StatefulWidget {
   final Color? backgroundColor;
   final Color? borderColor;
   final double borderRadius;
+  final bool isRequired;
 
   const CommonTextFormField({
     super.key,
@@ -68,6 +69,7 @@ class CommonTextFormField extends StatefulWidget {
     this.backgroundColor = Colors.white,
     this.borderColor,
     this.borderRadius = 30.0,
+    this.isRequired = false,
   });
 
   @override
@@ -106,7 +108,27 @@ class _CommonTextFormFieldState extends State<CommonTextFormField> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(widget.labelText ?? "",style: TextStyle(fontSize: 12,color: Colors.black),),
+        if (widget.labelText != null)
+          RichText(
+            text: TextSpan(
+              text: widget.labelText!,
+              style: const TextStyle(  fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: ColorResource.grayText,),
+              children: widget.isRequired
+                  ? const [
+                TextSpan(
+                  text: " *",
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ]
+                  : [],
+            ),
+          ),
+        // Text(widget.labelText ?? "",style: TextStyle(fontSize: 12,color: Colors.black),),
         SizedBox(height: 5,),
 
 

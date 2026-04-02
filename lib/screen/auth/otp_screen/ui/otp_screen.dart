@@ -197,18 +197,11 @@ class _OtpScreenState extends State<OtpScreen> {
                   length: 4,
                   defaultPinTheme: defaultPinTheme,
                   onChanged: (value) {
-                    setState(() {}); // 👈 IMPORTANT
+                    setState(() {});
                   },
-                ),
-                const SizedBox(height: 25),
-                //
 
-                CommonAppButton(
-                  text: 'Verify Now',
-                  backgroundColor: isOtpValid ? ColorResource.primaryColor : Colors.grey,
-                  onPressed: isOtpValid
-                      ? () async {
-
+                  /// 🔥 AUTO VERIFY HERE
+                  onCompleted: (value) async {
                     showLoader(context);
 
                     final otpProvider = context.read<OtpProvider>();
@@ -218,18 +211,17 @@ class _OtpScreenState extends State<OtpScreen> {
                     await otpProvider.verifyOtp(
                       context: context,
                       phone: widget.mobileNumber,
-                      otp: otpController.text,
+                      otp: value,
                       fcmToken: "temp_token",
                       deviceID: "temp_device",
                     );
 
-                    /// ❌ CLOSE LOADER
                     Navigator.pop(context);
 
                     if (otpProvider.verifyOtpModel != null &&
                         otpProvider.verifyOtpModel!.status == true) {
 
-                      /// 🔹 GET PROFILE (IMPORTANT 🔥)
+                      /// 🔹 GET PROFILE
                       showLoader(context);
 
                       await profileProvider.getProfileApi(context: context);
@@ -238,7 +230,6 @@ class _OtpScreenState extends State<OtpScreen> {
 
                       final driver = profileProvider.getProfileModel?.data?.driver;
 
-                      /// 🔥 SAVE ALL STATES LOCALLY
                       await SecureStorageService.saveFirstUser(driver?.firstUser ?? false);
                       await SecureStorageService.saveProfileComplete(driver?.isProfileComplete ?? false);
                       await SecureStorageService.saveVerified(driver?.isVerified ?? false);
@@ -248,34 +239,21 @@ class _OtpScreenState extends State<OtpScreen> {
                         return;
                       }
 
-                      /// 🔥 SAME LOGIC AS SPLASH
+                      /// 🔥 NAVIGATION LOGIC
                       if (driver.firstUser == true) {
-
                         navPushReplace(
                           context: context,
                           action: RegisterScreen(
                             mobileNumber: widget.mobileNumber,
                           ),
                         );
-
                       } else if (driver.isProfileComplete == false) {
-
                         navPushBottomRemove(
                           duration: 1,
                           context: context,
                           action: const ProfileManagementScreen(),
                         );
-
-                      } else if (driver.isVerified == false) {
-
-                        navPushBottomRemove(
-                          duration: 1,
-                          context: context,
-                          action: const MainScreen(),
-                        );
-
                       } else {
-
                         navPushBottomRemove(
                           duration: 1,
                           context: context,
@@ -284,75 +262,103 @@ class _OtpScreenState extends State<OtpScreen> {
                       }
 
                     } else {
-
                       _showError("Invalid OTP");
-
                     }
-
-                  }
-                      : null,
-                  // onPressed: isOtpValid
-                  //     ? () async {
-                  //   showLoader(context);
-                  //
-                  //   final provider = context.read<OtpProvider>();
-                  //
-                  //   await provider.verifyOtp(
-                  //       context: context,
-                  //       phone: widget.mobileNumber,
-                  //       otp: otpController.text,
-                  //       fcmToken: "Jab Firebase par kaam karenge tab dunga ok",
-                  //     deviceID: "Bhai Abhi Device ID Static use ho rha hai ok Jab tumko jarurat padega to bta dena dynamic kar dunga"
-                  //   );
-                  //   Navigator.pop(context);
-                  //
-                  //   if (provider.verifyOtpModel != null &&
-                  //       provider.verifyOtpModel!.status == true) {
-                  //     // navPushBottomRemove(
-                  //     //   duration: 1,
-                  //     //   context: context,
-                  //     //   action: const MainScreen(),
-                  //     // );
-                  //     if(provider.verifyOtpModel!.data!.astrologer!.firstUser==true){
-                  //       navPushReplace(
-                  //         context: context,
-                  //         action:  RegisterScreen(mobileNumber:  widget.mobileNumber,),
-                  //       );
-                  //
-                  //     }else       if(provider.verifyOtpModel!.data!.astrologer!.isProfileComplete==false){
-                  //       navPushBottomRemove(
-                  //         duration: 1,
-                  //         context: context,
-                  //         action: const ProfileManagementScreen(),
-                  //       );
-                  //
-                  //     }else  if(provider.verifyOtpModel!.data!.astrologer!.isVerified==false){
-                  //       navPushBottomRemove(
-                  //         duration: 1,
-                  //         context: context,
-                  //         action: const MainScreen(),
-                  //       );
-                  //
-                  //     }
-                  //
-                  //
-                  //     // navPushReplace(
-                  //     //   context: context,
-                  //     //   action: const MainScreen(),
-                  //     // );
-                  //
-                  //   } else {
-                  //
-                  //     ScaffoldMessenger.of(context).showSnackBar(
-                  //       const SnackBar(
-                  //         content: Text("Invalid OTP"),
-                  //       ),
-                  //     );
-                  //
-                  //   }
-                  // }
-                  //     : null,
+                  },
                 ),
+                const SizedBox(height: 25),
+                //
+
+                // CommonAppButton(
+                //   text: 'Verify Now',
+                //   backgroundColor: isOtpValid ? ColorResource.primaryColor : Colors.grey,
+                //   onPressed: isOtpValid
+                //       ? () async {
+                //
+                //     showLoader(context);
+                //
+                //     final otpProvider = context.read<OtpProvider>();
+                //     final profileProvider = context.read<ProfileDetailProvider>();
+                //
+                //     /// 🔹 VERIFY OTP
+                //     await otpProvider.verifyOtp(
+                //       context: context,
+                //       phone: widget.mobileNumber,
+                //       otp: otpController.text,
+                //       fcmToken: "temp_token",
+                //       deviceID: "temp_device",
+                //     );
+                //
+                //     /// ❌ CLOSE LOADER
+                //     Navigator.pop(context);
+                //
+                //     if (otpProvider.verifyOtpModel != null &&
+                //         otpProvider.verifyOtpModel!.status == true) {
+                //
+                //       /// 🔹 GET PROFILE (IMPORTANT 🔥)
+                //       showLoader(context);
+                //
+                //       await profileProvider.getProfileApi(context: context);
+                //
+                //       Navigator.pop(context);
+                //
+                //       final driver = profileProvider.getProfileModel?.data?.driver;
+                //
+                //       /// 🔥 SAVE ALL STATES LOCALLY
+                //       await SecureStorageService.saveFirstUser(driver?.firstUser ?? false);
+                //       await SecureStorageService.saveProfileComplete(driver?.isProfileComplete ?? false);
+                //       await SecureStorageService.saveVerified(driver?.isVerified ?? false);
+                //
+                //       if (driver == null) {
+                //         _showError("Something went wrong");
+                //         return;
+                //       }
+                //
+                //       /// 🔥 SAME LOGIC AS SPLASH
+                //       if (driver.firstUser == true) {
+                //
+                //         navPushReplace(
+                //           context: context,
+                //           action: RegisterScreen(
+                //             mobileNumber: widget.mobileNumber,
+                //           ),
+                //         );
+                //
+                //       } else if (driver.isProfileComplete == false) {
+                //
+                //         navPushBottomRemove(
+                //           duration: 1,
+                //           context: context,
+                //           action: const ProfileManagementScreen(),
+                //         );
+                //
+                //       } else if (driver.isVerified == false) {
+                //
+                //         navPushBottomRemove(
+                //           duration: 1,
+                //           context: context,
+                //           action: const MainScreen(),
+                //         );
+                //
+                //       } else {
+                //
+                //         navPushBottomRemove(
+                //           duration: 1,
+                //           context: context,
+                //           action: const MainScreen(),
+                //         );
+                //       }
+                //
+                //     } else {
+                //
+                //       _showError("Invalid OTP");
+                //
+                //     }
+                //
+                //   }
+                //       : null,
+                //
+                // ),
 
 
                 const SizedBox(height: 20),

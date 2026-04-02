@@ -123,32 +123,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   height: 20,
                 ),
               ),
-              SizedBox(width: 20,),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 4,vertical: 2),
-                decoration: BoxDecoration(
-                  color: ColorResource.yellow,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.star,size: 18,color: ColorResource.grayColor,),
-                    CustomText(
-                      profilePro.getProfileModel?.data?.driver?.rating.toString()??"5.0",
-                      size: 15,
-                      weight: FontWeight.w500,
-                      color: ColorResource.grayColor,
-                    )
-                  ],
-                ),
-              ),
-              SizedBox(width: 25,),
-              CustomImageView(
-                imagePath: AppIcons.callIcon,
-                fit: BoxFit.cover,
-                width: 20,
-                height: 20,
-              )
+              // SizedBox(width: 20,),
+
+
+              // CustomImageView(
+              //   imagePath: AppIcons.callIcon,
+              //   fit: BoxFit.cover,
+              //   width: 20,
+              //   height: 20,
+              // )
 
             ],
           ),

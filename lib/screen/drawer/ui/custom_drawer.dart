@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:mann_fleet_driver/screen/profileManagement/screen/profileManagementScreen.dart';
+import 'package:mann_fleet_driver/util/color/app_colors.dart';
 import 'package:mann_fleet_driver/widget/navigator_method.dart';
 import 'package:provider/provider.dart';
 
 import '../../../apiservice/services/secure_storage_service.dart';
+import '../../../widget/custom_text.dart';
 import '../../cms/ui/cMSContentScreen.dart';
 import '../../fuel_entry/ui/fuel_entry_screen.dart';
 import '../../penalty/ui/penaltyScreen.dart';
@@ -36,7 +38,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.only(top: 50, bottom: 24),
-              color: Colors.black,
+              color: ColorResource.primaryColor,
               child: GestureDetector(
                 onTap: (){
                   navPush(context: context, action: PersonalProfileScreen());
@@ -92,6 +94,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
                       ),
                     ),
                     SizedBox(height: 6),
+
+                    // SizedBox(height: 6),
                     Text(
                       profilePro.getProfileModel?.data?.driver?.email??"Update Profile",
                       style: TextStyle(
@@ -129,36 +133,68 @@ class _CustomDrawerState extends State<CustomDrawer> {
                         },
                       ),
                       drawerItem(
-                        icon: Icons.gavel_outlined,
-                        title: "Deduction",
-                        onTap: () {
-                          navPush(context: context, action: PenaltyScreen());
-                          // TODO: Navigate to penalty screen
-                        },
+                        icon: Icons.star_border,
+                        title: "Driver Rating",
+                        onTap: () {}, // optional
+                        trailing: Container(
+                          margin: const EdgeInsets.only(top: 12),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: Colors.amber.shade100,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: Colors.amber.shade300),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.star, size: 18, color: Colors.orange),
+                              const SizedBox(width: 4),
+                              Text(
+                                (double.tryParse(
+                                  profilePro.getProfileModel?.data?.driver?.rating?.toString() ?? "0",
+                                ) ??
+                                    0.0)
+                                    .toStringAsFixed(1),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
+                      // drawerItem(
+                      //   icon: Icons.gavel_outlined,
+                      //   title: "Deduction",
+                      //   onTap: () {
+                      //     navPush(context: context, action: PenaltyScreen());
+                      //     // TODO: Navigate to penalty screen
+                      //   },
+                      // ),
                       // drawerItem(
                       //   icon: Icons.payment_outlined,
                       //   title: "Payment Method",
                       //   onTap: () {},
                       // ),
-                      drawerItem(
-                        icon: Icons.currency_rupee,
-                        title: "Refund Policy",
-                        onTap: () {
-                          navPush(
-                            context: context,
-                            action: const CMSContentScreen(
-                              title: "Refund Policy",
-                              type: CMSContentType.refund,
-                            ),
-                          );
-                        },
-                      ),
                       // drawerItem(
-                      //   icon: Icons.support_agent,
-                      //   title: "Help & Support",
-                      //   onTap: () {},
+                      //   icon: Icons.currency_rupee,
+                      //   title: "Refund Policy",
+                      //   onTap: () {
+                      //     navPush(
+                      //       context: context,
+                      //       action: const CMSContentScreen(
+                      //         title: "Refund Policy",
+                      //         type: CMSContentType.refund,
+                      //       ),
+                      //     );
+                      //   },
                       // ),
+                      drawerItem(
+                        icon: Icons.support_agent,
+                        title: "Help & Support",
+                        onTap: () {},
+                      ),
                       drawerItem(
                         icon: Icons.info_outline,
                         title: "About us",
@@ -198,29 +234,32 @@ class _CustomDrawerState extends State<CustomDrawer> {
                           );
                         },
                       ),
-                      drawerItem(
-                        icon: Icons.fact_check_outlined,
-                        title: "Attendance Punch",
-                        onTap: () {
-                          navPush(
-                            context: context,
-                            action: const PunchScreen(
+                      //driver rating
 
-                            ),
-                          );
-                        },
-                      ),         drawerItem(
-                        icon: Icons.fact_check_outlined,
-                        title: "Fuel Entry",
-                        onTap: () {
-                          navPush(
-                            context: context,
-                            action:  FuelEntryScreen(
-
-                            ),
-                          );
-                        },
-                      ),
+                      // drawerItem(
+                      //   icon: Icons.fact_check_outlined,
+                      //   title: "Attendance Punch",
+                      //   onTap: () {
+                      //     navPush(
+                      //       context: context,
+                      //       action: const PunchScreen(
+                      //
+                      //       ),
+                      //     );
+                      //   },
+                      //  ),
+                // drawerItem(
+                //         icon: Icons.fact_check_outlined,
+                //         title: "Fuel Entry",
+                //         onTap: () {
+                //           navPush(
+                //             context: context,
+                //             action:  FuelEntryScreen(
+                //
+                //             ),
+                //           );
+                //         },
+                //       ),
 
                       const Divider(height: 32, thickness: 1),
 
@@ -230,21 +269,26 @@ class _CustomDrawerState extends State<CustomDrawer> {
                         onTap: () => showLogoutDialog(context),
                         color: Colors.red,
                       ),
+                      // Spacer(),
+
                     ],
                   ),
                 ),
               ),
             ),
+            Text("Version 1.0.0",style: TextStyle(color: Colors.grey),),SizedBox(height: 5,)
           ],
         ),
       );
     },);
   }
+
   Widget drawerItem({
     required IconData icon,
     required VoidCallback onTap,
     required String title,
-    Color? color, // optional - only for special cases like logout
+    Color? color,
+    Widget? trailing, // 👈 add this
   }) {
     final textColor = color ?? Colors.black87;
     final iconColor = color ?? Colors.black54;
@@ -255,20 +299,21 @@ class _CustomDrawerState extends State<CustomDrawer> {
         padding: const EdgeInsets.symmetric(vertical: 14),
         child: Row(
           children: [
-            Icon(
-              icon,
-              size: 22,
-              color: iconColor,
-            ),
+            Icon(icon, size: 22, color: iconColor),
             const SizedBox(width: 18),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 14,
-                color: textColor,
-                fontWeight: FontWeight.w400,
+
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: textColor,
+                  fontWeight: FontWeight.w400,
+                ),
               ),
             ),
+
+            if (trailing != null) trailing, // 👈 show trailing here
           ],
         ),
       ),

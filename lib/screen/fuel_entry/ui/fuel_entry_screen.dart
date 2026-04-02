@@ -15,6 +15,7 @@ import 'package:provider/provider.dart';
 
 import 'dart:io';
 
+import '../../vehicle/provider/editVehicalDetailPro.dart';
 import '../pro/fuelEntryPro.dart';
 
 
@@ -31,7 +32,9 @@ class _FuelEntryScreenState extends State<FuelEntryScreen> {
     // TODO: implement initState
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<EditVehicleDetailsPro>().getVehicleApi(context: context);
       context.read<FuelEntryProvider>().getCurrentLocation();
+
     });
   }
   // in
@@ -44,16 +47,19 @@ class _FuelEntryScreenState extends State<FuelEntryScreen> {
             appBar: CommonAppBar(title: 'Fuel Entry'),
             backgroundColor: ColorResource.white,
 
-            bottomSheet: Padding(
-              padding: const EdgeInsets.all(15),
-              child: CommonAppButton(
-                text: 'Submit Entry',
-                onPressed: () => provider.submit(context),
+            bottomSheet: ColoredBox(
+              color:  ColorResource.white,
+              child: Padding(
+                padding: const EdgeInsets.all(15),
+                child: CommonAppButton(
+                  text: 'Submit Entry',
+                  onPressed: () => provider.submit(context),
+                ),
               ),
             ),
 
             body: SingleChildScrollView(
-              padding: const EdgeInsets.all(15),
+              padding: const EdgeInsets.all(14),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

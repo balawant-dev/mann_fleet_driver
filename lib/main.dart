@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:mann_fleet_driver/screen/auth/login_screen/provider/loginProvider.dart';
 import 'package:mann_fleet_driver/screen/auth/otp_screen/otpProvider/otpProvider.dart';
 import 'package:mann_fleet_driver/screen/auth/register/provider/registerProvider.dart';
+import 'package:mann_fleet_driver/screen/bookingHistory/provider/bookingHistoryPro.dart';
 import 'package:mann_fleet_driver/screen/cms/viewModel/cmsPro.dart';
 import 'package:mann_fleet_driver/screen/fuel_entry/pro/fuelEntryPro.dart';
 import 'package:mann_fleet_driver/screen/home_screen/provider/newBookingProvider.dart';
@@ -58,6 +59,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => CMSProvider()),
         ChangeNotifierProvider(create: (_) => NewBookingProvider()),
         ChangeNotifierProvider(create: (_) => FuelEntryProvider()),
+        ChangeNotifierProvider(create: (_) => BookingHistoryProvider()),
       ],
 
       child: MaterialApp(

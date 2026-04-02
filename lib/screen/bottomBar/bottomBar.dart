@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:mann_fleet_driver/screen/profileManagement/screen/profileManagementScreen.dart';
+import 'package:mann_fleet_driver/screen/punch/provider/punchProvider.dart';
 import 'package:mann_fleet_driver/widget/commonAppBar.dart';
 
 import '../../util/color/app_colors.dart';
 import '../../util/image_resource/image_resource.dart';
 
 import '../billScanner/ui/billScannerScreen.dart';
+import '../bookingHistory/ui/bookingHistoryScreen.dart';
+import '../fuel_entry/ui/fuel_entry_screen.dart';
 import '../home_screen/ui/home_screen.dart';
 
 import '../performance/ui/performanceScreen.dart';
 import '../pickup/ui/pickUpScreen.dart';
 import '../profile/ui/profile_screen.dart';
+import '../punch/ui/punchScreen.dart';
 
 
 class MainScreen extends StatefulWidget {
@@ -27,11 +31,13 @@ class _MainScreenState extends State<MainScreen> {
   final List<Widget> pages = [
     const HomeScreen(),
     // BillScannerScreen(),
-    const MyBookingScreenss(),
+    const BookingHistoryScreen(),
+    const PunchScreen(),
+    const FuelEntryScreen(),
     // const PerformanceScreen(),
     //const PickupScreen(),
     // const ProfileReviewScreen(),
-    ProfileManagementScreen()
+    // ProfileManagementScreen()
 
   ];
 
@@ -83,9 +89,14 @@ class _MainScreenState extends State<MainScreen> {
 
             bottomItem(
               index: 2,
-              label: "Profile",
-              selectedIcon: "assets/icon/bottom_s_5.png",
-              unSelectedIcon: "assets/icon/bottom_u_5.png",
+              label: "Punch",
+              selectedIcon: "assets/icon/punchS.png",
+              unSelectedIcon: "assets/icon/punchU.png",
+            ),bottomItem(
+              index: 3,
+              label: "Fuel Entry",
+              selectedIcon: "assets/icon/feulS.png",
+              unSelectedIcon: "assets/icon/feulU.png",
             ),
           ],
         ),
@@ -145,6 +156,7 @@ class _MyBookingScreenssState extends State<MyBookingScreenss> {
     return Scaffold(
       appBar: CommonAppBar(
         title:"Trip History",
+        // isBack: true,
 
       ),
       body: Center(

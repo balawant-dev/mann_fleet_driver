@@ -16,6 +16,8 @@ class BookingCard extends StatelessWidget {
   final String driverStatus;
   final String pickupAddress;
   final String dropAddress;
+  final String tripStatus;
+  final String color;
   final VoidCallback onCardTap;
   final Widget button;
 
@@ -28,7 +30,9 @@ class BookingCard extends StatelessWidget {
     required this.vehicleNo,
     required this.vehicleModel,
     required this.bookingId,
+    required this.color,
     required this.driverStatus,
+    required this.tripStatus,
     required this.pickupAddress,
     required this.dropAddress,
     required this.onCardTap,
@@ -100,17 +104,19 @@ class BookingCard extends StatelessWidget {
                     CustomText("BOOKING TYPE", size: 12, weight: FontWeight.w700, color: ColorResource.grayText),
                     CustomText(bookingType, size: 16, weight: FontWeight.w700, color: ColorResource.black),
                     const SizedBox(height: 10),
-                    CustomText("OTP", size: 12, weight: FontWeight.w700, color: ColorResource.grayText),
-                    const CustomText("1234", size: 16, weight: FontWeight.w700, color: ColorResource.black),
+                    //tripStatus
+                    CustomText("TRIP STATUS", size: 12, weight: FontWeight.w700, color: ColorResource.grayText),
+                     CustomText(tripStatus, size: 16, weight: FontWeight.w700, color: ColorResource.black),
                   ],
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CustomText("Vehicle No", size: 12, weight: FontWeight.w700, color: ColorResource.grayText),
+                    //Vehicle
+                    CustomText("VEHICLE NO", size: 12, weight: FontWeight.w700, color: ColorResource.grayText),
                     CustomText(vehicleNo, size: 16, weight: FontWeight.w700, color: ColorResource.black),
                     const SizedBox(height: 10),
-                    CustomText("STATUS", size: 12, weight: FontWeight.w700, color: ColorResource.grayText),
+                    CustomText("DRIVER STATUS", size: 12, weight: FontWeight.w700, color: ColorResource.grayText),
                     CustomText(driverStatus, size: 16, weight: FontWeight.w700, color: ColorResource.black),
                   ],
                 ),
@@ -167,6 +173,12 @@ class BookingCard extends StatelessWidget {
               children: [
                 CustomText("Vehicle Model", size: 14, color: ColorResource.grayText),
                 CustomText(vehicleModel, size: 14, color: ColorResource.black),
+              ],
+            ),    Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CustomText("Color", size: 14, color: ColorResource.grayText),
+                CustomText(color, size: 14, color: ColorResource.black),
               ],
             ),
 

@@ -238,6 +238,7 @@ class _ComplianceScreenState extends State<ComplianceScreen> {
             CommonTextFormField(
               controller: provider.adhaarNumber,
               labelText: "Aadhaar Number",
+              keyboardType: TextInputType.number,
             ),
 
             const SizedBox(height: 10),
@@ -331,6 +332,7 @@ class _ComplianceScreenState extends State<ComplianceScreen> {
                 provider.submitCompliance(context);
               },
             ),
+            const SizedBox(height: 100),
           ],
         ),
       ),

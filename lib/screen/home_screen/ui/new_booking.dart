@@ -7,6 +7,7 @@ import 'package:mann_fleet_driver/util/image_resource/image_resource.dart';
 import 'package:mann_fleet_driver/widget/custom_text.dart';
 import 'package:mann_fleet_driver/widget/navigator_method.dart';
 
+import '../../../widget/empty/noAssignedBookingScreen.dart';
 import '../../../widget/motionToastHelper.dart';
 import '../../bookingDetail/ui/bookingDetailScreen.dart';
 
@@ -57,7 +58,11 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
         final bookings = provider.newBookingModel?.data ?? [];
 
         if (bookings.isEmpty) {
-          return const Center(child: Text("No bookings available"));
+          return NoAssignedBookingScreen(onRefresh: (){
+            context.read<NewBookingProvider>().getBannerApi(context: context);
+            context.read<NewBookingProvider>().getNewBooking(context: context);
+          },);
+          //return const Center(child: Text("No bookings available"));
         }
         final banners = provider.getBannerModel?.data ?? [];
 
@@ -172,8 +177,10 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
                           bookingType: booking.bookingType ?? "One Way",
                           vehicleNo: "DL 1C AB 1234",
                           vehicleModel: booking.vehicle?.model ?? "Mercedes E-Class",
+                          color: booking.vehicle?.color ?? "White",
                           bookingId: booking.id?.toString() ?? "",
                           driverStatus: booking.driverResponse?.status ?? "pending",
+                          tripStatus:  booking.tripStatus ??  "Not Started",
                           pickupAddress: booking.pickup?.address ?? "Noida Sector 63",
                           dropAddress: booking.dropoff?.address ?? "Delhi Airport",
                           onCardTap: () {

@@ -47,7 +47,7 @@ class _FuelEntryScreenState extends State<FuelEntryScreen> {
             appBar: CommonAppBar(title: 'Fuel Entry'),
             backgroundColor: ColorResource.white,
 
-            bottomSheet: ColoredBox(
+            bottomNavigationBar: ColoredBox(
               color:  ColorResource.white,
               child: Padding(
                 padding: const EdgeInsets.all(15),
@@ -294,24 +294,26 @@ class _FuelEntryScreenState extends State<FuelEntryScreen> {
   void _pick(BuildContext context, FuelEntryProvider provider, String type) {
     showModalBottomSheet(
       context: context,
-      builder: (_) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ListTile(
-            title: const Text("Camera"),
-            onTap: () {
-              Navigator.pop(context);
-              provider.pickImage(type, ImageSource.camera);
-            },
-          ),
-          ListTile(
-            title: const Text("Gallery"),
-            onTap: () {
-              Navigator.pop(context);
-              provider.pickImage(type, ImageSource.gallery);
-            },
-          ),
-        ],
+      builder: (_) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: const Text("Camera"),
+              onTap: () {
+                Navigator.pop(context);
+                provider.pickImage(type, ImageSource.camera);
+              },
+            ),
+            ListTile(
+              title: const Text("Gallery"),
+              onTap: () {
+                Navigator.pop(context);
+                provider.pickImage(type, ImageSource.gallery);
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

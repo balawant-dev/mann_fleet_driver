@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:mann_fleet_driver/widget/commonAppButton.dart';
 import 'package:mann_fleet_driver/widget/navigator_method.dart';
 
+import '../../../util/color/app_colors.dart';
 import '../../../widget/commonAppBar.dart';
+import '../../../widget/custom_text.dart';
 import '../../../widget/motionToastHelper.dart';
 import '../../home_screen/provider/newBookingProvider.dart';
 import '../../pickup/ui/pickUpScreen.dart';
@@ -60,8 +62,9 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
 
         final cabType =  "CNG CAB";
         // final cabType = data?.vehicle?.fuelType ?? "CNG CAB";
-        final carInfo =
-            "${data?.vehicle?.model ?? "Dzire"} , ${data?.vehicle?.color ?? "White"}";
+        final model =
+            "${data?.vehicle?.model ?? "Dzire"} "; final color =
+            "${data?.vehicle?.color ?? "White"}";
 
         return Scaffold(
           backgroundColor:  Colors.white,
@@ -231,24 +234,41 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                     ),
 
                     const SizedBox(height: 20),
+                    const Divider(),
 
-                    /// 🔹 CAB
+                    /// Vehicle Model
+                    const SizedBox(height: 10),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 14, vertical: 6),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.green),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(cabType,
-                              style: const TextStyle(color: Colors.green)),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(child: Text(carInfo)),
+                        CustomText("Vehicle Model", size: 14, color: ColorResource.grayText),
+                        CustomText(model, size: 14, color: ColorResource.black),
+                      ],
+                    ),    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        CustomText("Color", size: 14, color: ColorResource.grayText),
+                        CustomText(color, size: 14, color: ColorResource.black),
                       ],
                     ),
+
+                    // /// 🔹 CAB
+                    // Row(
+                    //   children: [
+                    //     Container(
+                    //       padding: const EdgeInsets.symmetric(
+                    //           horizontal: 14, vertical: 6),
+                    //       decoration: BoxDecoration(
+                    //         border: Border.all(color: Colors.green),
+                    //         borderRadius: BorderRadius.circular(20),
+                    //       ),
+                    //       child: Text(cabType,
+                    //           style: const TextStyle(color: Colors.green)),
+                    //     ),
+                    //     const SizedBox(width: 10),
+                    //     Expanded(child: Text(carInfo)),
+                    //   ],
+                    // ),
 
                     const SizedBox(height: 25),
 

@@ -47,58 +47,60 @@ class _MainScreenState extends State<MainScreen> {
     return Scaffold(
       body: pages[currentIndex],
 
-      bottomNavigationBar: Container(
-        height: 70,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              blurRadius: 10,
-              color: Colors.black12,
-            )
-          ],
-        ),
-
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            bottomItem(
-              index: 0,
-              label: "HOME",
-              selectedIcon: "assets/icon/bottom_s_0.png",
-              // selectedIcon: AppIcons.bellIcon,
-              unSelectedIcon: "assets/icon/bottom_u_0.png",
-              // unSelectedIcon: AppIcons.callIcon,
-            ),
-
-            bottomItem(
-              index: 1,
-              label: "Trip",
-              // selectedIcon: AppIcons.bellIcon,
-              // unSelectedIcon: AppIcons.callIcon,
-              selectedIcon: "assets/icon/bottom_s_1.png",
-              unSelectedIcon: "assets/icon/bottom_u_1.png",
-            ),
-
-            // bottomItem(
-            //   index: 2,
-            //   label: "Performance",
-            //   selectedIcon: "assets/icon/bottom_s_4.png",
-            //   unSelectedIcon: "assets/icon/bottom_u_4.png",
-            // ),
-
-            bottomItem(
-              index: 2,
-              label: "Punch",
-              selectedIcon: "assets/icon/punchS.png",
-              unSelectedIcon: "assets/icon/punchU.png",
-            ),bottomItem(
-              index: 3,
-              label: "Fuel Entry",
-              selectedIcon: "assets/icon/feulS.png",
-              unSelectedIcon: "assets/icon/feulU.png",
-            ),
-          ],
+      bottomNavigationBar: SafeArea(
+        child: Container(
+          height: 70,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                blurRadius: 10,
+                color: Colors.black12,
+              )
+            ],
+          ),
+        
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              bottomItem(
+                index: 0,
+                label: "HOME",
+                selectedIcon: "assets/icon/bottom_s_0.png",
+                // selectedIcon: AppIcons.bellIcon,
+                unSelectedIcon: "assets/icon/bottom_u_0.png",
+                // unSelectedIcon: AppIcons.callIcon,
+              ),
+        
+              bottomItem(
+                index: 1,
+                label: "Trip",
+                // selectedIcon: AppIcons.bellIcon,
+                // unSelectedIcon: AppIcons.callIcon,
+                selectedIcon: "assets/icon/bottom_s_1.png",
+                unSelectedIcon: "assets/icon/bottom_u_1.png",
+              ),
+        
+              // bottomItem(
+              //   index: 2,
+              //   label: "Performance",
+              //   selectedIcon: "assets/icon/bottom_s_4.png",
+              //   unSelectedIcon: "assets/icon/bottom_u_4.png",
+              // ),
+        
+              bottomItem(
+                index: 2,
+                label: "Punch",
+                selectedIcon: "assets/icon/punchS.png",
+                unSelectedIcon: "assets/icon/punchU.png",
+              ),bottomItem(
+                index: 3,
+                label: "Fuel Entry",
+                selectedIcon: "assets/icon/feulS.png",
+                unSelectedIcon: "assets/icon/feulU.png",
+              ),
+            ],
+          ),
         ),
       ),
     );

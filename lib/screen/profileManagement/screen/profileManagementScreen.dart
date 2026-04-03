@@ -126,7 +126,7 @@ class _ProfileManagementScreenState extends State<ProfileManagementScreen> {
           ),
         );
       },),
-      bottomSheet: (!isVerified)
+      bottomNavigationBar: (!isVerified)
           ? SafeArea(
         child: Container(
           width: double.infinity,

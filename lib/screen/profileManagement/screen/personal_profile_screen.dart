@@ -192,6 +192,7 @@ class _PersonalProfileScreenState extends State<PersonalProfileScreen> {
                 Navigator.pop(context);
               },
             ),
+            SizedBox(height: 100,)
 
           ],
         ),

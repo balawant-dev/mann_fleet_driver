@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mann_fleet_driver/widget/commonAppBar.dart';
 import 'package:provider/provider.dart';
 
+import '../../../widget/empty/bookingHistoryEmptyScreen.dart';
 import '../provider/bookingHistoryPro.dart';
 
 
@@ -38,7 +39,11 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
           final list = provider.bookingModel?.data ?? [];
 
           if (list.isEmpty) {
-            return const Center(child: Text("No bookings found"));
+            return BookingHistoryEmptyScreen(onRefresh: (){
+              Provider.of<BookingHistoryProvider>(context, listen: false)
+                  .fetchBookings(context);
+            },);
+           // return const Center(child: Text("No bookings found"));
           }
 
           return ListView.builder(

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../../util/color/app_colors.dart';
 import '../../../widget/commonAppBar.dart';
+import '../../../widget/showLoaderFunction.dart';
 import '../provider/punchProvider.dart';
 
 
@@ -27,24 +28,57 @@ class _PunchScreenState extends State<PunchScreen> {
     final hasPermission = await _checkLocationPermission();
     if (!hasPermission) return;
 
-    final position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
-    );
+    showLoader(context); // ✅ SHOW LOADER
 
-    if (provider.isCurrentlyPunchedIn) {
-      await provider.postPunchOutApi(
-        context: context,
-        lat: position.latitude.toString(),
-        lng: position.longitude.toString(),
+    try {
+      final position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
       );
-    } else {
-      await provider.postPunchInApi(
-        context: context,
-        lat: position.latitude.toString(),
-        lng: position.longitude.toString(),
-      );
+
+      if (provider.isCurrentlyPunchedIn) {
+        await provider.postPunchOutApi(
+          context: context,
+          lat: position.latitude.toString(),
+          lng: position.longitude.toString(),
+        );
+      } else {
+        await provider.postPunchInApi(
+          context: context,
+          lat: position.latitude.toString(),
+          lng: position.longitude.toString(),
+        );
+      }
+
+      // await provider.loadAllData(context: context); // ✅ IMPORTANT
+    } catch (e) {
+      debugPrint("Punch Error: $e");
+    } finally {
+      Navigator.pop(context); // ✅ CLOSE LOADER
     }
   }
+
+  // Future<void> _handlePunchAction(PunchProvider provider) async {
+  //   final hasPermission = await _checkLocationPermission();
+  //   if (!hasPermission) return;
+  //
+  //   final position = await Geolocator.getCurrentPosition(
+  //     desiredAccuracy: LocationAccuracy.high,
+  //   );
+  //
+  //   if (provider.isCurrentlyPunchedIn) {
+  //     await provider.postPunchOutApi(
+  //       context: context,
+  //       lat: position.latitude.toString(),
+  //       lng: position.longitude.toString(),
+  //     );
+  //   } else {
+  //     await provider.postPunchInApi(
+  //       context: context,
+  //       lat: position.latitude.toString(),
+  //       lng: position.longitude.toString(),
+  //     );
+  //   }
+  // }
 
   Future<bool> _checkLocationPermission() async {
     LocationPermission permission = await Geolocator.checkPermission();
@@ -135,6 +169,8 @@ class _PunchScreenState extends State<PunchScreen> {
                   width: double.infinity,
                   height: 56,
                   child: ElevatedButton(
+
+                    //showLoader
                     onPressed: hasRegion
                         ? () => _handlePunchAction(provider)
                         : null,
@@ -216,9 +252,14 @@ class _PunchScreenState extends State<PunchScreen> {
 
                       final punchInTime = item.punchInAtIST ?? item.punchInAt ?? "N/A";
                       final punchOutTime = item.punchOutAtIST ?? item.punchOutAt ?? "Not Punched Out";
-                      final totalHours = item.totalMinutes != null
-                          ? "${(item.totalMinutes! / 60).toStringAsFixed(1)} hrs"
+                      final totalTime = item.totalMinutes != null
+                          ? _formatDuration(item.totalMinutes!)
                           : "Ongoing";
+                      // final totalHours = item.totalMinutes != null
+                      //     ? item.totalMinutes! < 60
+                      //     ? "${item.totalMinutes} min"
+                      //     : "${(item.totalMinutes! / 60).toStringAsFixed(1)} hrs"
+                      //     : "Ongoing";
 
                       final isValid = (item.punchInValid ?? false) && (item.punchOutValid ?? true);
 
@@ -305,7 +346,7 @@ class _PunchScreenState extends State<PunchScreen> {
                                   children: [
                                     const Text("Total Time:", style: TextStyle(fontWeight: FontWeight.w500)),
                                     Text(
-                                      totalHours,
+                                      totalTime,
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 16,
@@ -395,5 +436,20 @@ class _PunchScreenState extends State<PunchScreen> {
         ),
       ],
     );
+  }
+
+  String _formatDuration(int totalMinutes) {
+    final totalSeconds = totalMinutes * 60;
+
+    if (totalSeconds < 60) {
+      return "$totalSeconds sec";
+    } else if (totalSeconds < 3600) {
+      final minutes = totalSeconds ~/ 60;
+      return "$minutes min";
+    } else {
+      final hours = totalSeconds ~/ 3600;
+      final minutes = (totalSeconds % 3600) ~/ 60;
+      return "$hours hr ${minutes > 0 ? "$minutes min" : ""}";
+    }
   }
 }

@@ -63,7 +63,7 @@ class MyApp extends StatelessWidget {
       ],
 
       child: MaterialApp(
-        title: 'Mann Fleet Driver',
+        title: 'Fleet Pilot',
         debugShowCheckedModeBanner: false,
        theme: AppTheme.lightTheme,
       //  home: const RegisterScreen(),

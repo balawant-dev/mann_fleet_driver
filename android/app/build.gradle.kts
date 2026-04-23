@@ -9,7 +9,7 @@ plugins {
 }
 
 android {
-    namespace = "com.driver.mannfleet"
+    namespace = "com.pilot.mannfleet"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -24,19 +24,19 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.driver.mannfleet"
+        applicationId = "com.pilot.mannfleet"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = 24
         targetSdk = flutter.targetSdkVersion
-        versionCode = 2
-        versionName = "1.0.1"
+        versionCode = 1
+        versionName = "1.0.0"
     }
     signingConfigs {
         create("release") {
-            storeFile = file("mann_fleet_pilot.jks")
+            storeFile = file("fleet_pilot.jks")
             storePassword = "123456"
-            keyAlias = "mann_fleet_pilot"
+            keyAlias = "fleet_pilot"
             keyPassword = "123456"
         }
     }

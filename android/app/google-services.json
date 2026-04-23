@@ -26,6 +26,25 @@
     },
     {
       "client_info": {
+        "mobilesdk_app_id": "1:389123453841:android:89ec990f5fea4f38a5e030",
+        "android_client_info": {
+          "package_name": "com.pilot.mannfleet"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyABunPSHdngJs4GKeXN3winEYDSiQsBwvM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:389123453841:android:a8cef9fffa1df24da5e030",
         "android_client_info": {
           "package_name": "com.user.mannfleet"

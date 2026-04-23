@@ -100,6 +100,7 @@ class PunchProvider extends ChangeNotifier {
       );
       punchInModel = res;
       if (res != null || res.status == true) {
+        loadAllData(context: context);
         //
         ToastHelper.show(
           context,
@@ -137,6 +138,7 @@ class PunchProvider extends ChangeNotifier {
           message: "Punched out successfully",
           type: ToastType.success,
         );
+        loadAllData(context: context);
         print("Punched out successfully");
       }
     } catch (e) {

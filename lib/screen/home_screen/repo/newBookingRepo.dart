@@ -17,6 +17,7 @@ import '../model/getBannerModel.dart';
 import '../model/newBookingModel.dart';
 import '../model/pickupVerificationModel.dart';
 import '../model/startTripModel.dart';
+import '../model/tripCompleteModel.dart';
 import '../model/verifyBookingOtpModel.dart';
 
 
@@ -131,6 +132,38 @@ class NewBookingRepo {
         showServerErrorScreen(
           context,
           onRetry: () => acceptBookingApi(context: context,id: id),
+        );
+        throw ServerException();
+      } else if (e.error is UnauthorizedException) {
+        await SecureStorageService.logout(context);
+        throw UnauthorizedException();
+      } else {
+        rethrow;
+      }
+    } catch (e) {
+      throw ApiException(0, e.toString());
+    }
+  }
+  Future<TripCompleteModel> completeTripApi({required BuildContext context,required String id,required String currentLat,required String currentLng}) async {
+    try {
+      final response = await _api.post("${ApiConstants.completeTrip}/${id}", requiresAuth: true,data: {
+        "currentLat":"28.627183363982304",
+        "currentLng":"77.37759764645396"
+      });
+      //   await SecureStorageService.saveToken(response['token']);
+      return TripCompleteModel.fromJson(response);
+      //  return LoginModel.fromJson(response['user']);
+    } on DioException catch (e) {
+      if (e.error is NoInternetException) {
+        showNoInternetScreen(
+          context,
+          onRetry: () => completeTripApi(context: context,id: id,currentLat: currentLat,currentLng: currentLng),
+        );
+        throw NoInternetException();
+      } else if (e.error is ServerException) {
+        showServerErrorScreen(
+          context,
+          onRetry: () => completeTripApi(context: context,id: id,currentLat: currentLat,currentLng: currentLng),
         );
         throw ServerException();
       } else if (e.error is UnauthorizedException) {

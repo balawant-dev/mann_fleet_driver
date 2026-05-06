@@ -83,71 +83,167 @@ class PunchProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
-
   Future<void> postPunchInApi({
     required BuildContext context,
     required String lat,
     required String lng,
   }) async {
-    try {
-      isLoading = true;
-      notifyListeners();
+    isLoading = true;
+    notifyListeners();
 
+    try {
       final res = await api.postPunchInApi(
         context: context,
-        lng: lng,
         lat: lat,
+        lng: lng,
       );
+
       punchInModel = res;
-      if (res != null || res.status == true) {
-        loadAllData(context: context);
-        //
+
+      if (res?.status == true) {
+        // Success
+        await loadAllData(context: context);
         ToastHelper.show(
           context,
-          message: "Punched in successfully",
+          message: res?.message ?? "Punched in successfully",
           type: ToastType.success,
         );
-        print("Punched in successfully");
+      } else {
+        // Error Handling
+        String errorMsg = res?.error?.message ??
+            res?.message ??
+            "Something went wrong";
+
+        ToastHelper.show(
+          context,
+          message: errorMsg,
+          type: ToastType.error,
+        );
       }
     } catch (e) {
-      debugPrint("Error in Get Profile: $e");
+      ToastHelper.show(
+        context,
+        message: "Failed to punch in. Please try again.",
+        type: ToastType.error,
+      );
     } finally {
       isLoading = false;
       notifyListeners();
     }
   }
+  // Future<void> postPunchInApi({
+  //   required BuildContext context,
+  //   required String lat,
+  //   required String lng,
+  // }) async {
+  //   try {
+  //     isLoading = true;
+  //     notifyListeners();
+  //
+  //     final res = await api.postPunchInApi(
+  //       context: context,
+  //       lng: lng,
+  //       lat: lat,
+  //     );
+  //     punchInModel = res;
+  //     if (res != null || res.status == true) {
+  //       loadAllData(context: context);
+  //       //
+  //       ToastHelper.show(
+  //         context,
+  //         message: "Punched in successfully",
+  //         type: ToastType.success,
+  //       );
+  //       print("Punched in successfully");
+  //     }
+  //   } catch (e) {
+  //     debugPrint("Error in Get Profile: $e");
+  //   } finally {
+  //     isLoading = false;
+  //     notifyListeners();
+  //   }
+  // }
 
   Future<void> postPunchOutApi({
     required BuildContext context,
     required String lat,
     required String lng,
   }) async {
-    try {
-      isLoading = true;
-      notifyListeners();
+    isLoading = true;
+    notifyListeners();
 
+    try {
       final res = await api.postPunchOutApi(
         context: context,
         lat: lat,
         lng: lng,
       );
+
       punchOutModel = res;
-      if (res != null || res.success == true) {
+
+      if (res?.success == true) {
+        // Success
         ToastHelper.show(
           context,
-          message: "Punched out successfully",
+          message: res.message ?? "Punched out successfully",
           type: ToastType.success,
         );
-        loadAllData(context: context);
-        print("Punched out successfully");
+        await loadAllData(context: context);
+      } else {
+        // Error Handling
+        String errorMsg = res.error?.message ??
+            res.message ??
+            "Something went wrong";
+
+        ToastHelper.show(
+          context,
+          message: errorMsg,   // Yeh "You are not punched in." dikhega
+          type: ToastType.error,
+        );
       }
     } catch (e) {
-      debugPrint("Error in Get Profile: $e");
+      ToastHelper.show(
+        context,
+        message: "Failed to punch out. Please try again.",
+        type: ToastType.error,
+      );
     } finally {
       isLoading = false;
       notifyListeners();
     }
   }
+
+  // Future<void> postPunchOutApi({
+  //   required BuildContext context,
+  //   required String lat,
+  //   required String lng,
+  // }) async {
+  //   try {
+  //     isLoading = true;
+  //     notifyListeners();
+  //
+  //     final res = await api.postPunchOutApi(
+  //       context: context,
+  //       lat: lat,
+  //       lng: lng,
+  //     );
+  //     punchOutModel = res;
+  //     if (res != null || res.success == true) {
+  //       ToastHelper.show(
+  //         context,
+  //         message: "Punched out successfully",
+  //         type: ToastType.success,
+  //       );
+  //       loadAllData(context: context);
+  //       print("Punched out successfully");
+  //     }
+  //   } catch (e) {
+  //     debugPrint("Error in Get Profile: $e");
+  //   } finally {
+  //     isLoading = false;
+  //     notifyListeners();
+  //   }
+  // }
 
   Future<void> getPunchHistoryApi({required BuildContext context}) async {
     try {

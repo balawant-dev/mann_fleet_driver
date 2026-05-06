@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:mann_fleet_driver/widget/commonAppButton.dart';
 import 'package:mann_fleet_driver/widget/navigator_method.dart';
 
@@ -6,6 +7,7 @@ import '../../../util/color/app_colors.dart';
 import '../../../widget/commonAppBar.dart';
 import '../../../widget/custom_text.dart';
 import '../../../widget/motionToastHelper.dart';
+import '../../../widget/showLoaderFunction.dart';
 import '../../home_screen/provider/newBookingProvider.dart';
 import '../../pickup/ui/pickUpScreen.dart';
 
@@ -27,13 +29,94 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
     Future.microtask(() {
       context.read<NewBookingProvider>()
           .getNewBookingDetail(context: context, id: widget.id);
-    });}
+    });
+    _getCurrentLocation();}
 
   Future<void> _onRefresh() async {
     await context.read<NewBookingProvider>().getNewBookingDetail(
       context: context,
       id: widget.id,
     );
+  }
+  double currentLat = 0.0;
+  double currentLng = 0.0;
+  Future<void> _completeTripAfterEndOtp(String bookingId) async {
+    final provider = context.read<NewBookingProvider>();
+
+    // Get current location
+    bool hasLocation = await _getCurrentLocation();
+
+    if (!hasLocation) {
+      ToastHelper.show(context,
+          message: "Unable to get current location",
+          type: ToastType.error);
+      return;
+    }
+
+    bool tripCompleted = await provider.completeTripApi(
+      context: context,
+      id: bookingId,
+      currentLat: currentLat.toString(),
+      currentLng: currentLng.toString(),
+    );
+
+    if (tripCompleted) {
+      ToastHelper.show(
+        context,
+        message: "Trip Completed Successfully 🎉",
+        type: ToastType.success,
+      );
+
+      // Refresh detail
+      await provider.getNewBookingDetail(context: context, id: bookingId);
+    }
+  }
+  Future<bool> _getCurrentLocation() async {
+    try {
+      // Check permission
+      LocationPermission permission = await Geolocator.checkPermission();
+
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        ToastHelper.show(
+          context,
+          message: "Location permission permanently denied. Please enable from settings.",
+          type: ToastType.error,
+        );
+        return false;
+      }
+
+      if (permission == LocationPermission.denied) {
+        ToastHelper.show(
+          context,
+          message: "Location permission denied",
+          type: ToastType.error,
+        );
+        return false;
+      }
+
+      // Get current position
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      currentLat = position.latitude;
+      currentLng = position.longitude;
+
+      debugPrint("📍 Current Location: $currentLat, $currentLng");
+      return true;
+    } catch (e) {
+      debugPrint("Location error: $e");
+      ToastHelper.show(
+        context,
+        message: "Failed to get location: ${e.toString()}",
+        type: ToastType.error,
+      );
+      return false;
+    }
   }
   @override
   Widget build(BuildContext context) {
@@ -299,7 +382,9 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                     const SizedBox(height: 25),
                     // CommonAppButton(
                     //   text: "End the trip",
-                    //   onPressed: () {},
+                    //   onPressed: ()async {
+                    //     await _completeTripAfterEndOtp(bookingId);
+                    //   },
                     // ),
                   ],
                 ),
@@ -379,7 +464,22 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
     }
 
     /// 🔹 5. Completed
-    if (tripStatus == "completed" || isEndOtpVerified) {
+    if (tripStatus == "in_progress" && isEndOtpVerified) {
+      print("Booking complte Kro ab ok");
+      print(tripStatus);
+      return CommonAppButton(
+        text: "Complete Trip",
+          onPressed: ()async {
+            showLoader(context);
+            await _completeTripAfterEndOtp(widget.id);
+            navPop(context: context);
+          },
+        // onPressed: () => showOtpDialog(widget.id, "end"),
+      );
+    }
+    if (tripStatus == "completed" && isEndOtpVerified) {
+      print("Booking complte ho gya");
+      print(tripStatus);
       return const Text("Trip Completed ✅");
     }
 
@@ -467,6 +567,10 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                     message:"OTP Verified ($type) ✅",
                     type: ToastType.success,
                   );
+                  // 🔥🔥🔥 MAIN CHANGE - End OTP ke baad Complete Trip API call
+                  // if (type == "end") {
+                  //   await _completeTripAfterEndOtp(bookingId);
+                  // }
                   // ScaffoldMessenger.of(context).showSnackBar(
                   //   SnackBar(content: Text("OTP Verified ($type) ✅")),
                   // );

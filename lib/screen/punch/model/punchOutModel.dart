@@ -2,13 +2,16 @@ class PunchOutModel {
   bool? success;
   String? message;
   Data? data;
-
-  PunchOutModel({this.success, this.message, this.data});
+  ApiError? error;   // ✅ ADD THIS
+  PunchOutModel({this.success, this.message, this.data,
+    this.error
+  });
 
   PunchOutModel.fromJson(Map<String, dynamic> json) {
     success = json['success'];
     message = json['message'];
     data = json['data'] != null ? new Data.fromJson(json['data']) : null;
+    error = json['error'] != null ? ApiError.fromJson(json['error']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -18,6 +21,9 @@ class PunchOutModel {
     if (this.data != null) {
       data['data'] = this.data!.toJson();
     }
+    // if (this.error != null) {
+    //   data['error'] = this.error!.toJson();
+    // }
     return data;
   }
 }
@@ -135,5 +141,29 @@ class Shift {
     data['startTime'] = this.startTime;
     data['endTime'] = this.endTime;
     return data;
+  }
+}
+class ApiError {
+  int? statusCode;
+  bool? status;
+  String? message;
+  String? name;
+
+  ApiError({this.statusCode, this.status, this.message, this.name});
+
+  ApiError.fromJson(Map<String, dynamic> json) {
+    statusCode = json['statusCode'];
+    status = json['status'];
+    message = json['message'];
+    name = json['name'];
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'statusCode': statusCode,
+      'status': status,
+      'message': message,
+      'name': name,
+    };
   }
 }

@@ -81,36 +81,44 @@ class PunchRepo {
     }
   }
 
-  Future<PunchInModel>postPunchInApi({required BuildContext context,required String lat,required String lng}) async {
+  Future<PunchInModel> postPunchInApi({
+    required BuildContext context,
+    required String lat,
+    required String lng,
+  }) async {
     try {
-      final response = await _api.post(ApiConstants.punchIn, requiresAuth: true,data: {
-        "lat":lat,
-        "lng":lng
-
-      });
+      final response = await _api.post(
+        ApiConstants.punchIn,
+        requiresAuth: true,
+        data: {"lat": lat, "lng": lng},
+      );
 
       return PunchInModel.fromJson(response);
+    }
+    on DioException catch (e) {
+      if (e.response != null) {
+        // ✅ Yeh line important hai - 400 error ke bawajood body parse kar rahe hain
+        try {
+          return PunchInModel.fromJson(e.response!.data);
+        } catch (_) {
+          rethrow;
+        }
+      }
 
-    } on DioException catch (e) {
+      // Existing error handling
       if (e.error is NoInternetException) {
-        showNoInternetScreen(
-          context,
-          onRetry: () => postPunchInApi(context: context,lat: lat,lng: lng),
-        );
+        showNoInternetScreen(context, onRetry: () => postPunchInApi(context: context, lat: lat, lng: lng));
         throw NoInternetException();
       } else if (e.error is ServerException) {
-        showServerErrorScreen(
-          context,
-          onRetry: () => postPunchInApi(context: context,lng: lng,lat: lat),
-        );
+        showServerErrorScreen(context, onRetry: () => postPunchInApi(context: context, lat: lat, lng: lng));
         throw ServerException();
       } else if (e.error is UnauthorizedException) {
         await SecureStorageService.logout(context);
         throw UnauthorizedException();
-      } else {
-        rethrow;
       }
-    } catch (e) {
+      rethrow;
+    }
+    catch (e) {
       throw ApiException(0, e.toString());
     }
   }
@@ -120,12 +128,21 @@ class PunchRepo {
       final response = await _api.post(ApiConstants.punchOut, requiresAuth: true,data: {
       "lat":lat,
       "lng":lng
+      //   "lat":"28.529632672319185",
+      // "lng":"77.27463003544605"
 
       });
 
       return PunchOutModel.fromJson(response);
 
     } on DioException catch (e) {
+      if (e.response != null) {
+        try {
+          return PunchOutModel.fromJson(e.response!.data);
+        } catch (_) {
+          rethrow;
+        }
+      }
       if (e.error is NoInternetException) {
         showNoInternetScreen(
           context,

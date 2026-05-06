@@ -1,8 +1,8 @@
 class ApiConstants {
   //Live Url
   // static const String baseUrl = 'https://maan.ablagro.in';
-  static const String baseUrl = 'https://admin.mannfleetpartners.com';
-  // static const String baseUrl = 'http://159.89.146.245:9020';
+  // static const String baseUrl = 'https://admin.mannfleetpartners.com';
+  static const String baseUrl = 'http://3.7.202.40:9020';
 
 
 
@@ -22,6 +22,7 @@ class ApiConstants {
   static const String driverCancelRequest = '/api/driver/driverCancelRequest';
   static const String bookingDetail = '/api/driver/booking';
   static const String bookingHistory = '/api/driver/bookingHistory';
+  static const String completeTrip = '/api/driver/completeTrip';
   static const String notifications = '/api/driver/notifications';
   static const String pickupVerification = '/api/driver/pickupVerification';
   static const String vehicle = '/api/driver/vehicle';

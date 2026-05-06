@@ -13,6 +13,7 @@ import '../model/getBannerModel.dart';
 import '../model/newBookingModel.dart';
 import '../model/pickupVerificationModel.dart';
 import '../model/startTripModel.dart';
+import '../model/tripCompleteModel.dart';
 import '../model/verifyBookingOtpModel.dart';
 import '../repo/newBookingRepo.dart';
 
@@ -25,6 +26,7 @@ class NewBookingProvider extends ChangeNotifier {
   VerifyBookingOtpModel? verifyBookingOtpModel;
   StartTripModel? startTripModel;
   GetBannerModel? getBannerModel;
+  TripCompleteModel? tripCompleteModel;
 
   bool isLoading = false;
 
@@ -152,6 +154,35 @@ class NewBookingProvider extends ChangeNotifier {
         getNewBookingDetail(context: context,id: id);
         getNewBooking(context: context);
         debugPrint("Trip started successfully for booking $id");
+        return true;
+      } else {
+        debugPrint("Failed to start trip for booking $id");
+        return false;
+      }
+    } catch (e) {
+      debugPrint("Error starting trip $id: $e");
+      return false;
+    } finally {
+      // isLoading = false;
+      notifyListeners();
+    }
+  }  // ── Complete trip ─────────────────────────────────────────────────────────────
+  Future<bool> completeTripApi({
+    required BuildContext context,
+    required String id,
+    required String currentLat,required String currentLng
+  }) async {
+    try {
+      // isLoading = true;
+      notifyListeners();
+
+      final res = await api.completeTripApi(context: context, id: id,currentLat: currentLat,currentLng: currentLng);
+      tripCompleteModel = res;
+
+      if (res != null && res.status == true) {
+        // getNewBookingDetail(context: context,id: id);
+        // getNewBooking(context: context);
+        debugPrint("Complete trip 🎈🎈🎈🎈🎈🎈🎈🎈 for booking $id");
         return true;
       } else {
         debugPrint("Failed to start trip for booking $id");

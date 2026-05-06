@@ -2,13 +2,16 @@ class PunchInModel {
   bool? status;
   String? message;
   Data? data;
-
-  PunchInModel({this.status, this.message, this.data});
+  ApiError? error;
+  PunchInModel({this.status, this.message, this.data,
+    this.error
+  });
 
   PunchInModel.fromJson(Map<String, dynamic> json) {
     status = json['status'];
     message = json['message'];
     data = json['data'] != null ? new Data.fromJson(json['data']) : null;
+    error = json['error'] != null ? ApiError.fromJson(json['error']) : null; // ← Yeh line active rakho
   }
 
   Map<String, dynamic> toJson() {
@@ -18,6 +21,9 @@ class PunchInModel {
     if (this.data != null) {
       data['data'] = this.data!.toJson();
     }
+    // if (this.error != null) {
+    //   data['error'] = this.error!.toJson();
+    // }
     return data;
   }
 }
@@ -101,5 +107,29 @@ class PunchRegion {
     data['address'] = this.address;
     data['radiusMeters'] = this.radiusMeters;
     return data;
+  }
+}
+class ApiError {
+  int? statusCode;
+  bool? status;
+  String? message;
+  String? name;
+
+  ApiError({this.statusCode, this.status, this.message, this.name});
+
+  ApiError.fromJson(Map<String, dynamic> json) {
+    statusCode = json['statusCode'];
+    status = json['status'];
+    message = json['message'];
+    name = json['name'];
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'statusCode': statusCode,
+      'status': status,
+      'message': message,
+      'name': name,
+    };
   }
 }

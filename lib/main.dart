@@ -13,6 +13,7 @@ import 'package:mann_fleet_driver/screen/profileManagement/provider/driving_cred
 import 'package:mann_fleet_driver/screen/profileManagement/provider/personal_profile_provider.dart';
 import 'package:mann_fleet_driver/screen/profileManagement/provider/profileDetailProvider.dart';
 import 'package:mann_fleet_driver/screen/punch/provider/punchProvider.dart';
+import 'package:mann_fleet_driver/screen/shuttle/qr_scanner/provider/qrScanPro.dart';
 import 'package:mann_fleet_driver/screen/vehicle/provider/editVehicalDetailPro.dart';
 import 'package:mann_fleet_driver/screen/vehicle/provider/vehicle_details_provider.dart';
 import 'package:mann_fleet_driver/screen/splash_screen/ui/splash_screen.dart';
@@ -60,6 +61,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => NewBookingProvider()),
         ChangeNotifierProvider(create: (_) => FuelEntryProvider()),
         ChangeNotifierProvider(create: (_) => BookingHistoryProvider()),
+        ChangeNotifierProvider(create: (_) => QrScanProvider()),
       ],
 
       child: MaterialApp(

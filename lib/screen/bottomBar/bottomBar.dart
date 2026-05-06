@@ -15,6 +15,7 @@ import '../performance/ui/performanceScreen.dart';
 import '../pickup/ui/pickUpScreen.dart';
 import '../profile/ui/profile_screen.dart';
 import '../punch/ui/punchScreen.dart';
+import '../shuttle/qr_scanner/ui/qr_scaner_screen.dart';
 
 
 class MainScreen extends StatefulWidget {
@@ -34,6 +35,7 @@ class _MainScreenState extends State<MainScreen> {
     const BookingHistoryScreen(),
     const PunchScreen(),
     const FuelEntryScreen(),
+    const QrScannerScreen(),
     // const PerformanceScreen(),
     //const PickupScreen(),
     // const ProfileReviewScreen(),
@@ -93,11 +95,17 @@ class _MainScreenState extends State<MainScreen> {
                 label: "Punch",
                 selectedIcon: "assets/icon/punchS.png",
                 unSelectedIcon: "assets/icon/punchU.png",
-              ),bottomItem(
+              ),
+              bottomItem(
                 index: 3,
                 label: "Fuel Entry",
                 selectedIcon: "assets/icon/feulS.png",
                 unSelectedIcon: "assets/icon/feulU.png",
+              ),  bottomItem(
+                index: 4,
+                label: "Shuttle",
+                selectedIcon: "assets/icon/scanS.png",
+                unSelectedIcon: "assets/icon/scanUn.png",
               ),
             ],
           ),

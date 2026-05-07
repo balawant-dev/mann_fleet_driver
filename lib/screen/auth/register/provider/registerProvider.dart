@@ -22,15 +22,68 @@ class RegisterProvider extends ChangeNotifier {
   File? profileImage;
 
   final ImagePicker picker = ImagePicker();
+  Future pickImage(BuildContext context) async {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Wrap(
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.camera_alt),
+                  title: const Text("Camera"),
+                  onTap: () async {
+                    Navigator.pop(context);
 
-  Future pickImage() async {
-    final picked = await picker.pickImage(source: ImageSource.gallery);
+                    final picked = await picker.pickImage(
+                      source: ImageSource.camera,
+                      imageQuality: 70,
+                    );
 
-    if (picked != null) {
-      profileImage = File(picked.path);
-      notifyListeners();
-    }
+                    if (picked != null) {
+                      profileImage = File(picked.path);
+                      notifyListeners();
+                    }
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.photo),
+                  title: const Text("Gallery"),
+                  onTap: () async {
+                    Navigator.pop(context);
+
+                    final picked = await picker.pickImage(
+                      source: ImageSource.gallery,
+                      imageQuality: 70,
+                    );
+
+                    if (picked != null) {
+                      profileImage = File(picked.path);
+                      notifyListeners();
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
+
+  // Future pickImage() async {
+  //   final picked = await picker.pickImage(source: ImageSource.gallery);
+  //
+  //   if (picked != null) {
+  //     profileImage = File(picked.path);
+  //     notifyListeners();
+  //   }
+  // }
 
   void setGender(String value){
     gender = value;

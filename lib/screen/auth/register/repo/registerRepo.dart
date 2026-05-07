@@ -48,6 +48,14 @@ class RegisterRepo{
       return RegisterModel.fromJson(response);
 
     } on DioException catch (e) {
+      if (e.response != null) {
+        // ✅ Yeh line important hai - 400 error ke bawajood body parse kar rahe hain
+        try {
+          return RegisterModel.fromJson(e.response!.data);
+        } catch (_) {
+          rethrow;
+        }
+      }
       if (e.error is NoInternetException) {
         showNoInternetScreen(
           context,

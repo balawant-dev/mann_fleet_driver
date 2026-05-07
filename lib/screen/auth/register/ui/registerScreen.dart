@@ -56,7 +56,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 /// PROFILE IMAGE
                 GestureDetector(
                   onTap: () {
-                    provider.pickImage();
+                    provider.pickImage(context);
                   },
                   child: CircleAvatar(
                     radius: 50,
@@ -65,10 +65,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ? FileImage(provider.profileImage!)
                         : null,
                     child: provider.profileImage == null
-                        ? const Icon(Icons.camera_alt,size:30)
+                        ? const Icon(
+                      Icons.camera_alt,
+                      size: 30,
+                    )
                         : null,
                   ),
                 ),
+                // GestureDetector(
+                //   onTap: () {
+                //     provider.pickImage();
+                //   },
+                //   child: CircleAvatar(
+                //     radius: 50,
+                //     backgroundColor: Colors.grey.shade200,
+                //     backgroundImage: provider.profileImage != null
+                //         ? FileImage(provider.profileImage!)
+                //         : null,
+                //     child: provider.profileImage == null
+                //         ? const Icon(Icons.camera_alt,size:30)
+                //         : null,
+                //   ),
+                // ),
 
                 const SizedBox(height: 30),
 
@@ -172,9 +190,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         type: ToastType.error,
                       );
 
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Please fill all fields correctly")),
-                      );
+                      // ScaffoldMessenger.of(context).showSnackBar(
+                      //   const SnackBar(content: Text("Please fill all fields correctly")),
+                      // );
                       return;
                     }
                     showLoader(context);
@@ -203,7 +221,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     } else {
                       ToastHelper.show(
                         context,
-                        message:"Registration failed. Please try again.",
+                        message:provider.registerModel?.message??"Registration failed. Please try again.",
                         type: ToastType.error,
                       );
                       //

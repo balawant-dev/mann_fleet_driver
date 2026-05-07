@@ -31,15 +31,73 @@ class DrivingCredentialsProvider extends ChangeNotifier {
     notifyListeners();
   }
   /// 📸 PICK IMAGE
-  Future pickLicense() async {
-    final picked = await picker.pickImage(source: ImageSource.gallery);
+  // Future pickLicense() async {
+  //   final picked = await picker.pickImage(source: ImageSource.gallery);
+  //
+  //   if (picked != null) {
+  //     licensePhoto = File(picked.path);
+  //     notifyListeners();
+  //   }
+  // }
+  Future pickLicense(BuildContext context) async {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(20),
+        ),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Wrap(
+              children: [
 
-    if (picked != null) {
-      licensePhoto = File(picked.path);
-      notifyListeners();
-    }
+                /// Camera
+                ListTile(
+                  leading: const Icon(Icons.camera_alt),
+                  title: const Text("Camera"),
+                  onTap: () async {
+                    Navigator.pop(context);
+
+                    final picked = await picker.pickImage(
+                      source: ImageSource.camera,
+                      imageQuality: 70,
+                    );
+
+                    if (picked != null) {
+                      licensePhoto = File(picked.path);
+                      notifyListeners();
+                    }
+                  },
+                ),
+
+                /// Gallery
+                ListTile(
+                  leading: const Icon(Icons.photo),
+                  title: const Text("Gallery"),
+                  onTap: () async {
+                    Navigator.pop(context);
+
+                    final picked = await picker.pickImage(
+                      source: ImageSource.gallery,
+                      imageQuality: 70,
+                    );
+
+                    if (picked != null) {
+                      licensePhoto = File(picked.path);
+                      notifyListeners();
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
-
   /// 📅 DATE PICKER
   Future<void> pickExpiryDate(BuildContext context) async {
     DateTime? pickedDate = await showDatePicker(

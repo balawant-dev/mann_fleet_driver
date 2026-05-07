@@ -200,7 +200,8 @@ class _DrivingCredentialsScreenState
             const SizedBox(height: 15),
 
             GestureDetector(
-              onTap: provider.pickLicense,
+              onTap: () => provider.pickLicense(context),
+              // onTap: provider.pickLicense,
               child: Container(
                 height: 130,
                 width: double.infinity,

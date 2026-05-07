@@ -45,45 +45,89 @@ class ComplianceProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
-  Future pickAdhaarFront() async {
-    final picked = await picker.pickImage(source: ImageSource.gallery);
-    if (picked != null) {
-      adhaarFront = File(picked.path);
-      notifyListeners();
-    }
+  Future pickAdhaarFront(BuildContext context) async {
+    await pickImageOption(
+      context: context,
+      onImagePicked: (file) {
+        adhaarFront = file;
+      },
+    );
   }
 
-  Future pickAdhaarBack() async {
-    final picked = await picker.pickImage(source: ImageSource.gallery);
-    if (picked != null) {
-      adhaarBack = File(picked.path);
-      notifyListeners();
-    }
+  Future pickAdhaarBack(BuildContext context) async {
+    await pickImageOption(
+      context: context,
+      onImagePicked: (file) {
+        adhaarBack = file;
+      },
+    );
   }
 
-  Future pickPanFront() async {
-    final picked = await picker.pickImage(source: ImageSource.gallery);
-    if (picked != null) {
-      panFront = File(picked.path);
-      notifyListeners();
-    }
+  Future pickPanFront(BuildContext context) async {
+    await pickImageOption(
+      context: context,
+      onImagePicked: (file) {
+        panFront = file;
+      },
+    );
   }
 
-  Future pickPanBack() async {
-    final picked = await picker.pickImage(source: ImageSource.gallery);
-    if (picked != null) {
-      panBack = File(picked.path);
-      notifyListeners();
-    }
+  Future pickPanBack(BuildContext context) async {
+    await pickImageOption(
+      context: context,
+      onImagePicked: (file) {
+        panBack = file;
+      },
+    );
   }
 
-  Future pickPolice() async {
-    final picked = await picker.pickImage(source: ImageSource.gallery);
-    if (picked != null) {
-      policeVerification = File(picked.path);
-      notifyListeners();
-    }
+  Future pickPolice(BuildContext context) async {
+    await pickImageOption(
+      context: context,
+      onImagePicked: (file) {
+        policeVerification = file;
+      },
+    );
   }
+  // Future pickAdhaarFront() async {
+  //   final picked = await picker.pickImage(source: ImageSource.gallery);
+  //   if (picked != null) {
+  //     adhaarFront = File(picked.path);
+  //     notifyListeners();
+  //   }
+  // }
+  //
+  // Future pickAdhaarBack() async {
+  //   final picked = await picker.pickImage(source: ImageSource.gallery);
+  //   if (picked != null) {
+  //     adhaarBack = File(picked.path);
+  //     notifyListeners();
+  //   }
+  // }
+  //
+  // Future pickPanFront() async {
+  //   final picked = await picker.pickImage(source: ImageSource.gallery);
+  //   if (picked != null) {
+  //     panFront = File(picked.path);
+  //     notifyListeners();
+  //   }
+  // }
+  //
+  // Future pickPanBack() async {
+  //   final picked = await picker.pickImage(source: ImageSource.gallery);
+  //   if (picked != null) {
+  //     panBack = File(picked.path);
+  //     notifyListeners();
+  //   }
+  // }
+  //
+  // Future pickPolice() async {
+  //   final picked = await picker.pickImage(source: ImageSource.gallery);
+  //   if (picked != null) {
+  //     policeVerification = File(picked.path);
+  //     notifyListeners();
+  //   }
+  // }
 
   final api = ProfileRepo();
   bool isLoading = false;
@@ -135,5 +179,68 @@ class ComplianceProvider extends ChangeNotifier {
       isLoading = false;
       notifyListeners();
     }
+  }
+
+  Future<void> pickImageOption({
+    required BuildContext context,
+    required Function(File file) onImagePicked,
+  }) async {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(20),
+        ),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Wrap(
+              children: [
+
+                /// Camera
+                ListTile(
+                  leading: const Icon(Icons.camera_alt),
+                  title: const Text("Camera"),
+                  onTap: () async {
+                    Navigator.pop(context);
+
+                    final picked = await picker.pickImage(
+                      source: ImageSource.camera,
+                      imageQuality: 70,
+                    );
+
+                    if (picked != null) {
+                      onImagePicked(File(picked.path));
+                      notifyListeners();
+                    }
+                  },
+                ),
+
+                /// Gallery
+                ListTile(
+                  leading: const Icon(Icons.photo),
+                  title: const Text("Gallery"),
+                  onTap: () async {
+                    Navigator.pop(context);
+
+                    final picked = await picker.pickImage(
+                      source: ImageSource.gallery,
+                      imageQuality: 70,
+                    );
+
+                    if (picked != null) {
+                      onImagePicked(File(picked.path));
+                      notifyListeners();
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 }

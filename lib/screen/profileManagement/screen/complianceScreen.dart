@@ -250,7 +250,8 @@ class _ComplianceScreenState extends State<ComplianceScreen> {
                     title: "Front",
                     file: provider.adhaarFront,
                     network: driver?.adhaarFrontPhoto,
-                    onTap: provider.pickAdhaarFront,
+                    onTap: (){provider.pickAdhaarFront(context);},
+                    // onTap: provider.pickAdhaarFront,
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -259,7 +260,8 @@ class _ComplianceScreenState extends State<ComplianceScreen> {
                     title: "Back",
                     file: provider.adhaarBack,
                     network: driver?.adhaarBackPhoto,
-                    onTap: provider.pickAdhaarBack,
+                    onTap: (){provider.pickAdhaarBack(context);},
+                    // onTap: provider.pickAdhaarBack,
                   ),
                 ),
               ],
@@ -285,7 +287,8 @@ class _ComplianceScreenState extends State<ComplianceScreen> {
                     title: "Front",
                     file: provider.panFront,
                     network: driver?.panFrontPhoto,
-                    onTap: provider.pickPanFront,
+                    onTap: (){provider.pickPanFront(context);},
+                    // onTap: provider.pickPanFront,
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -294,7 +297,7 @@ class _ComplianceScreenState extends State<ComplianceScreen> {
                     title: "Back",
                     file: provider.panBack,
                     network: driver?.panBackPhoto,
-                    onTap: provider.pickPanBack,
+                    onTap: (){provider.pickPanBack(context);},
                   ),
                 ),
               ],
@@ -320,7 +323,8 @@ class _ComplianceScreenState extends State<ComplianceScreen> {
               title: "Upload Document",
               file: provider.policeVerification,
               network: driver?.policeVerificationPhoto,
-              onTap: provider.pickPolice,
+              // onTap: provider.pickPolice,
+              onTap: (){provider.pickPolice(context);},
               full: true,
             ),
 
@@ -329,6 +333,11 @@ class _ComplianceScreenState extends State<ComplianceScreen> {
             CommonAppButton(
               text: "Submit KYC",
               onPressed: () {
+
+
+
+
+
                 provider.submitCompliance(context);
               },
             ),

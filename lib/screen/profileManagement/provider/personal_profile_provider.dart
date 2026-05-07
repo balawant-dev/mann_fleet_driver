@@ -24,14 +24,74 @@ class PersonalProfileProvider extends ChangeNotifier {
 
   final picker = ImagePicker();
 
-  Future pickProfile() async {
+  // Future pickProfile() async {
+  //
+  //   final picked = await picker.pickImage(source: ImageSource.gallery);
+  //
+  //   if(picked != null){
+  //     profileImage = File(picked.path);
+  //     notifyListeners();
+  //   }
+  // }
 
-    final picked = await picker.pickImage(source: ImageSource.gallery);
+  Future pickProfile(BuildContext context) async {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(20),
+        ),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Wrap(
+              children: [
 
-    if(picked != null){
-      profileImage = File(picked.path);
-      notifyListeners();
-    }
+                /// Camera
+                ListTile(
+                  leading: const Icon(Icons.camera_alt),
+                  title: const Text("Camera"),
+                  onTap: () async {
+                    Navigator.pop(context);
+
+                    final picked = await picker.pickImage(
+                      source: ImageSource.camera,
+                      imageQuality: 70,
+                    );
+
+                    if (picked != null) {
+                      profileImage = File(picked.path);
+                      notifyListeners();
+                    }
+                  },
+                ),
+
+                /// Gallery
+                ListTile(
+                  leading: const Icon(Icons.photo),
+                  title: const Text("Gallery"),
+                  onTap: () async {
+                    Navigator.pop(context);
+
+                    final picked = await picker.pickImage(
+                      source: ImageSource.gallery,
+                      imageQuality: 70,
+                    );
+
+                    if (picked != null) {
+                      profileImage = File(picked.path);
+                      notifyListeners();
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   final nameController = TextEditingController();

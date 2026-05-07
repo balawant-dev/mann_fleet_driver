@@ -71,7 +71,7 @@ class _PersonalProfileScreenState extends State<PersonalProfileScreen> {
             // ),
 
             GestureDetector(
-              onTap: provider.pickProfile,
+              onTap: () => provider.pickProfile(context),
               child: Stack(
                 children: [
                   CircleAvatar(

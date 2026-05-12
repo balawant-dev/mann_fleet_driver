@@ -69,6 +69,7 @@ dependencies:
   google_mlkit_text_recognition: ^0.15.0
   image_cropper: ^12.1.1
   mobile_scanner: ^7.2.0
+  webview_flutter: ^4.13.0
 
 
 

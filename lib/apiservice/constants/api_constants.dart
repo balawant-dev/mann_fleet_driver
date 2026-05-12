@@ -1,8 +1,8 @@
 class ApiConstants {
   //Live Url
   // static const String baseUrl = 'https://maan.ablagro.in';
-  static const String baseUrl = 'https://admin.mannfleetpartners.com';
-  // static const String baseUrl = 'http://3.7.202.40:9020';
+  // static const String baseUrl = 'https://admin.mannfleetpartners.com';
+  static const String baseUrl = 'http://3.7.202.40:9020';
 
 
 
@@ -13,6 +13,8 @@ class ApiConstants {
   static const String bookingEstimate = '/api/driver/bookingEstimate';
   static const String booking = '/api/driver/booking';
   static const String profile = '/api/driver/profile';
+  static const String verifyAadhaar = '/api/driver/verifyAadhaar';
+  static const String verifyCompleteAadhaar = '/api/driver/verifyCompleteAadhaar';
   static const String fuelLogs = '/api/driver/fuelLogs';
   static const String getMyAssignedBookings = '/api/driver/getMyAssignedBookings';
   static const String banner = '/api/driver/banner?type=driver';

@@ -10,6 +10,8 @@ import '../../../../../apiservice/network/api_service.dart';
 import '../../../../../apiservice/network/network_utils.dart';
 import '../../../../../apiservice/services/secure_storage_service.dart';
 import '../../auth/register/model/registerModel.dart';
+import '../model/aadharVerifyModel.dart';
+import '../model/complteAdharVarification.dart';
 import '../model/editProfileModel.dart';
 import '../model/getProfileModel.dart';
 
@@ -219,6 +221,56 @@ class ProfileRepo {
       );
 
       return RegisterModel.fromJson(response);
+
+    } catch (e) {
+      throw ApiException(0, e.toString());
+    }
+  }
+
+
+  Future<AadharVerifyModel> verifyAadhaar({
+
+    required String adharNumber,
+
+
+  }) async {
+    try {
+
+
+      final response = await _api.post(
+        ApiConstants.verifyAadhaar,
+        data: {
+          "adharNumber":adharNumber
+        },
+        requiresAuth: true,
+
+      );
+
+      return AadharVerifyModel.fromJson(response);
+
+    } catch (e) {
+      throw ApiException(0, e.toString());
+    }
+  }  Future<AadharVerificationComplteModel> verifyCompleteAadhaar({
+
+    required String adharNumber,
+    required String clientId,
+
+  }) async {
+    try {
+
+
+      final response = await _api.post(
+        ApiConstants.verifyCompleteAadhaar,
+        data: {
+          "adharNumber":adharNumber,
+          "clientId":clientId,
+        },
+        requiresAuth: true,
+
+      );
+
+      return AadharVerificationComplteModel.fromJson(response);
 
     } catch (e) {
       throw ApiException(0, e.toString());

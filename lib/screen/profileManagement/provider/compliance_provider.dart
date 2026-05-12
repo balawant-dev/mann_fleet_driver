@@ -4,6 +4,8 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../../widget/motionToastHelper.dart';
 import '../../../widget/showLoaderFunction.dart';
+import '../model/aadharVerifyModel.dart';
+import '../model/complteAdharVarification.dart';
 import '../model/getProfileModel.dart';
 import '../repo/profileRepo.dart';
 class ComplianceProvider extends ChangeNotifier {
@@ -17,6 +19,77 @@ class ComplianceProvider extends ChangeNotifier {
   TextEditingController adhaarNumber = TextEditingController();
   TextEditingController panNumber = TextEditingController();
   TextEditingController policeExpiry = TextEditingController();
+  AadharVerifyModel? aadharVerifyModel;
+  AadharVerificationComplteModel? aadharVerificationComplteModel;
+
+  bool isLoading = false;
+
+  /// 🔥 Aadhaar verification status
+  bool isAadhaarVerified = false;
+
+  /// ================= VERIFY AADHAAR =================
+
+  Future<AadharVerifyModel?> verifyAadhaar({
+    required String adharNumber,
+  }) async {
+    try {
+      isLoading = true;
+      notifyListeners();
+
+      final res = await api.verifyAadhaar(
+        adharNumber: adharNumber,
+      );
+
+      aadharVerifyModel = res;
+
+      if (res.status == true) {
+        debugPrint("Aadhaar Verify API Success");
+      }
+
+      return res;
+    } catch (e) {
+      debugPrint("Error verifyAadhaar: $e");
+      return null;
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  /// ================= COMPLETE AADHAAR =================
+
+  Future<AadharVerificationComplteModel?> verifyCompleteAadhaar({
+    required String adharNumber,
+    required String clientId,
+  }) async {
+    try {
+      isLoading = true;
+      notifyListeners();
+
+      final res = await api.verifyCompleteAadhaar(
+        adharNumber: adharNumber,
+        clientId: clientId,
+      );
+
+      aadharVerificationComplteModel = res;
+
+      if (res.status == true) {
+
+        /// 🔥 VERIFIED SUCCESS
+        isAadhaarVerified = true;
+
+        debugPrint("Aadhaar Verification Completed");
+      }
+
+      return res;
+    } catch (e) {
+      debugPrint("Error verifyCompleteAadhaar: $e");
+      return null;
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
   final picker = ImagePicker();
   void setInitialData(DriverProfile? driver) {
     if (driver == null) return;
@@ -130,7 +203,7 @@ class ComplianceProvider extends ChangeNotifier {
   // }
 
   final api = ProfileRepo();
-  bool isLoading = false;
+  // bool isLoading = false;
 
   Future<void> submitCompliance(BuildContext context) async {
     try {

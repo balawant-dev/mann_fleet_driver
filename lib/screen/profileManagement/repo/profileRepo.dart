@@ -24,7 +24,7 @@ class ProfileRepo {
     required String permanentAddress,
     required String currentAddress,
     required String gender,
-    required String profilePic, // 👈 path aa raha hai
+    required String profilePic,
     required BuildContext context,
   }) async {
     try {
@@ -136,6 +136,7 @@ class ProfileRepo {
     required String licenseNumber,
     required String licenseExpiry,
     required File? licensePhoto,
+    required File? licenseBackPhoto,
     required BuildContext context,
   }) async {
     try {
@@ -148,6 +149,10 @@ class ProfileRepo {
           "licensePhoto": await MultipartFile.fromFile(
             licensePhoto.path,
             filename: licensePhoto.path.split('/').last,
+          ),    if (licenseBackPhoto != null)
+          "licenseBackPhoto": await MultipartFile.fromFile(
+            licenseBackPhoto.path,
+            filename: licenseBackPhoto.path.split('/').last,
           ),
       });
 

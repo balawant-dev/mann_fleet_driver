@@ -183,6 +183,8 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
                           tripStatus:  booking.tripStatus ??  "Not Started",
                           pickupAddress: booking.pickup?.address ?? "Noida Sector 63",
                           dropAddress: booking.dropoff?.address ?? "Delhi Airport",
+
+
                           onCardTap: () {
                             navPush(
                               context: context,

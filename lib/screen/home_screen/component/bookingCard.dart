@@ -101,23 +101,23 @@ class BookingCard extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CustomText("BOOKING TYPE", size: 12, weight: FontWeight.w700, color: ColorResource.grayText),
-                    CustomText(bookingType, size: 16, weight: FontWeight.w700, color: ColorResource.black),
+                    CustomText("BOOKING TYPE", size: 12, weight: FontWeight.w500, color: ColorResource.grayText),
+                    CustomText(bookingType.toUpperCase(), size: 14, weight: FontWeight.w700, color: ColorResource.black),
                     const SizedBox(height: 10),
                     //tripStatus
-                    CustomText("TRIP STATUS", size: 12, weight: FontWeight.w700, color: ColorResource.grayText),
-                     CustomText(tripStatus, size: 16, weight: FontWeight.w700, color: ColorResource.black),
+                    CustomText("TRIP STATUS", size: 12, weight: FontWeight.w500, color: ColorResource.grayText),
+                     CustomText(tripStatus.toUpperCase(), size: 14, weight: FontWeight.w700, color: ColorResource.black),
                   ],
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     //Vehicle
-                    CustomText("VEHICLE NO", size: 12, weight: FontWeight.w700, color: ColorResource.grayText),
-                    CustomText(vehicleNo, size: 16, weight: FontWeight.w700, color: ColorResource.black),
+                    CustomText("VEHICLE NO", size: 12, weight: FontWeight.w500, color: ColorResource.grayText),
+                    CustomText(vehicleNo, size: 14, weight: FontWeight.w700, color: ColorResource.black),
                     const SizedBox(height: 10),
-                    CustomText("DRIVER STATUS", size: 12, weight: FontWeight.w700, color: ColorResource.grayText),
-                    CustomText(driverStatus, size: 16, weight: FontWeight.w700, color: ColorResource.black),
+                    CustomText("DRIVER STATUS", size: 12, weight: FontWeight.w500, color: ColorResource.grayText),
+                    CustomText(driverStatus.toUpperCase(), size: 14, weight: FontWeight.w700, color: ColorResource.black),
                   ],
                 ),
               ],

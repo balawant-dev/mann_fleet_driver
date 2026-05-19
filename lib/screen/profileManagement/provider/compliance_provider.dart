@@ -1,13 +1,16 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mann_fleet_driver/widget/navigator_method.dart';
 
 import '../../../widget/motionToastHelper.dart';
 import '../../../widget/showLoaderFunction.dart';
+import '../../bottomBar/bottomBar.dart';
 import '../model/aadharVerifyModel.dart';
 import '../model/complteAdharVarification.dart';
 import '../model/getProfileModel.dart';
 import '../repo/profileRepo.dart';
+import '../screen/profileManagementScreen.dart';
 class ComplianceProvider extends ChangeNotifier {
   bool submitted = false;          // to show errors only after submit attempt
   DriverProfile? driver;           // store reference for showing existing images
@@ -26,6 +29,11 @@ class ComplianceProvider extends ChangeNotifier {
 
   /// 🔥 Aadhaar verification status
   bool isAadhaarVerified = false;
+  /// =========================================
+  /// SET INITIAL DATA
+  /// =========================================
+
+
 
   /// ================= VERIFY AADHAAR =================
 
@@ -33,6 +41,7 @@ class ComplianceProvider extends ChangeNotifier {
     required String adharNumber,
   }) async {
     try {
+
       isLoading = true;
       notifyListeners();
 
@@ -93,7 +102,7 @@ class ComplianceProvider extends ChangeNotifier {
   final picker = ImagePicker();
   void setInitialData(DriverProfile? driver) {
     if (driver == null) return;
-
+    isAadhaarVerified = driver.isAdharVerified == true;
     adhaarNumber.text = driver.adhaarNumber ?? "";
     panNumber.text = driver.panNumber ?? "";
 
@@ -205,7 +214,7 @@ class ComplianceProvider extends ChangeNotifier {
   final api = ProfileRepo();
   // bool isLoading = false;
 
-  Future<void> submitCompliance(BuildContext context) async {
+  Future<void> submitCompliance({required BuildContext context,required bool isVerified}) async {
     try {
       showLoader(context);
 
@@ -240,6 +249,14 @@ class ComplianceProvider extends ChangeNotifier {
           message: "KYC Updated ✅",
           type: ToastType.success,
         );
+        print("isVerified       -------------------------$isVerified");
+        if(isVerified==true){
+          print("isVerified 2      -------------------------$isVerified");
+          navPushReplace(context: context, action: MainScreen(), );
+        }else{
+          navPushReplace(context: context, action: ProfileManagementScreen());
+        }
+        // if(res.data?.isProfileComplete==true){}
         // ScaffoldMessenger.of(context).showSnackBar(
         //   const SnackBar(content: Text("KYC Updated ✅")),
         // );

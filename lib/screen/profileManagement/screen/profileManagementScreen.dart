@@ -105,13 +105,13 @@ class _ProfileManagementScreenState extends State<ProfileManagementScreen> {
                       color: Colors.teal,
                       screen: const DrivingCredentialsScreen(),
                     ),
-                    _buildProfileCard(
-                      context,
-                      title: "Vehicle Details",
-                      icon: Icons.directions_car,
-                      color: Colors.orange,
-                      screen:vehiclePro.getVehicleModel?.data==null? const VehicleDetailsScreen():EditVehicleDetailsScreen(),
-                    ),
+                    // _buildProfileCard(
+                    //   context,
+                    //   title: "Vehicle Details",
+                    //   icon: Icons.directions_car,
+                    //   color: Colors.orange,
+                    //   screen:vehiclePro.getVehicleModel?.data==null? const VehicleDetailsScreen():EditVehicleDetailsScreen(),
+                    // ),
                     _buildProfileCard(
                       context,
                       title: "KYC Documents",

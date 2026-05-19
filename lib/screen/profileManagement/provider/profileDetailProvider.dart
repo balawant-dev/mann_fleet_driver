@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 
 
+import '../../../apiservice/services/secure_storage_service.dart';
 import '../model/getProfileModel.dart';
 
 import '../repo/profileRepo.dart';
@@ -25,6 +26,15 @@ class ProfileDetailProvider extends ChangeNotifier {
       getProfileModel = res;
       if(res!=null||res.status==true){
         print("Get Profile Successfully");
+
+        await SecureStorageService.saveFirstUser(res.data?.driver?.firstUser ?? false);
+        await SecureStorageService.saveProfileComplete(res.data?.driver?.isProfileComplete ?? false);
+        await SecureStorageService.saveVerified(res.data?.driver?.isVerified ?? false);
+
+        final isFirstUser = await SecureStorageService.getFirstUser();
+        final isProfileComplete = await SecureStorageService.getProfileComplete();
+        final isVerified = await SecureStorageService.getVerified();
+        print("Api with location storage isFirstUser : ${isFirstUser}  ,isProfileComplete:${isProfileComplete},isVerified ${isVerified}");
       }
 
     } catch (e) {

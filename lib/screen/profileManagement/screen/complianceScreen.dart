@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../../widget/commonAppBar.dart';
 import '../../../widget/commonAppButton.dart';
 import '../../../widget/commonTextFormField.dart';
+import '../../../widget/motionToastHelper.dart';
 import '../provider/compliance_provider.dart';
 import '../provider/profileDetailProvider.dart';
 import 'digilockerWebView.dart';
@@ -72,6 +73,9 @@ class _ComplianceScreenState extends State<ComplianceScreen> {
                       final data = await provider.verifyAadhaar(
                         adharNumber: value,
                       );
+
+
+
 
                       if (data == null || data.status != true) {
                         return;
@@ -242,11 +246,10 @@ class _ComplianceScreenState extends State<ComplianceScreen> {
             ),
 
             const SizedBox(height: 40),
-
-            CommonAppButton(
+    CommonAppButton(
               text: "Submit KYC",
               onPressed: () {
-                provider.submitCompliance(context);
+                provider.isAadhaarVerified==true? provider.submitCompliance(context:context,isVerified: driver?.isVerified??false):ToastHelper.show(context, message: "Please Verify Aadhaar Number",type: ToastType.warning);
               },
             ),
             const SizedBox(height: 100),

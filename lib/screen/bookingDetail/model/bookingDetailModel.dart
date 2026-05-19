@@ -319,8 +319,8 @@ class BookingData {
   bool? isScheduled;
   String? otp;
   String? invoice;
-  DateTime? createdAt;
-  DateTime? updatedAt;
+  String? createdAt;
+  String? updatedAt;
   String? driver;
   Vehicle? vehicle;
   String? tripEndOtp;
@@ -399,8 +399,8 @@ class BookingData {
     isScheduled = json['isScheduled'];
     otp = json['otp'];
     invoice = json['invoice'];
-    createdAt = json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null;
-    updatedAt = json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null;
+    createdAt = json['createdAt'];
+    updatedAt = json['updatedAt'] ;
     driver = json['driver'];
     vehicle = json['vehicle'] != null ? Vehicle.fromJson(json['vehicle']) : null;
     tripEndOtp = json['tripEndOtp'];
@@ -440,8 +440,8 @@ class BookingData {
       'isScheduled': isScheduled,
       'otp': otp,
       'invoice': invoice,
-      'createdAt': createdAt?.toIso8601String(),
-      'updatedAt': updatedAt?.toIso8601String(),
+      'createdAt': createdAt,
+      'updatedAt': updatedAt,
       'driver': driver,
       'vehicle': vehicle?.toJson(),
       'tripEndOtp': tripEndOtp,

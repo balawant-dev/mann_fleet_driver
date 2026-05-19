@@ -77,6 +77,19 @@ class _FuelEntryScreenState extends State<FuelEntryScreen> {
                     color: ColorResource.grayText,
                   ),
 
+                  const SizedBox(height: 15),
+                  _imageCard(
+                    title: "Upload Bill",
+                    file: provider.billImage,
+                    onTap: () => _pick(context, provider, "bill"),
+                  ),
+
+                  /// IMAGE SECTION
+                  _imageCard(
+                    title: "Odometer Image",
+                    file: provider.odometerImage,
+                    onTap: () => _pick(context, provider, "odometer"),
+                  ),
                   const SizedBox(height: 20),
 
                   /// VEHICLE
@@ -176,18 +189,7 @@ class _FuelEntryScreenState extends State<FuelEntryScreen> {
                   ),
 
                   const SizedBox(height: 20),
-                  _imageCard(
-                    title: "Upload Bill",
-                    file: provider.billImage,
-                    onTap: () => _pick(context, provider, "bill"),
-                  ),
 
-                  /// IMAGE SECTION
-                  _imageCard(
-                    title: "Odometer Image",
-                    file: provider.odometerImage,
-                    onTap: () => _pick(context, provider, "odometer"),
-                  ),
 
                   _imageCard(
                     title: "Start Meter",

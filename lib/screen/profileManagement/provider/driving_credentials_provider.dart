@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../widget/motionToastHelper.dart';
+import '../../../widget/navigator_method.dart';
 import '../../../widget/showLoaderFunction.dart';
+import '../../bottomBar/bottomBar.dart';
 import '../model/getProfileModel.dart';
 import '../repo/profileRepo.dart';
+import '../screen/profileManagementScreen.dart';
 
 class DrivingCredentialsProvider extends ChangeNotifier {
 
@@ -13,6 +16,7 @@ class DrivingCredentialsProvider extends ChangeNotifier {
   TextEditingController dlExpiry = TextEditingController();
 
   File? licensePhoto;
+  File? licenseBackPhoto;
   bool submitted = false;          // to show errors only after submit attempt
   DriverProfile? driver;           // store reference for showing existing images
   final picker = ImagePicker();
@@ -97,6 +101,64 @@ class DrivingCredentialsProvider extends ChangeNotifier {
         );
       },
     );
+  }  Future pickLicenseBackPhoto(BuildContext context) async {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(20),
+        ),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Wrap(
+              children: [
+
+                /// Camera
+                ListTile(
+                  leading: const Icon(Icons.camera_alt),
+                  title: const Text("Camera"),
+                  onTap: () async {
+                    Navigator.pop(context);
+
+                    final picked = await picker.pickImage(
+                      source: ImageSource.camera,
+                      imageQuality: 70,
+                    );
+
+                    if (picked != null) {
+                      licenseBackPhoto = File(picked.path);
+                      notifyListeners();
+                    }
+                  },
+                ),
+
+                /// Gallery
+                ListTile(
+                  leading: const Icon(Icons.photo),
+                  title: const Text("Gallery"),
+                  onTap: () async {
+                    Navigator.pop(context);
+
+                    final picked = await picker.pickImage(
+                      source: ImageSource.gallery,
+                      imageQuality: 70,
+                    );
+
+                    if (picked != null) {
+                      licenseBackPhoto = File(picked.path);
+                      notifyListeners();
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
   /// 📅 DATE PICKER
   Future<void> pickExpiryDate(BuildContext context) async {
@@ -117,7 +179,7 @@ class DrivingCredentialsProvider extends ChangeNotifier {
   }
 
   /// 🚀 SUBMIT
-  Future<void> submitDrivingDetails(BuildContext context) async {
+  Future<void> submitDrivingDetails({required BuildContext context,required bool isVerified }) async {
     try {
       showLoader(context);
 
@@ -125,12 +187,14 @@ class DrivingCredentialsProvider extends ChangeNotifier {
       debugPrint("licenseNumber: ${dlNumber.text}");
       debugPrint("licenseExpiry: ${dlExpiry.text}");
       debugPrint("licensePhoto: ${licensePhoto?.path}");
+      debugPrint("licenseBackPhoto: ${licenseBackPhoto?.path}");
 
       final res = await api.updateDrivingCredentials(
         context: context,
         licenseNumber: dlNumber.text.trim(),
         licenseExpiry: dlExpiry.text.trim(),
         licensePhoto: licensePhoto,
+        licenseBackPhoto: licenseBackPhoto,
       );
 
       Navigator.pop(context);
@@ -141,6 +205,13 @@ class DrivingCredentialsProvider extends ChangeNotifier {
           message: "Updated Successfully ✅",
           type: ToastType.success,
         );
+        print("isVerified       -------------------------$isVerified");
+        if(isVerified==true){
+          navPushReplace(context: context, action: MainScreen(), );
+        }else{
+          navPushReplace(context: context, action: ProfileManagementScreen());
+        }
+
         // ScaffoldMessenger.of(context).showSnackBar(
         //   const SnackBar(content: Text("Updated Successfully ✅")),
         // );

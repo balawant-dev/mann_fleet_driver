@@ -5,10 +5,14 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mann_fleet_driver/screen/profileManagement/provider/profileDetailProvider.dart';
 
 import '../../../widget/motionToastHelper.dart';
+import '../../../widget/navigator_method.dart';
 import '../../auth/register/model/registerModel.dart';
+import '../../bottomBar/bottomBar.dart';
 import '../model/getProfileModel.dart';
 import '../repo/profileRepo.dart';
 import 'package:provider/provider.dart';
+
+import '../screen/profileManagementScreen.dart';
 
 class PersonalProfileProvider extends ChangeNotifier {
 
@@ -134,6 +138,7 @@ class PersonalProfileProvider extends ChangeNotifier {
 
 
   bool isLoading = false;
+  bool isVerified = false;
   void setProfileData(DriverProfile? driver) {
     if (driver == null) return;
     String fullName = (driver.name ?? "").trim();
@@ -168,6 +173,7 @@ class PersonalProfileProvider extends ChangeNotifier {
     currentAddress.text = driver.currentAddress ?? "";
     permanentAddress.text = driver.permanentAddress ?? "";
     gender = driver.name ?? "Male";
+    isVerified = driver.isVerified ?? false;
 
     notifyListeners();
   }
@@ -179,6 +185,7 @@ class PersonalProfileProvider extends ChangeNotifier {
     required String currentAddress ,
     required String gender ,
     required String profilePic ,
+    required bool isVerified,
     required BuildContext context,}) async {
     try {
       isLoading = true;
@@ -201,6 +208,13 @@ context,
 message: "Profile Updated Successfully",
 type: ToastType.success,
 );
+print("isVerified       -------------------------$isVerified");
+        // if(isVerified==true){
+        //   print("Navigation pop complte why ");
+        //   navPush(context: context, action: MainScreen(),);
+        // }else{
+        //   navPushReplace(context: context, action: ProfileManagementScreen());
+        // }
 
         // ScaffoldMessenger.of(context).showSnackBar(
         //   const SnackBar(content: Text("Profile Updated Successfully")),

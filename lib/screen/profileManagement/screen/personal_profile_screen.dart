@@ -1,12 +1,15 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:mann_fleet_driver/screen/profileManagement/screen/profileManagementScreen.dart';
 import 'package:mann_fleet_driver/util/color/app_colors.dart';
 import 'package:provider/provider.dart';
 
 import '../../../widget/commonAppBar.dart';
 import '../../../widget/commonAppButton.dart';
 import '../../../widget/commonTextFormField.dart';
+import '../../../widget/navigator_method.dart';
 import '../../../widget/showLoaderFunction.dart';
+import '../../bottomBar/bottomBar.dart';
 import '../provider/personal_profile_provider.dart';
 import '../provider/profileDetailProvider.dart';
 
@@ -188,8 +191,17 @@ class _PersonalProfileScreenState extends State<PersonalProfileScreen> {
                   currentAddress: provider.currentAddress.text,
                   gender: provider.gender,
                   profilePic: provider.profileImage?.path ?? "", // 👈 optional
+                  isVerified: provider.isVerified??false,
                 );
                 Navigator.pop(context);
+                if( provider.isVerified==true){
+                  print("Navigation pop complte why ");
+                  navPush(context: context, action: MainScreen(),);
+                }else{
+                  navPushReplace(context: context, action: ProfileManagementScreen());
+                }
+
+                print("Navigation pop complte");
               },
             ),
             SizedBox(height: 100,)

@@ -47,6 +47,7 @@ class Data {
 class DriverProfile {
   String? id;                       // _id
   String? phone;
+  bool? isAdharVerified;
   bool? isVerified;
   bool? isOnline;
   bool? isAvailable;
@@ -71,10 +72,12 @@ class DriverProfile {
   bool? isDeleted;
   String? licenseExpiry;
   String? licensePhoto;
+  String? licenseBackPhoto;
   String? adhaarNumber;
   String? adhaarFrontPhoto;
   String? adhaarBackPhoto;
   String? panNumber;
+
   String? panFrontPhoto;
   String? panBackPhoto;
   String? policeVerificationPhoto;
@@ -84,6 +87,7 @@ class DriverProfile {
   DriverProfile({
     this.id,
     this.phone,
+    this.isAdharVerified,
     this.isVerified,
     this.isOnline,
     this.isAvailable,
@@ -108,6 +112,7 @@ class DriverProfile {
     this.isDeleted,
     this.licenseExpiry,
     this.licensePhoto,
+    this.licenseBackPhoto,
     this.adhaarNumber,
     this.adhaarFrontPhoto,
     this.adhaarBackPhoto,
@@ -122,6 +127,7 @@ class DriverProfile {
   DriverProfile.fromJson(Map<String, dynamic> json) {
     id = json['_id'];
     phone = json['phone'];
+    isAdharVerified = json['isAdharVerified'];
     isVerified = json['isVerified'];
     isOnline = json['isOnline'];
     isAvailable = json['isAvailable'];
@@ -146,6 +152,7 @@ class DriverProfile {
     isDeleted = json['isDeleted'];
     licenseExpiry = json['licenseExpiry'];
     licensePhoto = json['licensePhoto'];
+    licenseBackPhoto = json['licenseBackPhoto'];
     adhaarNumber = json['adhaarNumber'];
     adhaarFrontPhoto = json['adhaarFrontPhoto'];
     adhaarBackPhoto = json['adhaarBackPhoto'];
@@ -161,6 +168,7 @@ class DriverProfile {
     final Map<String, dynamic> map = <String, dynamic>{};
     map['_id'] = id;
     map['phone'] = phone;
+    map['isAdharVerified'] = isAdharVerified;
     map['isVerified'] = isVerified;
     map['isOnline'] = isOnline;
     map['isAvailable'] = isAvailable;
@@ -185,6 +193,7 @@ class DriverProfile {
     map['isDeleted'] = isDeleted;
     map['licenseExpiry'] = licenseExpiry;
     map['licensePhoto'] = licensePhoto;
+    map['licenseBackPhoto'] = licenseBackPhoto;
     map['adhaarNumber'] = adhaarNumber;
     map['adhaarFrontPhoto'] = adhaarFrontPhoto;
     map['adhaarBackPhoto'] = adhaarBackPhoto;

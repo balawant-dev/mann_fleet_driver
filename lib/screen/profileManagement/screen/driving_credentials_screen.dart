@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../util/color/app_colors.dart';
 import '../../../widget/commonAppBar.dart';
 import '../../../widget/commonAppButton.dart';
 import '../../../widget/commonTextFormField.dart';
@@ -184,7 +185,7 @@ class _DrivingCredentialsScreenState
             CommonTextFormField(
               controller: provider.dlNumber,
               labelText: "DL Number",
-              keyboardType: TextInputType.number,
+              keyboardType: TextInputType.text,
             ),
 
             const SizedBox(height: 12),
@@ -198,6 +199,10 @@ class _DrivingCredentialsScreenState
             ),
 
             const SizedBox(height: 15),
+            Text("Upload Front License Photo",style: TextStyle( fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: ColorResource.grayText,),),
+             SizedBox(height: 10,),
 
             GestureDetector(
               onTap: () => provider.pickLicense(context),
@@ -226,7 +231,43 @@ class _DrivingCredentialsScreenState
                   children: const [
                     Icon(Icons.cloud_upload, size: 30),
                     SizedBox(height: 5),
-                    Text("Upload License Photo"),
+                    Text("Upload Front License Photo"),
+                  ],
+                ),
+              ),
+            ),   SizedBox(height: 10,),   Text("Upload Back License Photo",style: TextStyle( fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: ColorResource.grayText,),),
+             SizedBox(height: 10,),
+
+            GestureDetector(
+              onTap: () => provider.pickLicenseBackPhoto(context),
+              // onTap: provider.pickLicense,
+              child: Container(
+                height: 130,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey.shade300),
+                ),
+                child: provider.licenseBackPhoto != null
+                    ? Image.file(provider.licenseBackPhoto!, fit: BoxFit.contain)
+                    : (driver?.licenseBackPhoto != null &&
+                    driver!.licenseBackPhoto!.isNotEmpty)
+                    ? Image.network(
+                  driver.licenseBackPhoto!,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Icon(Icons.image_not_supported_outlined,size: 60,);
+                  },
+                )
+                    : Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Icon(Icons.cloud_upload, size: 30),
+                    SizedBox(height: 5),
+                    Text("Upload Back License Photo"),
                   ],
                 ),
               ),
@@ -256,7 +297,7 @@ class _DrivingCredentialsScreenState
                   return;
                 }
 
-                await provider.submitDrivingDetails(context);
+                await provider.submitDrivingDetails(context:context,isVerified: driver?.isVerified??false);
               },
             ),
           ],

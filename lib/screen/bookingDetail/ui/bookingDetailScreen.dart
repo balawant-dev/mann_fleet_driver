@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:intl/intl.dart';
 import 'package:mann_fleet_driver/widget/commonAppButton.dart';
 import 'package:mann_fleet_driver/widget/navigator_method.dart';
 
@@ -12,6 +13,8 @@ import '../../home_screen/provider/newBookingProvider.dart';
 import '../../pickup/ui/pickUpScreen.dart';
 
 import 'package:provider/provider.dart';
+
+import 'mapRedirection.dart';
 
 class BookingDetailScreen extends StatefulWidget {
   final String id;
@@ -132,15 +135,35 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
         final data = provider.bookingDetailModel?.data;
 
         /// 🔥 FALLBACKS
-        final date = "4 Sep 2024";
-        final time = "08:30 PM";
+
+        final rawDate = data?.createdAt; // "2026-05-15T09:44:03.278Z"
+
+        String formattedDate = "4 Sep 2024"; // Default fallback
+        String formattedTime = "08:30 PM";   // Default fallback
+
+        if (rawDate != null) {
+          try {
+            // String ko DateTime object mein convert karna
+            DateTime dateTime = DateTime.parse(rawDate).toLocal();
+
+            // Date alag variable mein: "15 May 2026"
+            formattedDate = DateFormat('d MMM yyyy').format(dateTime);
+
+            // Time alag variable mein: "09:44 AM" (ya PM)
+            formattedTime = DateFormat('hh:mm a').format(dateTime);
+          } catch (e) {
+            debugPrint("Date parsing error: $e");
+          }
+        }
         final bookingId = data?.bookingNumber ?? "B0045681021";
         final tripType = data?.bookingType ?? "One Way Trip";
 
         final pickup = data?.pickup?.address ?? "Sector- 63, Noida";
         final drop = data?.dropoff?.address ?? "Nainital, Uttarakhand";
+        print("pickup lat${data?.pickup?.lat} pickup lng${data?.pickup?.lng} drop lat${data?.dropoff?.lat} dropoff lng${data?.dropoff?.lng}");
 
-        final totalKm = data?.estimatedFare?.toInt() ?? 10;
+
+        final totalKm = data?.estimatedKm?? 0;
         final extraKm = data?.pricingSnapshot?.perKmRate?.toInt() ?? 2;
 
         final cabType =  "CNG CAB";
@@ -198,7 +221,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                               children: [
                                 const Icon(Icons.calendar_today, size: 16),
                                 const SizedBox(width: 6),
-                                Text(date),
+                                Text(formattedDate),
                               ],
                             ),
                             const SizedBox(height: 6),
@@ -206,7 +229,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                               children: [
                                 const Icon(Icons.access_time, size: 16),
                                 const SizedBox(width: 6),
-                                Text(time),
+                                Text(formattedTime),
                               ],
                             ),
                           ],
@@ -238,37 +261,229 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                               width: 10,
                               height: 10,
                               decoration: const BoxDecoration(
-                                  color: Colors.orange, shape: BoxShape.circle),
+                                color: Colors.orange,
+                                shape: BoxShape.circle,
+                              ),
                             ),
-                            Container(height: 60, width: 2, color: Colors.grey),
+
+                            Container(
+                              height: 60,
+                              width: 2,
+                              color: Colors.grey,
+                            ),
+
                             Container(
                               width: 10,
                               height: 10,
                               decoration: const BoxDecoration(
-                                  color: Colors.red, shape: BoxShape.circle),
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                              ),
                             ),
                           ],
                         ),
 
-                        const SizedBox(width: 10),
+                        const SizedBox(width: 12),
 
-                        /// address
+                        /// address section
                         Expanded(
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(pickup,
-                                  style:
-                                  const TextStyle(fontWeight: FontWeight.w500)),
+
+                              /// pickup row
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+
+                                  Expanded(
+                                    child: Text(
+                                      pickup,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+
+                                  const SizedBox(width: 8),
+
+                                  GestureDetector(
+                                    onTap: () async {
+                                      final pLat = data?.pickup?.lat;
+                                      final pLng = data?.pickup?.lng;
+
+                                      if (pLat != null && pLng != null) {
+                                        await openMapNavigation(
+                                          destLat: double.parse(pLat.toString()),
+                                          destLng: double.parse(pLng.toString()),
+                                        );
+                                      } else {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(
+                                            content: Text("Pickup location missing!"),
+                                          ),
+                                        );
+                                      }
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.all(6),
+                                      decoration: BoxDecoration(
+                                        color: Colors.orange.withOpacity(.1),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Image.asset(
+                                        "assets/icon/directions.png",
+                                        height: 22,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+
                               const SizedBox(height: 20),
-                              Text(drop,
-                                  style:
-                                  const TextStyle(fontWeight: FontWeight.w500)),
+
+                              /// drop row
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+
+                                  Expanded(
+                                    child: Text(
+                                      drop,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+
+                                  const SizedBox(width: 8),
+
+                                  GestureDetector(
+                                    onTap: () async {
+                                      final dLat = data?.dropoff?.lat;
+                                      final dLng = data?.dropoff?.lng;
+
+                                      if (dLat != null && dLng != null) {
+                                        await openMapNavigation(
+                                          destLat: double.parse(dLat.toString()),
+                                          destLng: double.parse(dLng.toString()),
+                                        );
+                                      } else {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(
+                                            content: Text("Drop location missing!"),
+                                          ),
+                                        );
+                                      }
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.all(6),
+                                      decoration: BoxDecoration(
+                                        color: Colors.red.withOpacity(.1),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Image.asset(
+                                        "assets/icon/directions.png",
+                                        height: 22,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ],
                           ),
                         ),
                       ],
                     ),
+                    // Row(
+                    //   crossAxisAlignment: CrossAxisAlignment.start,
+                    //   children: [
+                    //
+                    //     /// timeline
+                    //     Column(
+                    //       children: [
+                    //         Container(
+                    //           width: 10,
+                    //           height: 10,
+                    //           decoration: const BoxDecoration(
+                    //               color: Colors.orange, shape: BoxShape.circle),
+                    //         ),
+                    //         Container(height: 60, width: 2, color: Colors.grey),
+                    //         Container(
+                    //           width: 10,
+                    //           height: 10,
+                    //           decoration: const BoxDecoration(
+                    //               color: Colors.red, shape: BoxShape.circle),
+                    //         ),
+                    //       ],
+                    //     ),
+                    //
+                    //     const SizedBox(width: 10),
+                    //
+                    //
+                    //
+                    //     /// address
+                    //     Expanded(
+                    //       child: GestureDetector(
+                    //         onTap: () {
+                    //           final pLat = data?.pickup?.lat;
+                    //           final pLng = data?.pickup?.lng;
+                    //           final dLat = data?.dropoff?.lat;
+                    //           final dLng = data?.dropoff?.lng;
+                    //
+                    //           print("Redirecting to Map: $pLat, $pLng to $dLat, $dLng");
+                    //
+                    //           if (pLat != null && pLng != null && dLat != null && dLng != null) {
+                    //             openMap(
+                    //                 double.parse(pLat.toString()),
+                    //                 double.parse(pLng.toString()),
+                    //                 double.parse(dLat.toString()),
+                    //                 double.parse(dLng.toString())
+                    //             );
+                    //           } else {
+                    //             ScaffoldMessenger.of(context).showSnackBar(
+                    //               const SnackBar(content: Text("Location coordinates missing!")),
+                    //             );
+                    //           }
+                    //         },
+                    //         child: Column(
+                    //           crossAxisAlignment: CrossAxisAlignment.start,
+                    //           children: [
+                    //             Text(pickup,
+                    //                 style:
+                    //                 const TextStyle(fontWeight: FontWeight.w500)),
+                    //             const SizedBox(height: 20),
+                    //             Text(drop,
+                    //                 style:
+                    //                 const TextStyle(fontWeight: FontWeight.w500)),
+                    //           ],
+                    //         ),
+                    //       ),
+                    //     ),
+                    //     GestureDetector(
+                    //         onTap: () {
+                    //           final pLat = data?.pickup?.lat;
+                    //           final pLng = data?.pickup?.lng;
+                    //           final dLat = data?.dropoff?.lat;
+                    //           final dLng = data?.dropoff?.lng;
+                    //
+                    //           print("Redirecting to Map: $pLat, $pLng to $dLat, $dLng");
+                    //
+                    //           if (pLat != null && pLng != null && dLat != null && dLng != null) {
+                    //             openMap(
+                    //                 double.parse(pLat.toString()),
+                    //                 double.parse(pLng.toString()),
+                    //                 double.parse(dLat.toString()),
+                    //                 double.parse(dLng.toString())
+                    //             );
+                    //           } else {
+                    //             ScaffoldMessenger.of(context).showSnackBar(
+                    //               const SnackBar(content: Text("Location coordinates missing!")),
+                    //             );
+                    //           }
+                    //         },
+                    //         child: Image.asset("assets/icon/directions.png",height: 30,)),
+                    //   ],
+                    // ),
 
                     const SizedBox(height: 20),
 
@@ -335,23 +550,6 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                       ],
                     ),
 
-                    // /// 🔹 CAB
-                    // Row(
-                    //   children: [
-                    //     Container(
-                    //       padding: const EdgeInsets.symmetric(
-                    //           horizontal: 14, vertical: 6),
-                    //       decoration: BoxDecoration(
-                    //         border: Border.all(color: Colors.green),
-                    //         borderRadius: BorderRadius.circular(20),
-                    //       ),
-                    //       child: Text(cabType,
-                    //           style: const TextStyle(color: Colors.green)),
-                    //     ),
-                    //     const SizedBox(width: 10),
-                    //     Expanded(child: Text(carInfo)),
-                    //   ],
-                    // ),
 
                     const SizedBox(height: 25),
 

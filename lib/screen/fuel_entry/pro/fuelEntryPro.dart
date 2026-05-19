@@ -138,6 +138,7 @@ class FuelEntryProvider extends ChangeNotifier {
       "total amount",
       "total amt",
       "total",
+      "sale",
       "amount",
       "amt",
       "net amount",
@@ -150,12 +151,19 @@ class FuelEntryProvider extends ChangeNotifier {
       "₹"
     ];
 
-    // List<String> invoiceKeys = [
-    //   "invoice no",
-    //   "inv no",
-    //   "bill no",
-    // ];
-    //
+    /// 🔥 FUEL QUANTITY KEYS
+    List<String> fuelQuantityKeys = [
+      "volume",
+      "qty",
+      "quantity",
+      "litre",
+      "liter",
+      "ltr",
+      "ltrs",
+      "liters",
+      "litres",
+    ];
+
     // List<String> amountKeys = [
     //   "total amt",
     //   "total amount",
@@ -165,6 +173,7 @@ class FuelEntryProvider extends ChangeNotifier {
 
     String foundInvoice = "";
     String foundAmount = "";
+    String foundFuelQty = "";
 
     List<String> lines = text.split('\n');
 
@@ -233,7 +242,47 @@ class FuelEntryProvider extends ChangeNotifier {
       amounts.sort();
       foundAmount = amounts.last.toStringAsFixed(2);
     }
+    /// ⛽ FUEL QUANTITY
+    for (int i = 0; i < lines.length; i++) {
+      String line = lines[i];
+      String l = line.toLowerCase();
 
+      for (String key in fuelQuantityKeys) {
+
+        if (l.contains(key) && foundFuelQty.isEmpty) {
+
+          /// Example:
+          /// Volume : 30.00L
+          /// Qty : 15.5
+          /// Volume 30.00
+
+          RegExp reg = RegExp(r'(\d+\.?\d{0,2})');
+
+          final match = reg.firstMatch(line);
+
+          if (match != null) {
+            foundFuelQty = match.group(1)!;
+            break;
+          }
+
+          /// next line fallback
+          if (i + 1 < lines.length) {
+
+            final nextMatch =
+            RegExp(r'(\d+\.?\d{0,2})').firstMatch(lines[i + 1]);
+
+            if (nextMatch != null) {
+              foundFuelQty = nextMatch.group(1)!;
+              break;
+            }
+          }
+        }
+      }
+    }
+
+    debugPrint("🧾 INVOICE: $foundInvoice");
+    debugPrint("💰 AMOUNT: $foundAmount");
+    debugPrint("⛽ QTY: $foundFuelQty");
     /// ✅ AUTO FILL (IMPORTANT 🔥)
     if (foundInvoice.isNotEmpty) {
       invoiceNumberController.text = foundInvoice;
@@ -242,7 +291,10 @@ class FuelEntryProvider extends ChangeNotifier {
     if (foundAmount.isNotEmpty) {
       fuelAmountController.text = foundAmount;
     }
-
+    /// 🔥 AUTO FILL FUEL QUANTITY
+    if (foundFuelQty.isNotEmpty) {
+      fuelQtyController.text = foundFuelQty;
+    }
     notifyListeners();
   }
   // Future<void> pickImage(String type, ImageSource source) async {

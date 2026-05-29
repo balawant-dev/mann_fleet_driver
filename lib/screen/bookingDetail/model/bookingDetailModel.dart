@@ -326,6 +326,7 @@ class BookingData {
   String? tripEndOtp;
   bool? tripEndOtpVerify;
   bool? tripStartOtpVerify;
+  bool? finalImageUploaded;
   bool? pickupVerification;
 
   BookingData({
@@ -365,6 +366,7 @@ class BookingData {
     this.tripEndOtp,
     this.tripEndOtpVerify,
     this.tripStartOtpVerify,
+    this.finalImageUploaded,
     this.pickupVerification,
   });
 
@@ -406,6 +408,7 @@ class BookingData {
     tripEndOtp = json['tripEndOtp'];
     tripEndOtpVerify = json['tripEndOtpVerify'];
     tripStartOtpVerify = json['tripStartOtpVerify'];
+    finalImageUploaded = json['finalImageUploaded'];
     pickupVerification = json['pickupVerification'];
   }
 
@@ -447,6 +450,7 @@ class BookingData {
       'tripEndOtp': tripEndOtp,
       'tripEndOtpVerify': tripEndOtpVerify,
       'tripStartOtpVerify': tripStartOtpVerify,
+      'finalImageUploaded': finalImageUploaded,
       'pickupVerification': pickupVerification,
     };
   }

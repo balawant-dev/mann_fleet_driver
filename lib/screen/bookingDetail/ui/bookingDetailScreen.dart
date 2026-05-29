@@ -14,6 +14,7 @@ import '../../pickup/ui/pickUpScreen.dart';
 
 import 'package:provider/provider.dart';
 
+import 'endSpeedoMeterScreen.dart';
 import 'mapRedirection.dart';
 
 class BookingDetailScreen extends StatefulWidget {
@@ -560,6 +561,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                       tripStatus: data?.tripStatus ?? "",
                       isStartOtpVerified: data?.tripStartOtpVerify ?? false,
                       isEndOtpVerified: data?.tripEndOtpVerify ?? false,
+                      finalImageUploaded: data?.finalImageUploaded ?? false,
                       // pickupDone: data?.pickupVerified ?? false, // 👈 backend flag
                       // isStartOtpVerified: true,
                       // isEndOtpVerified:true,
@@ -599,12 +601,14 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
     required bool isStartOtpVerified,
     required bool isEndOtpVerified,
     required bool pickupDone,
+    required bool finalImageUploaded,
   }) {
     print(">>>>>>>status>>>>>>>>>>>>>>>>>${status}");
     print(">>>>>>>tripStatus>>>>>>>>>>>>>>>>>${tripStatus}");
     print(">>>>>>>isStartOtpVerified>>>>>>>>>>>>>>>>>${isStartOtpVerified}");
     print(">>>>>>>isEndOtpVerified>>>>>>>>>>>>>>>>>${isEndOtpVerified}");
     print(">>>>>>>pickupDone>>>>>>>>>>>>>>>>>${pickupDone}");
+    print(">>>>>>>finalImageUploaded>>>>>>>>>>>>>>>>>${finalImageUploaded}");
 
     /// 🔹 1. Pickup Pending
     if (status == "accepted" && !pickupDone) {
@@ -628,6 +632,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
     }
 
     /// 🔹 3. Start Ride
+    // if (tripStatus == "driver_enroute" && isStartOtpVerified) {
     if (tripStatus == "arrived" && isStartOtpVerified) {
       return CommonAppButton(
         text: "Start Ride",
@@ -664,13 +669,22 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
     /// 🔹 5. Completed
     if (tripStatus == "in_progress" && isEndOtpVerified) {
       print("Booking complte Kro ab ok");
+      // navPush(context: context, action: UploadSpeedoMeterImageScreen(id: widget.id,));
       print(tripStatus);
       return CommonAppButton(
-        text: "Complete Trip",
+        text: finalImageUploaded==true?"Complete Trip":"Next",
           onPressed: ()async {
+          if(finalImageUploaded==true){
             showLoader(context);
             await _completeTripAfterEndOtp(widget.id);
             navPop(context: context);
+
+          }else{
+            navPush(context: context, action: UploadSpeedoMeterImageScreen(id: widget.id,));
+
+          }
+
+
           },
         // onPressed: () => showOtpDialog(widget.id, "end"),
       );

@@ -18,6 +18,7 @@ import '../model/newBookingModel.dart';
 import '../model/pickupVerificationModel.dart';
 import '../model/startTripModel.dart';
 import '../model/tripCompleteModel.dart';
+import '../model/updateLocationModel.dart';
 import '../model/verifyBookingOtpModel.dart';
 
 
@@ -115,9 +116,9 @@ class NewBookingRepo {
     }
   }
 
-  Future<BookingAcceptedModel> acceptBookingApi({required BuildContext context,required String id}) async {
+  Future<BookingAcceptedModel> acceptBookingApi({required BuildContext context,required String id,required double currentLat,required double currentLng}) async {
     try {
-      final response = await _api.get("${ApiConstants.acceptBooking}/${id}", requiresAuth: true);
+      final response = await _api.get("${ApiConstants.acceptBooking}/${id}?currentLat=$currentLat&currentLng =$currentLng", requiresAuth: true);
       //   await SecureStorageService.saveToken(response['token']);
       return BookingAcceptedModel.fromJson(response);
       //  return LoginModel.fromJson(response['user']);
@@ -125,13 +126,13 @@ class NewBookingRepo {
       if (e.error is NoInternetException) {
         showNoInternetScreen(
           context,
-          onRetry: () => acceptBookingApi(context: context,id: id),
+          onRetry: () => acceptBookingApi(context: context,id: id,currentLng: currentLng,currentLat: currentLat),
         );
         throw NoInternetException();
       } else if (e.error is ServerException) {
         showServerErrorScreen(
           context,
-          onRetry: () => acceptBookingApi(context: context,id: id),
+          onRetry: () => acceptBookingApi(context: context,id: id,currentLng: currentLng,currentLat: currentLat),
         );
         throw ServerException();
       } else if (e.error is UnauthorizedException) {
@@ -187,13 +188,13 @@ class NewBookingRepo {
       if (e.error is NoInternetException) {
         showNoInternetScreen(
           context,
-          onRetry: () => acceptBookingApi(context: context,id: id),
+          onRetry: () => startTripApi(context: context,id: id),
         );
         throw NoInternetException();
       } else if (e.error is ServerException) {
         showServerErrorScreen(
           context,
-          onRetry: () => acceptBookingApi(context: context,id: id),
+          onRetry: () => startTripApi(context: context,id: id),
         );
         throw ServerException();
       } else if (e.error is UnauthorizedException) {
@@ -219,13 +220,13 @@ class NewBookingRepo {
       if (e.error is NoInternetException) {
         showNoInternetScreen(
           context,
-          onRetry: () => acceptBookingApi(context: context,id: id),
+          onRetry: () => verifyBookingOtpApi(context: context,id: id,type: type,otp: otp),
         );
         throw NoInternetException();
       } else if (e.error is ServerException) {
         showServerErrorScreen(
           context,
-          onRetry: () => acceptBookingApi(context: context,id: id),
+          onRetry: () => verifyBookingOtpApi(context: context,id: id,otp: otp,type: type),
         );
         throw ServerException();
       } else if (e.error is UnauthorizedException) {
@@ -257,6 +258,37 @@ class NewBookingRepo {
         showServerErrorScreen(
           context,
           onRetry: () => getBookingDetailApi(context: context,id: id),
+        );
+        throw ServerException();
+      } else if (e.error is UnauthorizedException) {
+        await SecureStorageService.logout(context);
+        throw UnauthorizedException();
+      } else {
+        rethrow;
+      }
+    } catch (e) {
+      throw ApiException(0, e.toString());
+    }
+  }  Future<UpdateLocationModel> updateDriverLocationApi({required BuildContext context,required String id,required double lat,required double lng}) async {
+    try {
+      final response = await _api.patch("${ApiConstants.updateDriverLocation}/${id}", requiresAuth: true,data: {
+        "lat":lat,
+        "lng":lng
+      });
+      //   await SecureStorageService.saveToken(response['token']);
+      return UpdateLocationModel.fromJson(response);
+      //  return LoginModel.fromJson(response['user']);
+    } on DioException catch (e) {
+      if (e.error is NoInternetException) {
+        showNoInternetScreen(
+          context,
+          onRetry: () => updateDriverLocationApi(context: context,id: id,lat: lat,lng: lng),
+        );
+        throw NoInternetException();
+      } else if (e.error is ServerException) {
+        showServerErrorScreen(
+          context,
+          onRetry: () => updateDriverLocationApi(context: context,id: id,lng: lng,lat: lat),
         );
         throw ServerException();
       } else if (e.error is UnauthorizedException) {
@@ -356,6 +388,71 @@ class NewBookingRepo {
               interiorImage: interiorImage,
               leftViewImage: leftViewImage,
               rightViewImage: rightViewImage,
+              speedometerImage: speedometerImage
+          ),
+        );
+        throw ServerException();
+      } else if (e.error is UnauthorizedException) {
+        await SecureStorageService.logout(context);
+        throw UnauthorizedException();
+      } else {
+        rethrow;
+      }
+    } catch (e) {
+      throw ApiException(0, e.toString());
+    }
+  }  Future<PickupVerificationModel> speedometerVerification({
+    required String id,
+
+
+    required String speedometerImage,
+    required BuildContext context,
+  }) async {
+    try {
+
+      FormData formData = FormData.fromMap({
+        // "name": name,
+
+
+
+
+    if (speedometerImage.isNotEmpty)
+          "image": await MultipartFile.fromFile(
+            speedometerImage,
+            filename: speedometerImage.split('/').last,
+          ),
+
+      });
+
+      final response = await _api.patchMultipart(
+        "${ApiConstants.pickupVerification}/${id}",
+        data: formData, // 👈 important
+        requiresAuth: true,
+        isMultipart: true,
+      );
+
+      return PickupVerificationModel.fromJson(response);
+
+    } on DioException catch (e) {
+      if (e.error is NoInternetException) {
+        showNoInternetScreen(
+          context,
+          onRetry: () => speedometerVerification(
+            id: id,
+            context: context,
+
+            speedometerImage: speedometerImage
+          ),
+        );
+        throw NoInternetException();
+      } else if (e.error is ServerException) {
+        showServerErrorScreen(
+          context,
+          onRetry: () => speedometerVerification(
+              id: id,
+              context: context,
+
+
               speedometerImage: speedometerImage
           ),
         );

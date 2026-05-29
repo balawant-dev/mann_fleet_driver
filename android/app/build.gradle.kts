@@ -10,8 +10,8 @@ plugins {
 
 android {
     namespace = "com.pilot.mannfleet"
-    compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    compileSdk = 36
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -29,8 +29,8 @@ android {
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = 24
         targetSdk = flutter.targetSdkVersion
-        versionCode = 7
-        versionName = "1.0.6"
+        versionCode = 13
+        versionName = "1.2.1"
     }
     signingConfigs {
         create("release") {

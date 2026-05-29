@@ -249,7 +249,9 @@ class _ComplianceScreenState extends State<ComplianceScreen> {
     CommonAppButton(
               text: "Submit KYC",
               onPressed: () {
-                provider.isAadhaarVerified==true? provider.submitCompliance(context:context,isVerified: driver?.isVerified??false):ToastHelper.show(context, message: "Please Verify Aadhaar Number",type: ToastType.warning);
+                // provider.isAadhaarVerified==true?
+                provider.submitCompliance(context:context,isVerified: driver?.isVerified??false);
+                // :ToastHelper.show(context, message: "Please Verify Aadhaar Number",type: ToastType.warning);
               },
             ),
             const SizedBox(height: 100),

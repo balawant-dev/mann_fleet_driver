@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:mann_fleet_driver/widget/customImageView.dart';
 
 import 'package:mann_fleet_driver/util/color/app_colors.dart';
@@ -27,16 +28,67 @@ class NewBookingScreen extends StatefulWidget {
 
 class _NewBookingScreenState extends State<NewBookingScreen> {
   int currentIndex = 0;
+  double?currentLat;
+  double?currentLng;
   @override
   void initState() {
     super.initState();
+    _getCurrentLocation();
     Future.microtask(() {
       context.read<NewBookingProvider>().getBannerApi(context: context);
       context.read<NewBookingProvider>().getNewBooking(context: context);
     });
   }
+  Future<bool> _getCurrentLocation() async {
+    try {
+      // Check permission
+      LocationPermission permission = await Geolocator.checkPermission();
+
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        ToastHelper.show(
+          context,
+          message: "Location permission permanently denied. Please enable from settings.",
+          type: ToastType.error,
+        );
+        return false;
+      }
+
+      if (permission == LocationPermission.denied) {
+        ToastHelper.show(
+          context,
+          message: "Location permission denied",
+          type: ToastType.error,
+        );
+        return false;
+      }
+
+      // Get current position
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      currentLat = position.latitude;
+      currentLng = position.longitude;
+
+      debugPrint("📍 Current Location Home: $currentLat, $currentLng");
+      return true;
+    } catch (e) {
+      debugPrint("Location error: $e");
+      ToastHelper.show(
+        context,
+        message: "Failed to get location: ${e.toString()}",
+        type: ToastType.error,
+      );
+      return false;
+    }
+  }
   @override
   Widget build(BuildContext context) {
+
     return Consumer<NewBookingProvider>(
       builder: (context, provider, child) {
         if (provider.newBookingModel==null||provider.newBookingModel!.data==null) {
@@ -328,6 +380,7 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
               bool success = await provider.acceptBookingApi(
                 context: context,
                 id: bookingId,
+                currentLng:currentLng??0.0 ,currentLat: currentLat??0.0,
               );
 
               if (success) {
@@ -353,10 +406,12 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
           title: "Go to Detail",
           color: Colors.blue,
           onTap: () {
+
             navPush(
               context: context,
               action: BookingDetailScreen(id: bookingId),
             );
+            provider.updateDriverLocationApi(id: bookingId,lng: currentLng??0.0,lat: currentLat??0.0,context: context);
           },
         ),
       );

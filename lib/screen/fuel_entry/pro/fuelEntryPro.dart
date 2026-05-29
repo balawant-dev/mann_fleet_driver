@@ -8,6 +8,9 @@ import 'package:geocoding/geocoding.dart';
 import '../../../widget/motionToastHelper.dart';
 import '../../../widget/showLoaderFunction.dart';
 import '../repo/fuelEntryRepo.dart';
+import 'dart:convert';
+import 'dart:io';
+import 'package:http/http.dart' as http;
 
 class FuelEntryProvider extends ChangeNotifier {
   final FuelEntryRepo repo = FuelEntryRepo();
@@ -21,7 +24,8 @@ class FuelEntryProvider extends ChangeNotifier {
   final fuelPriceController = TextEditingController();
   final fuelAmountController = TextEditingController();
   final invoiceNumberController = TextEditingController();
-
+  String foundRate = "";
+  String foundFuelType = "";
   // Location
   String lat = "";
   String lng = "";
@@ -35,6 +39,7 @@ class FuelEntryProvider extends ChangeNotifier {
   final picker = ImagePicker();
 
   bool isLoading = false;
+
   /// 🔥 GET CURRENT LOCATION
   Future<void> getCurrentLocation() async {
     try {
@@ -48,13 +53,15 @@ class FuelEntryProvider extends ChangeNotifier {
       lng = position.longitude.toString();
 
       /// Convert lat/lng → Address
-      List<Placemark> placemarks =
-      await placemarkFromCoordinates(position.latitude, position.longitude);
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
 
       Placemark place = placemarks.first;
 
       addressController.text =
-      "${place.name}, ${place.locality}, ${place.administrativeArea}";
+          "${place.name}, ${place.locality}, ${place.administrativeArea}";
 
       debugPrint("📍 CURRENT LAT: $lat");
       debugPrint("📍 CURRENT LNG: $lng");
@@ -67,47 +74,262 @@ class FuelEntryProvider extends ChangeNotifier {
   }
 
   /// Pick Image
+  //   Future<void> pickImage(String type, ImageSource source) async {
+  //     final picked = await picker.pickImage(source: source);
+  //
+  //     if (picked != null) {
+  //       File file = File(picked.path);
+  //
+  //       /// ✂️ CROP IMAGE
+  //       CroppedFile? cropped = await ImageCropper().cropImage(
+  //         sourcePath: file.path,
+  //         uiSettings: [
+  //           AndroidUiSettings(toolbarTitle: "Crop Image"),
+  //           IOSUiSettings(title: "Crop Image"),
+  //         ],
+  //       );
+  //
+  //       if (cropped != null) {
+  //         file = File(cropped.path);
+  //       }
+  //
+  //       /// SET IMAGE
+  //       if (type == "odometer") odometerImage = file;
+  //       if (type == "start") startImage = file;
+  //       // if (type == "end") endImage = file;
+  //       if (type == "end") {
+  //         endImage = file;
+  //         await scanFuelDisplayWithGemini(file);
+  //
+  //         /// FUTURE OCR
+  //         // await scanFuelDisplayOCR(file);
+  //       }
+  //
+  //       /// 🧾 BILL IMAGE (MAIN LOGIC 🔥)
+  //       if (type == "bill") {
+  //         billImage = file;
+  //
+  // //yah wline hai jo ham f=bill sacn karke data fill kar rhe hai jo abhi nhi karn ahi ok bhut code mat hatna ok
+  // //         await scanBillOCR(file); // 🔥 AUTO SCAN
+  //       }
+  //
+  //       notifyListeners();
+  //     }
+  //   }
   Future<void> pickImage(String type, ImageSource source) async {
-    final picked = await picker.pickImage(source: source);
-
-    if (picked != null) {
-      File file = File(picked.path);
-
-      /// ✂️ CROP IMAGE
-      CroppedFile? cropped = await ImageCropper().cropImage(
-        sourcePath: file.path,
-        uiSettings: [
-          AndroidUiSettings(toolbarTitle: "Crop Image"),
-          IOSUiSettings(title: "Crop Image"),
-        ],
+    try {
+      final pickedFile = await ImagePicker().pickImage(
+        source: source,
+        imageQuality: 70,
       );
 
-      if (cropped != null) {
-        file = File(cropped.path);
-      }
+      if (pickedFile == null) return;
+
+      File image = File(pickedFile.path);
 
       /// SET IMAGE
-      if (type == "odometer") odometerImage = file;
-      if (type == "start") startImage = file;
-      if (type == "end") endImage = file;
+      switch (type) {
+        case "bill":
+          billImage = image;
 
-      /// 🧾 BILL IMAGE (MAIN LOGIC 🔥)
-      if (type == "bill") {
-        billImage = file;
+          /// 🔥 CALL GEMINI HERE
+          //  await scanFuelDisplayWithGemini(image);
 
-        await scanBillOCR(file); // 🔥 AUTO SCAN
+          break;
+
+        case "odometer":
+          odometerImage = image;
+          break;
+
+        case "start":
+          startImage = image;
+          break;
+
+        case "end":
+          endImage = image;
+          await scanFuelDisplayWithGemini(image);
+          break;
       }
 
       notifyListeners();
+
+      print("IMAGE SELECTED => ${image.path}");
+    } catch (e) {
+      print("IMAGE PICK ERROR => $e");
     }
   }
+
+  Future<void> scanFuelDisplayOCR(File file) async {
+    try {
+      final inputImage = InputImage.fromFile(file);
+
+      final textRecognizer = TextRecognizer(
+        script: TextRecognitionScript.latin,
+      );
+
+      final RecognizedText recognizedText = await textRecognizer.processImage(
+        inputImage,
+      );
+
+      await textRecognizer.close();
+
+      extractFuelDisplayData(recognizedText.text);
+    } catch (e) {
+      debugPrint("OCR ERROR: $e");
+      // ToastHelper.show(context, message: "Could not read display clearly");
+    }
+  }
+
+  double? smartParseNumber(String raw) {
+    raw = raw.replaceAll(RegExp(r'[^0-9]'), '');
+
+    if (raw.isEmpty) return null;
+
+    /// NORMAL
+    double? direct = double.tryParse(raw);
+
+    /// TRY DECIMAL INSERTIONS
+    List<double> candidates = [];
+
+    if (raw.length >= 2) {
+      /// 9234 -> 92.34
+      candidates.add(
+        double.parse(
+          raw.substring(0, raw.length - 2) +
+              "." +
+              raw.substring(raw.length - 2),
+        ),
+      );
+    }
+
+    if (raw.length >= 3) {
+      /// 9234 -> 9.234
+      candidates.add(
+        double.parse(
+          raw.substring(0, raw.length - 3) +
+              "." +
+              raw.substring(raw.length - 3),
+        ),
+      );
+    }
+
+    /// ALSO KEEP ORIGINAL
+    if (direct != null) {
+      candidates.add(direct);
+    }
+
+    debugPrint("CANDIDATES: $candidates");
+
+    /// RETURN BEST RANGE MATCH
+
+    for (double n in candidates) {
+      /// RATE RANGE
+      if (n >= 60 && n <= 150) {
+        return n;
+      }
+
+      /// LITER RANGE
+      if (n >= 1 && n <= 500) {
+        return n;
+      }
+
+      /// AMOUNT RANGE
+      if (n >= 50 && n <= 50000) {
+        return n;
+      }
+    }
+
+    return null;
+  }
+
+  void extractFuelDisplayData(String rawText) {
+    debugPrint("=== PUMP DISPENSER OCR START ===");
+    debugPrint(rawText);
+
+    String text = rawText.replaceAll(RegExp(r'[^\d\.\s]'), ' '); // Clean karo
+    text = text.replaceAll(RegExp(r'\s+'), ' ');
+
+    final RegExp numberRegex = RegExp(r'\d+\.?\d*');
+    List<String> numberStrings =
+        numberRegex.allMatches(text).map((m) => m.group(0)!).toList();
+
+    List<double> numbers = [];
+    for (String numStr in numberStrings) {
+      double? val = double.tryParse(numStr);
+      if (val != null && val > 0) numbers.add(val);
+    }
+
+    debugPrint("Detected Numbers: $numbers");
+
+    double? litres;
+    double? rate;
+    double? amount;
+
+    // === Smart Assignment Logic for Petrol Pumps ===
+    for (double num in numbers) {
+      // Litres (Volume) → Generally 5 to 100 litres
+      if (litres == null && num >= 1 && num <= 150) {
+        litres = num;
+      }
+
+      // Rate per Litre → 70 to 150 rupees
+      if (rate == null && num >= 70 && num <= 150) {
+        rate = num;
+      }
+
+      // Total Amount → Usually 300 se 8000 tak
+      if (amount == null && num >= 200 && num <= 15000) {
+        amount = num;
+      }
+    }
+
+    // === Cross Verification (Sabse Powerful Part) ===
+    if (litres != null && rate != null) {
+      double calculated = litres * rate;
+
+      if (amount == null) {
+        amount = calculated;
+      } else {
+        // Agar amount mila hai to check karo kitna close hai
+        if ((calculated - amount).abs() > 30) {
+          amount = calculated; // Better assume calculated hi sahi hai
+        }
+      }
+    }
+
+    // === Final Auto Fill ===
+    if (litres != null) {
+      fuelQtyController.text = litres.toStringAsFixed(2);
+    }
+    if (rate != null) {
+      fuelPriceController.text = rate.toStringAsFixed(2);
+    }
+    if (amount != null) {
+      fuelAmountController.text = amount.toStringAsFixed(2);
+    }
+
+    // Agar rate aur qty hai to amount auto calculate (backup)
+    if (fuelQtyController.text.isNotEmpty &&
+        fuelPriceController.text.isNotEmpty) {
+      calculateAmount();
+    }
+
+    notifyListeners();
+
+    debugPrint("✅ AUTO FILL DONE");
+    debugPrint("Litres: ${fuelQtyController.text}");
+    debugPrint("Rate  : ${fuelPriceController.text}");
+    debugPrint("Amount: ${fuelAmountController.text}");
+  }
+
   Future<void> scanBillOCR(File file) async {
     try {
       final inputImage = InputImage.fromFile(file);
       final textRecognizer = TextRecognizer();
 
-      final RecognizedText recognizedText =
-      await textRecognizer.processImage(inputImage);
+      final RecognizedText recognizedText = await textRecognizer.processImage(
+        inputImage,
+      );
 
       textRecognizer.close();
 
@@ -116,6 +338,7 @@ class FuelEntryProvider extends ChangeNotifier {
       debugPrint("OCR Error: $e");
     }
   }
+
   void extractDataAdvanced(String text) {
     List<String> invoiceKeys = [
       "invoice no",
@@ -123,16 +346,14 @@ class FuelEntryProvider extends ChangeNotifier {
       "invoice",
       "bill no",
       "bill number",
-      "receipt no",
-      "receipt",
       "txn no",
       "transaction no",
       "inv no",
       "inv",
       "invoice#",
       "bill#",
-      "receipt#"
     ];
+    List<String> rateKeys = ["rate", "price", "rs/ltr", "rs.\/ltr"];
 
     List<String> amountKeys = [
       "total amount",
@@ -148,8 +369,9 @@ class FuelEntryProvider extends ChangeNotifier {
       "rs",
       "rs.",
       "inr",
-      "₹"
+      "₹",
     ];
+    List<String> fuelTypeKeys = ["petrol", "diesel", "cng"];
 
     /// 🔥 FUEL QUANTITY KEYS
     List<String> fuelQuantityKeys = [
@@ -164,54 +386,19 @@ class FuelEntryProvider extends ChangeNotifier {
       "litres",
     ];
 
-    // List<String> amountKeys = [
-    //   "total amt",
-    //   "total amount",
-    //   "net amt",
-    //   "payable",
-    // ];
-
     String foundInvoice = "";
     String foundAmount = "";
     String foundFuelQty = "";
 
     List<String> lines = text.split('\n');
 
-    /// 🔍 INVOICE
-    for (int i = 0; i < lines.length; i++) {
-      String line = lines[i];
-      String l = line.toLowerCase();
+    /// 🔍 INVOICE NUMBER (HP BILL PERFECT)
+    RegExp invoiceReg = RegExp(r'([A-Za-z]{2,5}-\d{3,}-[A-Za-z0-9]+)');
 
-      for (String key in invoiceKeys) {
-        if (l.contains(key) && foundInvoice.isEmpty) {
+    final invoiceMatch = invoiceReg.firstMatch(text);
 
-          int index = l.indexOf(key);
-          String after = line.substring(index + key.length);
-
-          RegExp reg = RegExp(r'[:\-\s]*([A-Z0-9\-]{4,})');
-          final match = reg.firstMatch(after);
-
-          if (match != null) {
-            String val = match.group(1)!;
-
-            if (!RegExp(r'^\d+$').hasMatch(val)) {
-              foundInvoice = val;
-              break;
-            }
-          }
-
-          /// next line fallback
-          if (i + 1 < lines.length) {
-            final nextMatch =
-            RegExp(r'([A-Z0-9\-]{4,})').firstMatch(lines[i + 1]);
-
-            if (nextMatch != null) {
-              foundInvoice = nextMatch.group(1)!;
-              break;
-            }
-          }
-        }
-      }
+    if (invoiceMatch != null) {
+      foundInvoice = invoiceMatch.group(1)!;
     }
 
     /// 💰 AMOUNT
@@ -242,15 +429,14 @@ class FuelEntryProvider extends ChangeNotifier {
       amounts.sort();
       foundAmount = amounts.last.toStringAsFixed(2);
     }
+
     /// ⛽ FUEL QUANTITY
     for (int i = 0; i < lines.length; i++) {
       String line = lines[i];
       String l = line.toLowerCase();
 
       for (String key in fuelQuantityKeys) {
-
         if (l.contains(key) && foundFuelQty.isEmpty) {
-
           /// Example:
           /// Volume : 30.00L
           /// Qty : 15.5
@@ -267,9 +453,9 @@ class FuelEntryProvider extends ChangeNotifier {
 
           /// next line fallback
           if (i + 1 < lines.length) {
-
-            final nextMatch =
-            RegExp(r'(\d+\.?\d{0,2})').firstMatch(lines[i + 1]);
+            final nextMatch = RegExp(
+              r'(\d+\.?\d{0,2})',
+            ).firstMatch(lines[i + 1]);
 
             if (nextMatch != null) {
               foundFuelQty = nextMatch.group(1)!;
@@ -280,9 +466,50 @@ class FuelEntryProvider extends ChangeNotifier {
       }
     }
 
+    /// ⛽ RATE
+    for (int i = 0; i < lines.length; i++) {
+      String line = lines[i];
+      String l = line.toLowerCase();
+
+      for (String key in rateKeys) {
+        if (l.contains(key) && foundRate.isEmpty) {
+          RegExp reg = RegExp(r'(\d+\.?\d{0,2})');
+
+          final match = reg.firstMatch(line);
+
+          if (match != null) {
+            foundRate = match.group(1)!;
+            break;
+          }
+        }
+      }
+    }
+
+    /// ⛽ FUEL TYPE
+    for (int i = 0; i < lines.length; i++) {
+      String line = lines[i].toLowerCase();
+
+      for (String type in fuelTypeKeys) {
+        if (line.contains(type)) {
+          foundFuelType = type.toUpperCase();
+          break;
+        }
+      }
+
+      if (foundFuelType.isNotEmpty) break;
+    }
     debugPrint("🧾 INVOICE: $foundInvoice");
     debugPrint("💰 AMOUNT: $foundAmount");
     debugPrint("⛽ QTY: $foundFuelQty");
+    debugPrint("⛽ foundRate: $foundRate");
+    debugPrint("⛽ foundFuelType: $foundFuelType");
+    if (foundFuelType.isNotEmpty) {
+      fuelTypeController.text = foundFuelType;
+    }
+    if (foundRate.isNotEmpty) {
+      fuelPriceController.text = foundRate;
+    }
+
     /// ✅ AUTO FILL (IMPORTANT 🔥)
     if (foundInvoice.isNotEmpty) {
       invoiceNumberController.text = foundInvoice;
@@ -291,25 +518,13 @@ class FuelEntryProvider extends ChangeNotifier {
     if (foundAmount.isNotEmpty) {
       fuelAmountController.text = foundAmount;
     }
+
     /// 🔥 AUTO FILL FUEL QUANTITY
     if (foundFuelQty.isNotEmpty) {
       fuelQtyController.text = foundFuelQty;
     }
     notifyListeners();
   }
-  // Future<void> pickImage(String type, ImageSource source) async {
-  //   final picked = await picker.pickImage(source: source);
-  //   if (picked != null) {
-  //     final file = File(picked.path);
-  //
-  //     if (type == "odometer") odometerImage = file;
-  //     if (type == "start") startImage = file;
-  //     if (type == "end") endImage = file;
-  //     if (type == "bill") billImage = file;
-  //
-  //     notifyListeners();
-  //   }
-  // }
 
   /// Auto Calculate Amount
   void calculateAmount() {
@@ -363,7 +578,7 @@ class FuelEntryProvider extends ChangeNotifier {
         carNumber: vehicleController.text,
         fuelType: fuelTypeController.text,
         locationAddress: addressController.text,
-        invoiceNumber:invoiceNumberController.text,//ye bhi
+        invoiceNumber: invoiceNumberController.text, //ye bhi
         locationLat: lat,
         locationLng: lng,
         odometerReading: odometerController.text,
@@ -379,8 +594,11 @@ class FuelEntryProvider extends ChangeNotifier {
       Navigator.pop(context);
 
       if (res.status == true) {
-        ToastHelper.show(context,
-            message: "Fuel Entry Added ✅", type: ToastType.success);
+        ToastHelper.show(
+          context,
+          message: "Fuel Entry Added ✅",
+          type: ToastType.success,
+        );
         clear();
       }
     } catch (e) {
@@ -388,8 +606,111 @@ class FuelEntryProvider extends ChangeNotifier {
     } finally {
       isLoading = false;
       notifyListeners();
+    } //9161470607
+  }
+  final apiKey = "AIzaSyA2X6HG6ZE2pzrykNypPtoQ-KJR67gpWjM";
+
+  Future<void> scanFuelDisplayWithGemini(File imageFile) async {
+    try {
+      print("START OCR");
+
+      final bytes = await imageFile.readAsBytes();
+      final base64Image = base64Encode(bytes);
+      print("kkkk${base64Image}");
+
+
+      final uri = Uri.parse(
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=$apiKey",
+        //  "https://generativelanguage.googleapis.com/v1beta/models?key=$apiKey",
+      );
+
+      final response = await http.post(
+        uri,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "contents": [
+            {
+              "parts": [
+                {
+                  "text": """
+Extract fuel data and return ONLY JSON:
+
+{
+  "liters": 0,
+  "price_per_liter": 0,
+  "total_amount": 0
+}
+""",
+                },
+                {
+                  "inline_data": {
+                    "mime_type": "image/jpeg",
+                    "data": base64Image,
+                  },
+                },
+              ],
+            },
+          ],
+        }),
+      );
+
+      print(response.statusCode);
+      print(response.body);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        String rawText =
+            data["candidates"][0]["content"]["parts"][0]["text"] ?? "";
+
+        print("RAW => $rawText");
+
+        /// CLEAN JSON (IMPORTANT FIX)
+        String cleaned =
+            rawText
+                .replaceAll("```json", "")
+                .replaceAll("```", "")
+                .replaceAll("\n", "")
+                .trim();
+
+        /// SAFE JSON PARSE
+        Map<String, dynamic> jsonData = {};
+        try {
+          jsonData = jsonDecode(cleaned);
+        } catch (e) {
+          print("JSON PARSE ERROR => $e");
+
+          /// fallback extraction
+          final regex = RegExp(r'\{.*\}');
+          final match = regex.firstMatch(rawText);
+
+          if (match != null) {
+            jsonData = jsonDecode(match.group(0)!);
+          }
+        }
+
+        /// SAFE AUTO FILL
+        double liters = (jsonData["liters"] ?? 0).toDouble();
+        double price = (jsonData["price_per_liter"] ?? 0).toDouble();
+        double total = (jsonData["total_amount"] ?? 0).toDouble();
+
+        fuelQtyController.text = liters > 0 ? liters.toStringAsFixed(2) : "";
+
+        fuelPriceController.text = price > 0 ? price.toStringAsFixed(2) : "";
+
+        fuelAmountController.text = total > 0 ? total.toStringAsFixed(2) : "";
+
+        print("AUTO FILL DONE");
+
+        notifyListeners();
+      } else {
+        print("ERROR RESPONSE => ${response.body}");
+      }
+    } catch (e) {
+      print("OCR ERROR => $e");
     }
   }
+
 
   void clear() {
     vehicleController.clear();

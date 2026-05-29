@@ -1,4 +1,3 @@
-
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -14,6 +13,7 @@ import '../model/newBookingModel.dart';
 import '../model/pickupVerificationModel.dart';
 import '../model/startTripModel.dart';
 import '../model/tripCompleteModel.dart';
+import '../model/updateLocationModel.dart';
 import '../model/verifyBookingOtpModel.dart';
 import '../repo/newBookingRepo.dart';
 
@@ -27,7 +27,7 @@ class NewBookingProvider extends ChangeNotifier {
   StartTripModel? startTripModel;
   GetBannerModel? getBannerModel;
   TripCompleteModel? tripCompleteModel;
-
+  UpdateLocationModel?updateLocationModel;
   bool isLoading = false;
 
   // ── Get pending / assigned bookings ────────────────────────────────────────
@@ -51,7 +51,31 @@ class NewBookingProvider extends ChangeNotifier {
       isLoading = false;
       notifyListeners();
     }
-  }  // ── Get pending / assigned bookings ────────────────────────────────────────
+  }  // ── Update Location ────────────────────────────────────────
+  Future<void> updateDriverLocationApi({required BuildContext context,required String id,required double lat,required double lng}) async {
+    try {
+      // isLoading = true;
+      notifyListeners();
+
+      final res = await api.updateDriverLocationApi(context: context,lat:lat,lng: lng,id: id );
+      updateLocationModel = res;
+
+      if (res != null && res.status == true) {
+        debugPrint("updateLocationModel fetched successfully");
+      } else {
+        debugPrint("Failed to fetch updateLocationModel");
+      }
+    } catch (e) {
+      debugPrint("Error fetching new bookings: $e");
+      // TODO: show error toast/snackbar here
+    } finally {
+      // isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  // ── Get pending / assigned bookings ────────────────────────────────────────
+
   Future<void> getNewBooking({required BuildContext context}) async {
     try {
       isLoading = true;
@@ -78,12 +102,15 @@ class NewBookingProvider extends ChangeNotifier {
   Future<bool> acceptBookingApi({
     required BuildContext context,
     required String id,
+    required double currentLat,
+    required double currentLng,
+
   }) async {
     try {
       // isLoading = true;
       notifyListeners();
 
-      final res = await api.acceptBookingApi(context: context, id: id);
+      final res = await api.acceptBookingApi(context: context, id: id,currentLat:currentLat ,currentLng: currentLng);
       bookingAcceptedModel = res;
 
       if (res != null && res.status == true) {
@@ -151,7 +178,7 @@ class NewBookingProvider extends ChangeNotifier {
       startTripModel = res;
 
       if (res != null && res.status == true) {
-        getNewBookingDetail(context: context,id: id);
+        getNewBookingDetail(context: context, id: id);
         getNewBooking(context: context);
         debugPrint("Trip started successfully for booking $id");
         return true;
@@ -166,17 +193,24 @@ class NewBookingProvider extends ChangeNotifier {
       // isLoading = false;
       notifyListeners();
     }
-  }  // ── Complete trip ─────────────────────────────────────────────────────────────
+  } // ── Complete trip ─────────────────────────────────────────────────────────────
+
   Future<bool> completeTripApi({
     required BuildContext context,
     required String id,
-    required String currentLat,required String currentLng
+    required String currentLat,
+    required String currentLng,
   }) async {
     try {
       // isLoading = true;
       notifyListeners();
 
-      final res = await api.completeTripApi(context: context, id: id,currentLat: currentLat,currentLng: currentLng);
+      final res = await api.completeTripApi(
+        context: context,
+        id: id,
+        currentLat: currentLat,
+        currentLng: currentLng,
+      );
       tripCompleteModel = res;
 
       if (res != null && res.status == true) {
@@ -212,15 +246,13 @@ class NewBookingProvider extends ChangeNotifier {
         context: context,
         id: id,
         otp: otp,
-        type:type //type value ["start", "end"]'
-
-
+        type: type, //type value ["start", "end"]'
       );
       verifyBookingOtpModel = res; // ← fixed: was startTripModel
 
       if (res != null && res.status == true) {
         // startTripApi(context: context,id: id);
-        getNewBookingDetail(context: context,id: id);
+        getNewBookingDetail(context: context, id: id);
         getNewBooking(context: context);
         debugPrint("OTP verified successfully for booking $id");
         return true;
@@ -237,7 +269,6 @@ class NewBookingProvider extends ChangeNotifier {
     }
   }
 
-
   final ImagePicker picker = ImagePicker();
 
   File? front;
@@ -246,9 +277,9 @@ class NewBookingProvider extends ChangeNotifier {
   File? right;
   File? interior;
   File? speedometer;
+  File? speedometerEndImage;
 
   Future pickImage(String type) async {
-
     final XFile? picked = await picker.pickImage(source: ImageSource.camera);
 
     if (picked == null) return;
@@ -274,6 +305,9 @@ class NewBookingProvider extends ChangeNotifier {
       case "speedometer":
         speedometer = file;
         break;
+      case "speedometerEndImage":
+        speedometerEndImage = file;
+        break;
     }
 
     notifyListeners();
@@ -282,28 +316,30 @@ class NewBookingProvider extends ChangeNotifier {
   BookingDetailModel? bookingDetailModel;
   PickupVerificationModel? pickupVerificationModel;
 
-
-
   bool isLoading2 = false;
 
-  Future<void> getNewBookingDetail({required BuildContext context,required String id}) async {
+  Future<void> getNewBookingDetail({
+    required BuildContext context,
+    required String id,
+  }) async {
     try {
       isLoading2 = true;
       notifyListeners();
 
-      final res = await api.getBookingDetailApi( context: context,id: id);
+      final res = await api.getBookingDetailApi(context: context, id: id);
       bookingDetailModel = res;
-      if(res!=null||res.status==true){
+      if (res != null || res.status == true) {
         print("Get Profile Successfully");
       }
-
     } catch (e) {
       debugPrint("Error in Get Profile: $e");
     } finally {
       isLoading2 = false;
       notifyListeners();
     }
-}  Future<void> pickupVerificationApi({
+  }
+
+  Future<void> pickupVerificationApi({
     required BuildContext context,
     required String id,
   }) async {
@@ -329,8 +365,38 @@ class NewBookingProvider extends ChangeNotifier {
       );
 
       pickupVerificationModel = res;
-      getNewBookingDetail(context: context,id: id);
+      getNewBookingDetail(context: context, id: id);
+    } catch (e) {
+      debugPrint("Error: $e");
+    } finally {
+      isLoading2 = false;
+      notifyListeners();
+    }
+  }
 
+  Future<void> speedometerVerification({
+    required BuildContext context,
+    required String id,
+  }) async {
+    try {
+      isLoading2 = true;
+      notifyListeners();
+      debugPrint("frontViewImage: ${front?.path ?? ""}");
+      debugPrint("backViewImage: ${back?.path ?? ""}");
+      debugPrint("leftViewImage: ${left?.path ?? ""}");
+      debugPrint("rightViewImage: ${right?.path ?? ""}");
+      debugPrint("interiorImage: ${interior?.path ?? ""}");
+      debugPrint("speedometerImage: ${speedometer?.path ?? ""}");
+
+      final res = await api.speedometerVerification(
+        context: context,
+        id: id,
+
+        speedometerImage: speedometerEndImage?.path ?? "",
+      );
+
+      pickupVerificationModel = res;
+      getNewBookingDetail(context: context, id: id);
     } catch (e) {
       debugPrint("Error: $e");
     } finally {

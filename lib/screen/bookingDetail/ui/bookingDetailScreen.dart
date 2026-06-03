@@ -19,22 +19,24 @@ import 'mapRedirection.dart';
 
 class BookingDetailScreen extends StatefulWidget {
   final String id;
-  const BookingDetailScreen({super.key,required this.id});
+  const BookingDetailScreen({super.key, required this.id});
 
   @override
   State<BookingDetailScreen> createState() => _BookingDetailScreenState();
 }
 
 class _BookingDetailScreenState extends State<BookingDetailScreen> {
-
   @override
   void initState() {
     super.initState();
     Future.microtask(() {
-      context.read<NewBookingProvider>()
-          .getNewBookingDetail(context: context, id: widget.id);
+      context.read<NewBookingProvider>().getNewBookingDetail(
+        context: context,
+        id: widget.id,
+      );
     });
-    _getCurrentLocation();}
+    _getCurrentLocation();
+  }
 
   Future<void> _onRefresh() async {
     await context.read<NewBookingProvider>().getNewBookingDetail(
@@ -42,8 +44,10 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
       id: widget.id,
     );
   }
+
   double currentLat = 0.0;
   double currentLng = 0.0;
+
   Future<void> _completeTripAfterEndOtp(String bookingId) async {
     final provider = context.read<NewBookingProvider>();
 
@@ -51,9 +55,11 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
     bool hasLocation = await _getCurrentLocation();
 
     if (!hasLocation) {
-      ToastHelper.show(context,
-          message: "Unable to get current location",
-          type: ToastType.error);
+      ToastHelper.show(
+        context,
+        message: "Unable to get current location",
+        type: ToastType.error,
+      );
       return;
     }
 
@@ -71,10 +77,51 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
         type: ToastType.success,
       );
 
+      await provider.getNewBookingDetail(context: context, id: bookingId);
+    }
+  }
+
+  Future<void> _checkFinalFareAfterEndOtp(String bookingId) async {
+    final provider = context.read<NewBookingProvider>();
+
+    // Get current location
+    bool hasLocation = await _getCurrentLocation();
+
+    if (!hasLocation) {
+      ToastHelper.show(
+        context,
+        message: "Unable to get current location",
+        type: ToastType.error,
+      );
+      return;
+    }
+
+    final getMinutes = await provider.getFinalFare(
+      id: bookingId,
+      context: context,
+    );
+
+    print(getMinutes);
+
+    bool tripCompleted = await provider.checkFinalFare(
+      context: context,
+      currentLat: currentLat.toString(),
+      currentLng: currentLng.toString(),
+      durationMins: "12",
+    );
+
+    if (tripCompleted) {
+      ToastHelper.show(
+        context,
+        message: "Trip Completed Successfully 🎉",
+        type: ToastType.success,
+      );
+
       // Refresh detail
       await provider.getNewBookingDetail(context: context, id: bookingId);
     }
   }
+
   Future<bool> _getCurrentLocation() async {
     try {
       // Check permission
@@ -87,7 +134,8 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
       if (permission == LocationPermission.deniedForever) {
         ToastHelper.show(
           context,
-          message: "Location permission permanently denied. Please enable from settings.",
+          message:
+              "Location permission permanently denied. Please enable from settings.",
           type: ToastType.error,
         );
         return false;
@@ -122,11 +170,11 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
       return false;
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<NewBookingProvider>(
       builder: (context, provider, child) {
-
         if (provider.isLoading) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
@@ -137,15 +185,16 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
 
         /// 🔥 FALLBACKS
 
-        final rawDate = data?.createdAt; // "2026-05-15T09:44:03.278Z"
+        final rawDate = data?.scheduledAt; // "2026-05-15T09:44:03.278Z"
 
         String formattedDate = "4 Sep 2024"; // Default fallback
-        String formattedTime = "08:30 PM";   // Default fallback
+        String formattedTime = "08:30 PM"; // Default fallback
 
         if (rawDate != null) {
           try {
             // String ko DateTime object mein convert karna
-            DateTime dateTime = DateTime.parse(rawDate).toLocal();
+            DateTime dateTime =
+                DateTime.parse(rawDate.toIso8601String()).toLocal();
 
             // Date alag variable mein: "15 May 2026"
             formattedDate = DateFormat('d MMM yyyy').format(dateTime);
@@ -161,21 +210,22 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
 
         final pickup = data?.pickup?.address ?? "Sector- 63, Noida";
         final drop = data?.dropoff?.address ?? "Nainital, Uttarakhand";
-        print("pickup lat${data?.pickup?.lat} pickup lng${data?.pickup?.lng} drop lat${data?.dropoff?.lat} dropoff lng${data?.dropoff?.lng}");
+        print(
+          "pickup lat${data?.pickup?.lat} pickup lng${data?.pickup?.lng} drop lat${data?.dropoff?.lat} dropoff lng${data?.dropoff?.lng}",
+        );
 
-
-        final totalKm = data?.estimatedKm?? 0;
+        final totalKm = data?.estimatedKm ?? 0;
         final extraKm = data?.pricingSnapshot?.perKmRate?.toInt() ?? 2;
 
-        final cabType =  "CNG CAB";
+        final cabType = "CNG CAB";
         // final cabType = data?.vehicle?.fuelType ?? "CNG CAB";
-        final model =
-            "${data?.vehicle?.model ?? "Dzire"} "; final color =
-            "${data?.vehicle?.color ?? "White"}";
+        final model = "${data?.vehicle?.model ?? "Dzire"} ";
+        final color = "${data?.vehicle?.color ?? "White"}";
 
         return Scaffold(
-          backgroundColor:  Colors.white,
-          appBar: CommonAppBar(title: "Booking Detail",),
+          backgroundColor: Colors.white,
+          appBar: CommonAppBar(title: "Booking Detail"),
+
           // appBar: AppBar(
           //   backgroundColor: Colors.white,
           //   elevation: 0,
@@ -184,7 +234,6 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
           //   title: const Text("My Booking",
           //       style: TextStyle(color: Colors.black)),
           // ),
-
           body: RefreshIndicator(
             onRefresh: _onRefresh,
             child: SingleChildScrollView(
@@ -193,15 +242,17 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
               child: Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF8FAFC),        // ← Changed: Soft elegant background
+                  color: const Color(
+                    0xFFF8FAFC,
+                  ), // ← Changed: Soft elegant background
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: const Color(0xFFE2E8F0),      // ← Changed: Cleaner border
+                    color: const Color(0xFFE2E8F0), // ← Changed: Cleaner border
                     width: 1.2,
                   ),
                   boxShadow: const [
                     BoxShadow(
-                      color: Color(0x0A000000),           // ← Softer shadow
+                      color: Color(0x0A000000), // ← Softer shadow
                       blurRadius: 8,
                       offset: Offset(0, 3),
                     ),
@@ -211,7 +262,6 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-
                     /// 🔹 DATE + BOOKING ID
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -239,12 +289,15 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            Text("🕘 : $bookingId",
-                                style:
-                                const TextStyle(fontWeight: FontWeight.w700)),
+                            Text(
+                              "🕘 : $bookingId",
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
                             Text(tripType),
                           ],
-                        )
+                        ),
                       ],
                     ),
 
@@ -254,7 +307,6 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-
                         /// timeline
                         Column(
                           children: [
@@ -267,11 +319,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                               ),
                             ),
 
-                            Container(
-                              height: 60,
-                              width: 2,
-                              color: Colors.grey,
-                            ),
+                            Container(height: 60, width: 2, color: Colors.grey),
 
                             Container(
                               width: 10,
@@ -290,12 +338,10 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                         Expanded(
                           child: Column(
                             children: [
-
                               /// pickup row
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-
                                   Expanded(
                                     child: Text(
                                       pickup,
@@ -314,13 +360,21 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
 
                                       if (pLat != null && pLng != null) {
                                         await openMapNavigation(
-                                          destLat: double.parse(pLat.toString()),
-                                          destLng: double.parse(pLng.toString()),
+                                          destLat: double.parse(
+                                            pLat.toString(),
+                                          ),
+                                          destLng: double.parse(
+                                            pLng.toString(),
+                                          ),
                                         );
                                       } else {
-                                        ScaffoldMessenger.of(context).showSnackBar(
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
                                           const SnackBar(
-                                            content: Text("Pickup location missing!"),
+                                            content: Text(
+                                              "Pickup location missing!",
+                                            ),
                                           ),
                                         );
                                       }
@@ -346,7 +400,6 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-
                                   Expanded(
                                     child: Text(
                                       drop,
@@ -365,13 +418,21 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
 
                                       if (dLat != null && dLng != null) {
                                         await openMapNavigation(
-                                          destLat: double.parse(dLat.toString()),
-                                          destLng: double.parse(dLng.toString()),
+                                          destLat: double.parse(
+                                            dLat.toString(),
+                                          ),
+                                          destLng: double.parse(
+                                            dLng.toString(),
+                                          ),
                                         );
                                       } else {
-                                        ScaffoldMessenger.of(context).showSnackBar(
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
                                           const SnackBar(
-                                            content: Text("Drop location missing!"),
+                                            content: Text(
+                                              "Drop location missing!",
+                                            ),
                                           ),
                                         );
                                       }
@@ -395,6 +456,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                         ),
                       ],
                     ),
+
                     // Row(
                     //   crossAxisAlignment: CrossAxisAlignment.start,
                     //   children: [
@@ -485,7 +547,6 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                     //         child: Image.asset("assets/icon/directions.png",height: 30,)),
                     //   ],
                     // ),
-
                     const SizedBox(height: 20),
 
                     /// 🔹 PARKING / TOLL / TAX
@@ -498,11 +559,19 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                         children: [
                           _infoBox("Parking", "Extra"),
                           _divider(),
-                          _infoBox("Toll",
-                              data?.pricingSnapshot != null ? "Included" : "Included"),
+                          _infoBox(
+                            "Toll",
+                            data?.pricingSnapshot != null
+                                ? "Included"
+                                : "Included",
+                          ),
                           _divider(),
-                          _infoBox("Tax",
-                              data?.pricingSnapshot != null ? "Included" : "Included"),
+                          _infoBox(
+                            "Tax",
+                            data?.pricingSnapshot != null
+                                ? "Included"
+                                : "Included",
+                          ),
                         ],
                       ),
                     ),
@@ -515,17 +584,25 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                       children: [
                         Column(
                           children: [
-                            Text("$totalKm",
-                                style: const TextStyle(
-                                    fontSize: 24, fontWeight: FontWeight.bold)),
+                            Text(
+                              "$totalKm",
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                             const Text("Total KM"),
                           ],
                         ),
                         Column(
                           children: [
-                            Text("$extraKm",
-                                style: const TextStyle(
-                                    fontSize: 24, fontWeight: FontWeight.bold)),
+                            Text(
+                              "$extraKm",
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                             const Text("Per Km Rate"),
                           ],
                         ),
@@ -540,17 +617,25 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        CustomText("Vehicle Model", size: 14, color: ColorResource.grayText),
+                        CustomText(
+                          "Vehicle Model",
+                          size: 14,
+                          color: ColorResource.grayText,
+                        ),
                         CustomText(model, size: 14, color: ColorResource.black),
                       ],
-                    ),    Row(
+                    ),
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        CustomText("Color", size: 14, color: ColorResource.grayText),
+                        CustomText(
+                          "Color",
+                          size: 14,
+                          color: ColorResource.grayText,
+                        ),
                         CustomText(color, size: 14, color: ColorResource.black),
                       ],
                     ),
-
 
                     const SizedBox(height: 25),
 
@@ -562,13 +647,13 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                       isStartOtpVerified: data?.tripStartOtpVerify ?? false,
                       isEndOtpVerified: data?.tripEndOtpVerify ?? false,
                       finalImageUploaded: data?.finalImageUploaded ?? false,
+
                       // pickupDone: data?.pickupVerified ?? false, // 👈 backend flag
                       // isStartOtpVerified: true,
                       // isEndOtpVerified:true,
                       // tripStatus: "arrived",
-
-                      pickupDone:  data?.pickupVerification ?? false, // 👈 backend flag
-
+                      pickupDone:
+                          data?.pickupVerification ?? false, // 👈 backend flag
                     ),
                     // CommonAppButton(
                     //   text: "Reporting to client",
@@ -595,6 +680,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
       },
     );
   }
+
   Widget buildMainButton({
     required String status,
     required String tripStatus,
@@ -615,10 +701,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
       return CommonAppButton(
         text: "Reporting to Client",
         onPressed: () {
-          navPush(
-            context: context,
-            action: PickupScreen(id: widget.id),
-          );
+          navPush(context: context, action: PickupScreen(id: widget.id));
         },
       );
     }
@@ -637,9 +720,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
       return CommonAppButton(
         text: "Start Ride",
         onPressed: () async {
-          bool success = await context
-              .read<NewBookingProvider>()
-              .startTripApi(
+          bool success = await context.read<NewBookingProvider>().startTripApi(
             context: context,
             id: widget.id,
           );
@@ -647,7 +728,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
           if (success) {
             ToastHelper.show(
               context,
-              message:"Trip Started 🚗",
+              message: "Trip Started 🚗",
               type: ToastType.success,
             );
             // ScaffoldMessenger.of(context).showSnackBar(
@@ -672,20 +753,19 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
       // navPush(context: context, action: UploadSpeedoMeterImageScreen(id: widget.id,));
       print(tripStatus);
       return CommonAppButton(
-        text: finalImageUploaded==true?"Complete Trip":"Next",
-          onPressed: ()async {
-          if(finalImageUploaded==true){
+        text: finalImageUploaded == true ? "Complete Trip" : "Next",
+        onPressed: () async {
+          if (finalImageUploaded == true) {
             showLoader(context);
             await _completeTripAfterEndOtp(widget.id);
             navPop(context: context);
-
-          }else{
-            navPush(context: context, action: UploadSpeedoMeterImageScreen(id: widget.id,));
-
+          } else {
+            navPush(
+              context: context,
+              action: UploadSpeedoMeterImageScreen(id: widget.id),
+            );
           }
-
-
-          },
+        },
         // onPressed: () => showOtpDialog(widget.id, "end"),
       );
     }
@@ -704,11 +784,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
   }
 
   Widget _divider() {
-    return Container(
-      height: 45,
-      width: 1,
-      color: Colors.grey.shade200,
-    );
+    return Container(height: 45, width: 1, color: Colors.grey.shade200);
   }
 
   Widget _infoBox(String title, String value) {
@@ -717,26 +793,33 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
         padding: const EdgeInsets.symmetric(vertical: 12),
         child: Column(
           children: [
-            Text(title,  style: TextStyle(
-              color: const Color(0xFF94A3B8),
-              fontSize: 10,
-              fontFamily: 'Inter',
-              fontWeight: FontWeight.w700,
-              height: 1.50,
-            ),),
+            Text(
+              title,
+              style: TextStyle(
+                color: const Color(0xFF94A3B8),
+                fontSize: 10,
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w700,
+                height: 1.50,
+              ),
+            ),
             const SizedBox(height: 4),
-            Text(value,      style: TextStyle(
-              color: const Color(0xFF334155),
-              fontSize: 12,
-              fontFamily: 'Inter',
-              fontWeight: FontWeight.w600,
-              height: 1.50,
-            ),)
+            Text(
+              value,
+              style: TextStyle(
+                color: const Color(0xFF334155),
+                fontSize: 12,
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w600,
+                height: 1.50,
+              ),
+            ),
           ],
         ),
       ),
     );
   }
+
   void showOtpDialog(String bookingId, String type) {
     TextEditingController otpController = TextEditingController();
 
@@ -744,7 +827,10 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
       context: context,
       builder: (_) {
         return AlertDialog(
-          title: Text("Enter OTP ($type)",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 18),),
+          title: Text(
+            "Enter OTP ($type)",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          ),
           content: TextField(
             controller: otpController,
             keyboardType: TextInputType.number,
@@ -765,18 +851,18 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                 bool success = await context
                     .read<NewBookingProvider>()
                     .verifyBookingOtpApi(
-                  context: context,
-                  id: bookingId,
-                  otp: otpController.text,
-                  type: type, // 🔥 important
-                );
+                      context: context,
+                      id: bookingId,
+                      otp: otpController.text,
+                      type: type,
+                    );
 
                 Navigator.pop(context);
 
                 if (success) {
                   ToastHelper.show(
                     context,
-                    message:"OTP Verified ($type) ✅",
+                    message: "OTP Verified ($type) ✅",
                     type: ToastType.success,
                   );
                   // 🔥🔥🔥 MAIN CHANGE - End OTP ke baad Complete Trip API call

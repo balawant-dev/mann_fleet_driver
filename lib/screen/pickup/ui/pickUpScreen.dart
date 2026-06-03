@@ -4,6 +4,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:mann_fleet_driver/widget/commonAppBar.dart';
 import 'package:provider/provider.dart';
+import '../../../widget/commonTextFormField.dart';
 import '../../../widget/motionToastHelper.dart';
 import '../../../widget/showLoaderFunction.dart';
 import '../../home_screen/provider/newBookingProvider.dart';
@@ -55,63 +56,61 @@ class PickupScreen extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            const Text(
-              "EXTERIOR SHOTS",
-              style: TextStyle(
-                color: const Color(0xFF0F172A),
-                fontSize: 14,
-                fontFamily: 'Inter',
-                fontWeight: FontWeight.w700,
-                height: 1.43,
-                letterSpacing: 0.70,
-              ),
-            ),
+            // const Text(
+            //   "EXTERIOR SHOTS",
+            //   style: TextStyle(
+            //     color: const Color(0xFF0F172A),
+            //     fontSize: 14,
+            //     fontFamily: 'Inter',
+            //     fontWeight: FontWeight.w700,
+            //     height: 1.43,
+            //     letterSpacing: 0.70,
+            //   ),
+            // ),
+            //
+            // const SizedBox(height: 16),
 
-            const SizedBox(height: 16),
-
-            GridView(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                childAspectRatio: .7,
-                // childAspectRatio: .85,
-              ),
-              children: [
-                _photoCard(
-                  "Front View",
-                  provider.front,
-                  () => provider.pickImage("front"),
-                ),
-
-                _photoCard(
-                  "Back View",
-                  provider.back,
-                  () => provider.pickImage("back"),
-                ),
-
-                _photoCard(
-                  "Left Side",
-                  provider.left,
-                  () => provider.pickImage("left"),
-                ),
-
-                _photoCard(
-                  "Right Side",
-                  provider.right,
-                  () => provider.pickImage("right"),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 20),
-
-            _interiorCard(provider),
-
-            const SizedBox(height: 30),
-
+            // GridView(
+            //   shrinkWrap: true,
+            //   physics: const NeverScrollableScrollPhysics(),
+            //   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            //     crossAxisCount: 2,
+            //     crossAxisSpacing: 12,
+            //     mainAxisSpacing: 12,
+            //     childAspectRatio: .7,
+            //     // childAspectRatio: .85,
+            //   ),
+            //   children: [
+            //     _photoCard(
+            //       "Front View",
+            //       provider.front,
+            //       () => provider.pickImage("front"),
+            //     ),
+            //
+            //     _photoCard(
+            //       "Back View",
+            //       provider.back,
+            //       () => provider.pickImage("back"),
+            //     ),
+            //
+            //     _photoCard(
+            //       "Left Side",
+            //       provider.left,
+            //       () => provider.pickImage("left"),
+            //     ),
+            //
+            //     _photoCard(
+            //       "Right Side",
+            //       provider.right,
+            //       () => provider.pickImage("right"),
+            //     ),
+            //   ],
+            // ),
+            // const SizedBox(height: 20),
+            //
+            // _interiorCard(provider),
+            //
+            // const SizedBox(height: 30),
             const Text(
               "MILEAGE READING",
               style: TextStyle(fontWeight: FontWeight.bold),
@@ -120,6 +119,14 @@ class PickupScreen extends StatelessWidget {
             const SizedBox(height: 10),
 
             _speedometerCard(provider),
+            const SizedBox(height: 10),
+            CommonTextFormField(
+              labelText: 'Odometer Reading',
+              isRequired: true,
+              controller: provider.speedoMetervalue,
+              keyboardType: TextInputType.number,
+              hintText: 'Enter KM',
+            ),
 
             const SizedBox(height: 30),
             ElevatedButton(
@@ -131,15 +138,15 @@ class PickupScreen extends StatelessWidget {
                 final provider = context.read<NewBookingProvider>();
 
                 // ✅ Validation
-                if (provider.front == null ||
+                if ( /*provider.front == null ||
                     provider.back == null ||
                     provider.left == null ||
                     provider.right == null ||
-                    provider.interior == null ||
-                    provider.speedometer == null) {
+                    provider.interior == null ||*/ provider.speedometer ==
+                    null) {
                   ToastHelper.show(
                     context,
-                    message: "Upload all images",
+                    message: "Upload image",
                     type: ToastType.error,
                   );
                   // ScaffoldMessenger.of(context).showSnackBar(
@@ -385,8 +392,6 @@ class PickupScreen extends StatelessWidget {
       ),
     );
   }
-
-
 
   Widget _speedometerCard(NewBookingProvider provider) {
     return Container(

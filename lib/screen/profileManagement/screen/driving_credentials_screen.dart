@@ -134,8 +134,6 @@ import '../provider/profileDetailProvider.dart';
 //   }
 // }
 
-
-
 class DrivingCredentialsScreen extends StatefulWidget {
   const DrivingCredentialsScreen({super.key});
 
@@ -144,9 +142,7 @@ class DrivingCredentialsScreen extends StatefulWidget {
       _DrivingCredentialsScreenState();
 }
 
-class _DrivingCredentialsScreenState
-    extends State<DrivingCredentialsScreen> {
-
+class _DrivingCredentialsScreenState extends State<DrivingCredentialsScreen> {
   @override
   void initState() {
     super.initState();
@@ -174,7 +170,6 @@ class _DrivingCredentialsScreenState
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             const Text(
               "Driving License Details",
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -199,10 +194,15 @@ class _DrivingCredentialsScreenState
             ),
 
             const SizedBox(height: 15),
-            Text("Upload Front License Photo",style: TextStyle( fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: ColorResource.grayText,),),
-             SizedBox(height: 10,),
+            Text(
+              "Upload Front License Photo",
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: ColorResource.grayText,
+              ),
+            ),
+            SizedBox(height: 10),
 
             GestureDetector(
               onTap: () => provider.pickLicense(context),
@@ -215,30 +215,44 @@ class _DrivingCredentialsScreenState
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: Colors.grey.shade300),
                 ),
-                child: provider.licensePhoto != null
-                    ? Image.file(provider.licensePhoto!, fit: BoxFit.contain)
-                    : (driver?.licensePhoto != null &&
-                    driver!.licensePhoto!.isNotEmpty)
-                    ? Image.network(
-                  driver.licensePhoto!,
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Icon(Icons.image_not_supported_outlined,size: 60,);
-                  },
-                )
-                    : Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(Icons.cloud_upload, size: 30),
-                    SizedBox(height: 5),
-                    Text("Upload Front License Photo"),
-                  ],
-                ),
+                child:
+                    provider.licensePhoto != null
+                        ? Image.file(
+                          provider.licensePhoto!,
+                          fit: BoxFit.contain,
+                        )
+                        : (driver?.licensePhoto != null &&
+                            driver!.licensePhoto!.isNotEmpty)
+                        ? Image.network(
+                          driver.licensePhoto!,
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(
+                              Icons.image_not_supported_outlined,
+                              size: 60,
+                            );
+                          },
+                        )
+                        : Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(Icons.cloud_upload, size: 30),
+                            SizedBox(height: 5),
+                            Text("Upload Front License Photo"),
+                          ],
+                        ),
               ),
-            ),   SizedBox(height: 10,),   Text("Upload Back License Photo",style: TextStyle( fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: ColorResource.grayText,),),
-             SizedBox(height: 10,),
+            ),
+            SizedBox(height: 10),
+            Text(
+              "Upload Back License Photo",
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: ColorResource.grayText,
+              ),
+            ),
+            SizedBox(height: 10),
 
             GestureDetector(
               onTap: () => provider.pickLicenseBackPhoto(context),
@@ -251,25 +265,32 @@ class _DrivingCredentialsScreenState
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: Colors.grey.shade300),
                 ),
-                child: provider.licenseBackPhoto != null
-                    ? Image.file(provider.licenseBackPhoto!, fit: BoxFit.contain)
-                    : (driver?.licenseBackPhoto != null &&
-                    driver!.licenseBackPhoto!.isNotEmpty)
-                    ? Image.network(
-                  driver.licenseBackPhoto!,
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Icon(Icons.image_not_supported_outlined,size: 60,);
-                  },
-                )
-                    : Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(Icons.cloud_upload, size: 30),
-                    SizedBox(height: 5),
-                    Text("Upload Back License Photo"),
-                  ],
-                ),
+                child:
+                    provider.licenseBackPhoto != null
+                        ? Image.file(
+                          provider.licenseBackPhoto!,
+                          fit: BoxFit.contain,
+                        )
+                        : (driver?.licensePhoto != null &&
+                            driver!.licensePhoto!.isNotEmpty)
+                        ? Image.network(
+                          driver.licensePhoto!,
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(
+                              Icons.image_not_supported_outlined,
+                              size: 60,
+                            );
+                          },
+                        )
+                        : Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(Icons.cloud_upload, size: 30),
+                            SizedBox(height: 5),
+                            Text("Upload Back License Photo"),
+                          ],
+                        ),
               ),
             ),
 
@@ -297,7 +318,10 @@ class _DrivingCredentialsScreenState
                   return;
                 }
 
-                await provider.submitDrivingDetails(context:context,isVerified: driver?.isVerified??false);
+                await provider.submitDrivingDetails(
+                  context: context,
+                  isVerified: driver?.isVerified ?? false,
+                );
               },
             ),
           ],
@@ -307,7 +331,6 @@ class _DrivingCredentialsScreenState
   }
 
   void _error(BuildContext context, String msg) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(msg)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
 }

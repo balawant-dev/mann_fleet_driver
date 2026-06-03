@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:intl/intl.dart';
 import 'package:mann_fleet_driver/widget/customImageView.dart';
 
 import 'package:mann_fleet_driver/util/color/app_colors.dart';
@@ -11,7 +12,6 @@ import 'package:mann_fleet_driver/widget/navigator_method.dart';
 import '../../../widget/empty/noAssignedBookingScreen.dart';
 import '../../../widget/motionToastHelper.dart';
 import '../../bookingDetail/ui/bookingDetailScreen.dart';
-
 
 import '../../trip_cancellation/ui/trip_cancellation.dart';
 import '../component/bookingCard.dart';
@@ -28,8 +28,8 @@ class NewBookingScreen extends StatefulWidget {
 
 class _NewBookingScreenState extends State<NewBookingScreen> {
   int currentIndex = 0;
-  double?currentLat;
-  double?currentLng;
+  double? currentLat;
+  double? currentLng;
   @override
   void initState() {
     super.initState();
@@ -39,6 +39,7 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
       context.read<NewBookingProvider>().getNewBooking(context: context);
     });
   }
+
   Future<bool> _getCurrentLocation() async {
     try {
       // Check permission
@@ -51,7 +52,8 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
       if (permission == LocationPermission.deniedForever) {
         ToastHelper.show(
           context,
-          message: "Location permission permanently denied. Please enable from settings.",
+          message:
+              "Location permission permanently denied. Please enable from settings.",
           type: ToastType.error,
         );
         return false;
@@ -86,21 +88,22 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
       return false;
     }
   }
+
   @override
   Widget build(BuildContext context) {
-
     return Consumer<NewBookingProvider>(
       builder: (context, provider, child) {
-        if (provider.newBookingModel==null||provider.newBookingModel!.data==null) {
-          return  SizedBox(
-            height:MediaQuery.of(context).size.height*0.7,
+        if (provider.newBookingModel == null ||
+            provider.newBookingModel!.data == null) {
+          return SizedBox(
+            height: MediaQuery.of(context).size.height * 0.7,
             width: MediaQuery.of(context).size.width,
-            child: Center(child:     ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Image.asset(
-                "assets/images/upcommingBooking.gif",
+            child: Center(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.asset("assets/images/upcommingBooking.gif"),
               ),
-            ),),
+            ),
           );
         }
         // if (provider.isLoading) {
@@ -110,10 +113,14 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
         final bookings = provider.newBookingModel?.data ?? [];
 
         if (bookings.isEmpty) {
-          return NoAssignedBookingScreen(onRefresh: (){
-            context.read<NewBookingProvider>().getBannerApi(context: context);
-            context.read<NewBookingProvider>().getNewBooking(context: context);
-          },);
+          return NoAssignedBookingScreen(
+            onRefresh: () {
+              context.read<NewBookingProvider>().getBannerApi(context: context);
+              context.read<NewBookingProvider>().getNewBooking(
+                context: context,
+              );
+            },
+          );
           //return const Center(child: Text("No bookings available"));
         }
         final banners = provider.getBannerModel?.data ?? [];
@@ -139,19 +146,21 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
                               });
                             },
                           ),
-                          items: provider.getBannerModel!.data!.map((item) {
-                            return ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: CustomImageView(
-                                imagePath: item.image,
-                                width: MediaQuery.of(context).size.width,
-                                fit: BoxFit.cover,
-                                imageType: ImageType.network,
-                              ),
-                            );
-                          }).toList(),
+                          items:
+                              provider.getBannerModel!.data!.map((item) {
+                                return ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: CustomImageView(
+                                    imagePath: item.image,
+                                    width: MediaQuery.of(context).size.width,
+                                    fit: BoxFit.cover,
+                                    imageType: ImageType.network,
+                                  ),
+                                );
+                              }).toList(),
                         ),
-                        const SizedBox(height: 10),    Row(
+                        const SizedBox(height: 10),
+                        Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: List.generate(banners.length, (index) {
                             bool isActive = index == currentIndex;
@@ -162,9 +171,10 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
                               height: 8,
                               width: isActive ? 20 : 8,
                               decoration: BoxDecoration(
-                                color: isActive
-                                    ? ColorResource.primaryColor
-                                    : Colors.grey.shade300,
+                                color:
+                                    isActive
+                                        ? ColorResource.primaryColor
+                                        : Colors.grey.shade300,
                                 borderRadius: BorderRadius.circular(20),
                               ),
                             );
@@ -189,14 +199,13 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
 
                   // const SizedBox(height: 10),
 
-                //   CustomImageView(
-                //   //                  imagePath: AppImages.banner,
-                //   imagePath: provider.getBannerModel!.data!.first.image,
-                //   height: 150,
-                //   width: MediaQuery.of(context).size.width,
-                //   fit: BoxFit.cover,
-                // ),
-
+                  //   CustomImageView(
+                  //   //                  imagePath: AppImages.banner,
+                  //   imagePath: provider.getBannerModel!.data!.first.image,
+                  //   height: 150,
+                  //   width: MediaQuery.of(context).size.width,
+                  //   fit: BoxFit.cover,
+                  // ),
                   const SizedBox(height: 10),
                   ListView.builder(
                     shrinkWrap: true,
@@ -204,58 +213,76 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
                     itemCount: bookings.length,
                     itemBuilder: (context, index) {
                       final booking = bookings[index];
-                            // final booking = bookings[index];
 
-                            final title = booking.segment?.name ?? "Airport Taxi – Terminal 3";
-                            final dateTime = booking.scheduledAtIST ?? "Oct 24, 2023 • 10:30 AM";
-                            final price = booking.estimatedFare ?? 850;
-                            final bookingType = booking.bookingType ?? "One Way";
-                            final vehicleNo = "DL 1C AB 1234";
-                            final vehicleModel = booking.vehicle?.model ?? "Mercedes E-Class";
-                            final bookingId = booking.id ?? "";
-                            final driverStatus = booking.driverResponse?.status ?? "pending";
-                            print(bookings[index].tripEndOtpVerify);//ye bool value hai
-                            print(bookings[index].tripStartOtpVerify);//ye bool value hai ok
-                            print(bookings[index].tripStatus); // if trip status arrived hoga tab start ride wal botton hit hoga  jaise in progress hoga to type end otp wala hit hoga ok//enum: ["not_started","driver_enroute","arrived","in_progress","completed","cancelled",],
+                      final rawDate = booking.scheduledAtIST;
 
-                      //
+                      String formattedDate = "4 Sep 2024";
+                      String formattedTime = "08:30 PM";
+
+                      if (rawDate != null && rawDate.isNotEmpty) {
+                        try {
+                          DateTime dateTime = DateFormat(
+                            'yyyy-MM-dd HH:mm:ss',
+                          ).parse(rawDate);
+
+                          formattedDate = DateFormat(
+                            'd MMM yyyy',
+                          ).format(dateTime);
+
+                          formattedTime = DateFormat(
+                            'hh:mm a',
+                          ).format(dateTime);
+                        } catch (e) {
+                          debugPrint("Date parsing error: $e");
+                        }
+                      }
+                      final bookingId = booking.id ?? "";
+                      final driverStatus =
+                          booking.driverResponse?.status ?? "pending";
 
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 5.0),
                         child: BookingCard(
-                          title: booking.segment?.name ?? "Airport Taxi – Terminal 3",
-                          dateTime: booking.scheduledAtIST ?? "Oct 24, 2023 • 10:30 AM",
-                          price: booking.estimatedFare.toString() ,
+                          title:
+                              booking.segment?.name ??
+                              "Airport Taxi – Terminal 3",
+                          dateTime: "$formattedDate $formattedTime",
+                          price: booking.estimatedFare.toString(),
                           bookingType: booking.bookingType ?? "One Way",
-                          vehicleNo: "DL 1C AB 1234",
-                          vehicleModel: booking.vehicle?.model ?? "Mercedes E-Class",
+                          vehicleNo: booking.vehicle?.carNumber ?? "",
+                          vehicleModel:
+                              booking.vehicle?.model ?? "Mercedes E-Class",
                           color: booking.vehicle?.color ?? "White",
                           bookingId: booking.id?.toString() ?? "",
-                          driverStatus: booking.driverResponse?.status ?? "pending",
-                          tripStatus:  booking.tripStatus ??  "Not Started",
-                          pickupAddress: booking.pickup?.address ?? "Noida Sector 63",
-                          dropAddress: booking.dropoff?.address ?? "Delhi Airport",
-
+                          driverStatus:
+                              booking.driverResponse?.status ?? "pending",
+                          tripStatus: booking.tripStatus ?? "Not Started",
+                          pickupAddress:
+                              booking.pickup?.address ?? "Noida Sector 63",
+                          dropAddress:
+                              booking.dropoff?.address ?? "Delhi Airport",
 
                           onCardTap: () {
                             navPush(
                               context: context,
-                              action: BookingDetailScreen(id: booking.id.toString()),
+                              action: BookingDetailScreen(
+                                id: booking.id.toString(),
+                              ),
                             );
                           },
-                          button:                      buildActionButtons(
-                                                status: driverStatus,
-                                                tripStatus: booking.tripStatus ?? "",
-                                                bookingId: bookingId,
-                                                provider: provider,
-                                                isStartOtpVerified: booking.tripStartOtpVerify ?? false,
-                                                isEndOtpVerified: booking.tripEndOtpVerify ?? false,
-                                              ),
+                          button: buildActionButtons(
+                            status: driverStatus,
+                            tripStatus: booking.tripStatus ?? "",
+                            bookingId: bookingId,
+                            provider: provider,
+                            isStartOtpVerified:
+                                booking.tripStartOtpVerify ?? false,
+                            isEndOtpVerified: booking.tripEndOtpVerify ?? false,
+                          ),
                         ),
                       );
                     },
-                  )
-
+                  ),
                 ],
               ),
             ),
@@ -264,20 +291,19 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
                 top: 0,
                 left: 0,
                 right: 0,
-                child: LinearProgressIndicator(
-                  minHeight: 3,
-                ),
+                child: LinearProgressIndicator(minHeight: 3),
               ),
           ],
         );
       },
     );
   }
+
   Widget button({
     required String title,
     required VoidCallback onTap,
     Color? color,
-  }){
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -300,10 +326,8 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
       ),
     );
   }
-  Widget activeCard({
-    required String title,
-    required double price,
-  }){
+
+  Widget activeCard({required String title, required double price}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -318,7 +342,7 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
           size: 14,
           weight: FontWeight.w500,
           color: ColorResource.black,
-        )
+        ),
       ],
     );
   }
@@ -331,7 +355,6 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
     required bool isStartOtpVerified,
     required bool isEndOtpVerified,
   }) {
-
     /// 🔹 1. PENDING → CANCEL + ACCEPT
     if (status == "pending") {
       return Row(
@@ -344,26 +367,35 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
               navPush(
                 context: context,
                 action: TripCancellationScreen(
-                  bookingNumber: provider.newBookingModel?.data
-                      ?.firstWhere((e) => e.id.toString() == bookingId)
-                      .bookingNumber,
+                  bookingNumber:
+                      provider.newBookingModel?.data
+                          ?.firstWhere((e) => e.id.toString() == bookingId)
+                          .bookingNumber,
                   bookingId: bookingId,
-                  pickupAddress: provider.newBookingModel?.data
-                      ?.firstWhere((e) => e.id.toString() == bookingId)
-                      .pickup?.address,
-                  dropoffAddress: provider.newBookingModel?.data
-                      ?.firstWhere((e) => e.id.toString() == bookingId)
-                      .dropoff?.address,
-                  bookingDateTime: provider.newBookingModel?.data
-                      ?.firstWhere((e) => e.id.toString() == bookingId)
-                      .scheduledAtIST,
-                  fareEstimate: provider.newBookingModel?.data
-                      ?.firstWhere((e) => e.id.toString() == bookingId)
-                      .estimatedFare
-                      ?.toString(),
-                  passengerInfo: provider.newBookingModel?.data
-                      ?.firstWhere((e) => e.id.toString() == bookingId)
-                      .user?.name,
+                  pickupAddress:
+                      provider.newBookingModel?.data
+                          ?.firstWhere((e) => e.id.toString() == bookingId)
+                          .pickup
+                          ?.address,
+                  dropoffAddress:
+                      provider.newBookingModel?.data
+                          ?.firstWhere((e) => e.id.toString() == bookingId)
+                          .dropoff
+                          ?.address,
+                  bookingDateTime:
+                      provider.newBookingModel?.data
+                          ?.firstWhere((e) => e.id.toString() == bookingId)
+                          .scheduledAtIST,
+                  fareEstimate:
+                      provider.newBookingModel?.data
+                          ?.firstWhere((e) => e.id.toString() == bookingId)
+                          .estimatedFare
+                          ?.toString(),
+                  passengerInfo:
+                      provider.newBookingModel?.data
+                          ?.firstWhere((e) => e.id.toString() == bookingId)
+                          .user
+                          ?.name,
                 ),
               );
             },
@@ -380,13 +412,14 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
               bool success = await provider.acceptBookingApi(
                 context: context,
                 id: bookingId,
-                currentLng:currentLng??0.0 ,currentLat: currentLat??0.0,
+                currentLng: currentLng ?? 0.0,
+                currentLat: currentLat ?? 0.0,
               );
 
               if (success) {
                 ToastHelper.show(
                   context,
-                  message:"Booking Accepted ✅",
+                  message: "Booking Accepted ✅",
                   type: ToastType.success,
                 );
                 // ScaffoldMessenger.of(context).showSnackBar(
@@ -400,18 +433,22 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
     }
 
     /// 🔹 2. ACCEPTED → START OTP
-  if (status == "accepted") {
+    if (status == "accepted") {
       return Center(
         child: button(
           title: "Go to Detail",
           color: Colors.blue,
           onTap: () {
-
             navPush(
               context: context,
               action: BookingDetailScreen(id: bookingId),
             );
-            provider.updateDriverLocationApi(id: bookingId,lng: currentLng??0.0,lat: currentLat??0.0,context: context);
+            provider.updateDriverLocationApi(
+              id: bookingId,
+              lng: currentLng ?? 0.0,
+              lat: currentLat ?? 0.0,
+              context: context,
+            );
           },
         ),
       );
@@ -441,7 +478,7 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
             if (success) {
               ToastHelper.show(
                 context,
-                message:"Trip Started 🚗",
+                message: "Trip Started 🚗",
                 type: ToastType.success,
               );
               // ScaffoldMessenger.of(context).showSnackBar(
@@ -486,17 +523,13 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
       return const Center(
         child: Text(
           "Trip Cancelled ❌",
-          style: TextStyle(
-            color: Colors.red,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
         ),
       );
     }
 
     return const SizedBox();
   }
-
 
   void showCancelDialog(String bookingId) {
     TextEditingController reasonController = TextEditingController();
@@ -505,12 +538,13 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
       context: context,
       builder: (_) {
         return AlertDialog(
-          title: const Text("Cancel Booking",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 18),),
+          title: const Text(
+            "Cancel Booking",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          ),
           content: TextField(
             controller: reasonController,
-            decoration: const InputDecoration(
-              hintText: "Enter reason",
-            ),
+            decoration: const InputDecoration(hintText: "Enter reason"),
           ),
           actions: [
             TextButton(
@@ -527,8 +561,9 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
 
                 Navigator.pop(context);
 
-                context.read<NewBookingProvider>()
-                    .getNewBooking(context: context);
+                context.read<NewBookingProvider>().getNewBooking(
+                  context: context,
+                );
               },
               child: const Text("Submit"),
             ),
@@ -538,8 +573,6 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
     );
   }
 
-
-
   /// 🔢 OTP DIALOG
   void showOtpDialog(String bookingId, String type) {
     TextEditingController otpController = TextEditingController();
@@ -548,7 +581,10 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
       context: context,
       builder: (_) {
         return AlertDialog(
-          title: Text("Enter OTP ($type)",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 18),),
+          title: Text(
+            "Enter OTP ($type)",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          ),
           content: TextField(
             controller: otpController,
             keyboardType: TextInputType.number,
@@ -569,18 +605,18 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
                 bool success = await context
                     .read<NewBookingProvider>()
                     .verifyBookingOtpApi(
-                  context: context,
-                  id: bookingId,
-                  otp: otpController.text,
-                  type: type, // 🔥 important
-                );
+                      context: context,
+                      id: bookingId,
+                      otp: otpController.text,
+                      type: type, // 🔥 important
+                    );
 
                 Navigator.pop(context);
 
                 if (success) {
                   ToastHelper.show(
                     context,
-                    message:"OTP Verified ($type) ✅",
+                    message: "OTP Verified ($type) ✅",
                     type: ToastType.success,
                   );
                   // ScaffoldMessenger.of(context).showSnackBar(

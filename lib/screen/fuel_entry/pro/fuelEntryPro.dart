@@ -1,15 +1,15 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
-import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import '../../../widget/motionToastHelper.dart';
 import '../../../widget/showLoaderFunction.dart';
+import '../../profileManagement/provider/profileDetailProvider.dart';
 import '../repo/fuelEntryRepo.dart';
 import 'dart:convert';
-import 'dart:io';
+import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 
 class FuelEntryProvider extends ChangeNotifier {
@@ -39,6 +39,31 @@ class FuelEntryProvider extends ChangeNotifier {
   final picker = ImagePicker();
 
   bool isLoading = false;
+
+  void setVehicleNumber(BuildContext context) {
+    final profileProvider = context.read<ProfileDetailProvider>();
+
+    vehicleController.text =
+        profileProvider
+            .getProfileModel
+            ?.data
+            ?.driver
+            ?.vehicles
+            ?.first
+            .carNumber ??
+        "";
+    fuelTypeController.text =
+        profileProvider
+            .getProfileModel
+            ?.data
+            ?.driver
+            ?.vehicles
+            ?.first
+            .fuelType ??
+        "";
+
+    notifyListeners();
+  }
 
   /// 🔥 GET CURRENT LOCATION
   Future<void> getCurrentLocation() async {
@@ -73,49 +98,6 @@ class FuelEntryProvider extends ChangeNotifier {
     }
   }
 
-  /// Pick Image
-  //   Future<void> pickImage(String type, ImageSource source) async {
-  //     final picked = await picker.pickImage(source: source);
-  //
-  //     if (picked != null) {
-  //       File file = File(picked.path);
-  //
-  //       /// ✂️ CROP IMAGE
-  //       CroppedFile? cropped = await ImageCropper().cropImage(
-  //         sourcePath: file.path,
-  //         uiSettings: [
-  //           AndroidUiSettings(toolbarTitle: "Crop Image"),
-  //           IOSUiSettings(title: "Crop Image"),
-  //         ],
-  //       );
-  //
-  //       if (cropped != null) {
-  //         file = File(cropped.path);
-  //       }
-  //
-  //       /// SET IMAGE
-  //       if (type == "odometer") odometerImage = file;
-  //       if (type == "start") startImage = file;
-  //       // if (type == "end") endImage = file;
-  //       if (type == "end") {
-  //         endImage = file;
-  //         await scanFuelDisplayWithGemini(file);
-  //
-  //         /// FUTURE OCR
-  //         // await scanFuelDisplayOCR(file);
-  //       }
-  //
-  //       /// 🧾 BILL IMAGE (MAIN LOGIC 🔥)
-  //       if (type == "bill") {
-  //         billImage = file;
-  //
-  // //yah wline hai jo ham f=bill sacn karke data fill kar rhe hai jo abhi nhi karn ahi ok bhut code mat hatna ok
-  // //         await scanBillOCR(file); // 🔥 AUTO SCAN
-  //       }
-  //
-  //       notifyListeners();
-  //     }
-  //   }
   Future<void> pickImage(String type, ImageSource source) async {
     try {
       final pickedFile = await ImagePicker().pickImage(
@@ -132,13 +114,11 @@ class FuelEntryProvider extends ChangeNotifier {
         case "bill":
           billImage = image;
 
-          /// 🔥 CALL GEMINI HERE
-          //  await scanFuelDisplayWithGemini(image);
-
           break;
 
         case "odometer":
           odometerImage = image;
+          await scanOdometerDisplayWithGemini(image);
           break;
 
         case "start":
@@ -176,7 +156,6 @@ class FuelEntryProvider extends ChangeNotifier {
       extractFuelDisplayData(recognizedText.text);
     } catch (e) {
       debugPrint("OCR ERROR: $e");
-      // ToastHelper.show(context, message: "Could not read display clearly");
     }
   }
 
@@ -495,7 +474,6 @@ class FuelEntryProvider extends ChangeNotifier {
           break;
         }
       }
-
       if (foundFuelType.isNotEmpty) break;
     }
     debugPrint("🧾 INVOICE: $foundInvoice");
@@ -608,6 +586,7 @@ class FuelEntryProvider extends ChangeNotifier {
       notifyListeners();
     } //9161470607
   }
+
   final apiKey = "AIzaSyA2X6HG6ZE2pzrykNypPtoQ-KJR67gpWjM";
 
   Future<void> scanFuelDisplayWithGemini(File imageFile) async {
@@ -617,7 +596,6 @@ class FuelEntryProvider extends ChangeNotifier {
       final bytes = await imageFile.readAsBytes();
       final base64Image = base64Encode(bytes);
       print("kkkk${base64Image}");
-
 
       final uri = Uri.parse(
         "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=$apiKey",
@@ -711,6 +689,98 @@ Extract fuel data and return ONLY JSON:
     }
   }
 
+  Future<void> scanOdometerDisplayWithGemini(File imageFile) async {
+    try {
+      print("START Odometer OCR");
+
+      final bytes = await imageFile.readAsBytes();
+      final base64Image = base64Encode(bytes);
+      print("kkkk${base64Image}");
+
+      final uri = Uri.parse(
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=$apiKey",
+        //  "https://generativelanguage.googleapis.com/v1beta/models?key=$apiKey",
+      );
+
+      final response = await http.post(
+        uri,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "contents": [
+            {
+              "parts": [
+                {
+                  "text": """
+Extract odometer value and return ONLY JSON:
+
+{
+  "km_reading": 0,
+}
+""",
+                },
+                {
+                  "inline_data": {
+                    "mime_type": "image/jpeg",
+                    "data": base64Image,
+                  },
+                },
+              ],
+            },
+          ],
+        }),
+      );
+
+      print(response.statusCode);
+      print(response.body);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        String rawText =
+            data["candidates"][0]["content"]["parts"][0]["text"] ?? "";
+
+        print("RAW => $rawText");
+
+        /// CLEAN JSON (IMPORTANT FIX)
+        String cleaned =
+            rawText
+                .replaceAll("```json", "")
+                .replaceAll("```", "")
+                .replaceAll("\n", "")
+                .trim();
+
+        /// SAFE JSON PARSE
+        Map<String, dynamic> jsonData = {};
+        try {
+          jsonData = jsonDecode(cleaned);
+        } catch (e) {
+          print("JSON PARSE ERROR => $e");
+
+          /// fallback extraction
+          final regex = RegExp(r'\{.*\}');
+          final match = regex.firstMatch(rawText);
+
+          if (match != null) {
+            jsonData = jsonDecode(match.group(0)!);
+          }
+        }
+
+        /// SAFE AUTO FILL
+        double kmReading = (jsonData["km_reading"] ?? 0).toDouble();
+
+        odometerController.text =
+            kmReading > 0 ? kmReading.toStringAsFixed(2) : "";
+
+        print("AUTO FILL DONE");
+
+        notifyListeners();
+      } else {
+        print("ERROR RESPONSE => ${response.body}");
+      }
+    } catch (e) {
+      print("OCR ERROR => $e");
+    }
+  }
 
   void clear() {
     vehicleController.clear();

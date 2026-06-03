@@ -1,10 +1,11 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mann_fleet_driver/widget/navigator_method.dart';
 import '../../../widget/showLoaderFunction.dart';
-
+import 'package:http/http.dart' as http;
 import '../../bookingDetail/model/bookingDetailModel.dart';
 import '../model/bookingAcceptedModel.dart';
 import '../model/bookingCancelModel.dart';
@@ -27,7 +28,7 @@ class NewBookingProvider extends ChangeNotifier {
   StartTripModel? startTripModel;
   GetBannerModel? getBannerModel;
   TripCompleteModel? tripCompleteModel;
-  UpdateLocationModel?updateLocationModel;
+  UpdateLocationModel? updateLocationModel;
   bool isLoading = false;
 
   // ── Get pending / assigned bookings ────────────────────────────────────────
@@ -51,13 +52,24 @@ class NewBookingProvider extends ChangeNotifier {
       isLoading = false;
       notifyListeners();
     }
-  }  // ── Update Location ────────────────────────────────────────
-  Future<void> updateDriverLocationApi({required BuildContext context,required String id,required double lat,required double lng}) async {
+  } // ── Update Location ────────────────────────────────────────
+
+  Future<void> updateDriverLocationApi({
+    required BuildContext context,
+    required String id,
+    required double lat,
+    required double lng,
+  }) async {
     try {
       // isLoading = true;
       notifyListeners();
 
-      final res = await api.updateDriverLocationApi(context: context,lat:lat,lng: lng,id: id );
+      final res = await api.updateDriverLocationApi(
+        context: context,
+        lat: lat,
+        lng: lng,
+        id: id,
+      );
       updateLocationModel = res;
 
       if (res != null && res.status == true) {
@@ -104,13 +116,17 @@ class NewBookingProvider extends ChangeNotifier {
     required String id,
     required double currentLat,
     required double currentLng,
-
   }) async {
     try {
       // isLoading = true;
       notifyListeners();
 
-      final res = await api.acceptBookingApi(context: context, id: id,currentLat:currentLat ,currentLng: currentLng);
+      final res = await api.acceptBookingApi(
+        context: context,
+        id: id,
+        currentLat: currentLat,
+        currentLng: currentLng,
+      );
       bookingAcceptedModel = res;
 
       if (res != null && res.status == true) {
@@ -231,6 +247,66 @@ class NewBookingProvider extends ChangeNotifier {
     }
   }
 
+  Future<bool> getFinalFare({
+    required BuildContext context,
+    required String id,
+  }) async {
+    try {
+      // isLoading = true;
+      notifyListeners();
+
+      final res = await api.getFinalFare(context: context, id: id);
+      tripCompleteModel = res;
+
+      if (res != null && res.status == true) {
+        debugPrint("Complete trip 🎈🎈🎈🎈🎈🎈🎈🎈 for booking $id");
+        return true;
+      } else {
+        debugPrint("Failed to start trip for booking $id");
+        return false;
+      }
+    } catch (e) {
+      debugPrint("Error starting trip $id: $e");
+      return false;
+    } finally {
+      // isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> checkFinalFare({
+    required BuildContext context,
+    required String currentLat,
+    required String currentLng,
+    required String durationMins,
+  }) async {
+    try {
+      // isLoading = true;
+      notifyListeners();
+
+      final res = await api.checkFinalFare(
+        context: context,
+        currentLat: currentLat,
+        currentLng: currentLng,
+        durationMins: durationMins,
+      );
+      tripCompleteModel = res;
+
+      if (res != null && res.status == true) {
+        return true;
+      } else {
+        debugPrint("Failed to start trip for booking");
+        return false;
+      }
+    } catch (e) {
+      debugPrint("Error starting trip: $e");
+      return false;
+    } finally {
+      // isLoading = false;
+      notifyListeners();
+    }
+  }
+
   // ── Verify OTP ─────────────────────────────────────────────────────────────
   Future<bool> verifyBookingOtpApi({
     required BuildContext context,
@@ -278,6 +354,101 @@ class NewBookingProvider extends ChangeNotifier {
   File? interior;
   File? speedometer;
   File? speedometerEndImage;
+  TextEditingController speedoMetervalue = TextEditingController();
+
+  final apiKey = "AIzaSyA2X6HG6ZE2pzrykNypPtoQ-KJR67gpWjM";
+  Future<void> scanOdometerDisplayWithGemini(File imageFile) async {
+    try {
+      print("START Odometer OCR");
+
+      final bytes = await imageFile.readAsBytes();
+      final base64Image = base64Encode(bytes);
+      print("kkkk${base64Image}");
+
+      final uri = Uri.parse(
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=$apiKey",
+        //  "https://generativelanguage.googleapis.com/v1beta/models?key=$apiKey",
+      );
+
+      final response = await http.post(
+        uri,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "contents": [
+            {
+              "parts": [
+                {
+                  "text": """
+Extract odometer value and return ONLY JSON:
+
+{
+  "km_reading": 0,
+}
+""",
+                },
+                {
+                  "inline_data": {
+                    "mime_type": "image/jpeg",
+                    "data": base64Image,
+                  },
+                },
+              ],
+            },
+          ],
+        }),
+      );
+
+      print(response.statusCode);
+      print(response.body);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        String rawText =
+            data["candidates"][0]["content"]["parts"][0]["text"] ?? "";
+
+        print("RAW => $rawText");
+
+        /// CLEAN JSON (IMPORTANT FIX)
+        String cleaned =
+            rawText
+                .replaceAll("```json", "")
+                .replaceAll("```", "")
+                .replaceAll("\n", "")
+                .trim();
+
+        /// SAFE JSON PARSE
+        Map<String, dynamic> jsonData = {};
+        try {
+          jsonData = jsonDecode(cleaned);
+        } catch (e) {
+          print("JSON PARSE ERROR => $e");
+
+          /// fallback extraction
+          final regex = RegExp(r'\{.*\}');
+          final match = regex.firstMatch(rawText);
+
+          if (match != null) {
+            jsonData = jsonDecode(match.group(0)!);
+          }
+        }
+
+        /// SAFE AUTO FILL
+        double kmReading = (jsonData["km_reading"] ?? 0).toDouble();
+
+        speedoMetervalue.text =
+            kmReading > 0 ? kmReading.toStringAsFixed(2) : "";
+
+        print("AUTO FILL DONE");
+
+        notifyListeners();
+      } else {
+        print("ERROR RESPONSE => ${response.body}");
+      }
+    } catch (e) {
+      print("OCR ERROR => $e");
+    }
+  }
 
   Future pickImage(String type) async {
     final XFile? picked = await picker.pickImage(source: ImageSource.camera);
@@ -303,9 +474,11 @@ class NewBookingProvider extends ChangeNotifier {
         interior = file;
         break;
       case "speedometer":
+        scanOdometerDisplayWithGemini(file);
         speedometer = file;
         break;
       case "speedometerEndImage":
+        scanOdometerDisplayWithGemini(file);
         speedometerEndImage = file;
         break;
     }
@@ -352,6 +525,7 @@ class NewBookingProvider extends ChangeNotifier {
       debugPrint("rightViewImage: ${right?.path ?? ""}");
       debugPrint("interiorImage: ${interior?.path ?? ""}");
       debugPrint("speedometerImage: ${speedometer?.path ?? ""}");
+      debugPrint("speedoMetervalue: ${speedoMetervalue.text}");
 
       final res = await api.pickupVerificationApi(
         context: context,
@@ -362,6 +536,7 @@ class NewBookingProvider extends ChangeNotifier {
         rightViewImage: right?.path ?? "",
         interiorImage: interior?.path ?? "",
         speedometerImage: speedometer?.path ?? "",
+        speedoMetervalue: speedoMetervalue.text,
       );
 
       pickupVerificationModel = res;
@@ -381,15 +556,12 @@ class NewBookingProvider extends ChangeNotifier {
     try {
       isLoading2 = true;
       notifyListeners();
-      debugPrint("frontViewImage: ${front?.path ?? ""}");
-      debugPrint("backViewImage: ${back?.path ?? ""}");
-      debugPrint("leftViewImage: ${left?.path ?? ""}");
-      debugPrint("rightViewImage: ${right?.path ?? ""}");
-      debugPrint("interiorImage: ${interior?.path ?? ""}");
+      debugPrint("speedoMetervalue: ${speedoMetervalue.text ?? ""}");
       debugPrint("speedometerImage: ${speedometer?.path ?? ""}");
 
       final res = await api.speedometerVerification(
         context: context,
+        speedoMetervalue: speedoMetervalue.text,
         id: id,
 
         speedometerImage: speedometerEndImage?.path ?? "",

@@ -11,16 +11,17 @@ import '../../../../../apiservice/services/secure_storage_service.dart';
 import '../../auth/register/model/registerModel.dart';
 import '../model/bookingHistoryModel.dart';
 
-
 class BookingHistoryRepo {
   final ApiService _api = ApiService();
 
-
-
-
-  Future<BookingHistoryModel> getBookingHistoryApi({required BuildContext context}) async {
+  Future<BookingHistoryModel> getBookingHistoryApi({
+    required BuildContext context,
+  }) async {
     try {
-      final response = await _api.get(ApiConstants.bookingHistory, requiresAuth: true);
+      final response = await _api.get(
+        ApiConstants.bookingHistory,
+        requiresAuth: true,
+      );
       //   await SecureStorageService.saveToken(response['token']);
       return BookingHistoryModel.fromJson(response);
       //  return LoginModel.fromJson(response['user']);
@@ -28,13 +29,13 @@ class BookingHistoryRepo {
       if (e.error is NoInternetException) {
         showNoInternetScreen(
           context,
-          onRetry: () => getBookingHistoryApi(context: context,),
+          onRetry: () => getBookingHistoryApi(context: context),
         );
         throw NoInternetException();
       } else if (e.error is ServerException) {
         showServerErrorScreen(
           context,
-          onRetry: () => getBookingHistoryApi(context: context,),
+          onRetry: () => getBookingHistoryApi(context: context),
         );
         throw ServerException();
       } else if (e.error is UnauthorizedException) {

@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:mann_fleet_driver/widget/commonAppBar.dart';
 import 'package:provider/provider.dart';
 
 import '../../../widget/empty/bookingHistoryEmptyScreen.dart';
 import '../provider/bookingHistoryPro.dart';
-
-
 
 // ================= SCREEN =================
 class BookingHistoryScreen extends StatefulWidget {
@@ -20,8 +19,10 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<BookingHistoryProvider>(context, listen: false)
-          .fetchBookings(context);
+      Provider.of<BookingHistoryProvider>(
+        context,
+        listen: false,
+      ).fetchBookings(context);
     });
   }
 
@@ -39,11 +40,15 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
           final list = provider.bookingModel?.data ?? [];
 
           if (list.isEmpty) {
-            return BookingHistoryEmptyScreen(onRefresh: (){
-              Provider.of<BookingHistoryProvider>(context, listen: false)
-                  .fetchBookings(context);
-            },);
-           // return const Center(child: Text("No bookings found"));
+            return BookingHistoryEmptyScreen(
+              onRefresh: () {
+                Provider.of<BookingHistoryProvider>(
+                  context,
+                  listen: false,
+                ).fetchBookings(context);
+              },
+            );
+            // return const Center(child: Text("No bookings found"));
           }
 
           return ListView.builder(
@@ -52,6 +57,24 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
             itemBuilder: (context, index) {
               final item = list[index];
 
+              final rawDate = item.scheduledAtIST;
+
+              String formattedDate = "4 Sep 2024";
+              String formattedTime = "08:30 PM";
+
+              DateTime? parsedDate;
+
+              if (rawDate != null && rawDate.isNotEmpty) {
+                try {
+                  parsedDate = DateFormat('yyyy-MM-dd HH:mm:ss').parse(rawDate);
+
+                  formattedDate = DateFormat('d MMM yyyy').format(parsedDate);
+
+                  formattedTime = DateFormat('hh:mm a').format(parsedDate);
+                } catch (e) {
+                  debugPrint("Date parsing error: $e");
+                }
+              }
               return Container(
                 margin: const EdgeInsets.only(bottom: 12),
                 padding: const EdgeInsets.all(14),
@@ -83,7 +106,9 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
                         ),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 4),
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.green.shade50,
                             borderRadius: BorderRadius.circular(20),
@@ -95,7 +120,7 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
                               color: Colors.green.shade700,
                             ),
                           ),
-                        )
+                        ),
                       ],
                     ),
 
@@ -104,8 +129,11 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
                     // Pickup
                     Row(
                       children: [
-                        const Icon(Icons.radio_button_checked,
-                            size: 14, color: Colors.green),
+                        const Icon(
+                          Icons.radio_button_checked,
+                          size: 14,
+                          color: Colors.green,
+                        ),
                         const SizedBox(width: 6),
                         Expanded(
                           child: Text(
@@ -121,8 +149,11 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
                     // Drop
                     Row(
                       children: [
-                        const Icon(Icons.location_on,
-                            size: 14, color: Colors.red),
+                        const Icon(
+                          Icons.location_on,
+                          size: 14,
+                          color: Colors.red,
+                        ),
                         const SizedBox(width: 6),
                         Expanded(
                           child: Text(
@@ -137,16 +168,16 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
 
                     // Bottom Info
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
+                        // Text(
+                        //   "₹ ${item.estimatedFare ?? 0}",
+                        //   style: const TextStyle(
+                        //     fontWeight: FontWeight.w600,
+                        //   ),
+                        // ),
                         Text(
-                          "₹ ${item.estimatedFare ?? 0}",
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        Text(
-                          item.scheduledAtIST ?? "",
+                          "$formattedDate $formattedTime",
                           style: TextStyle(
                             fontSize: 12,
                             color: Colors.grey.shade600,

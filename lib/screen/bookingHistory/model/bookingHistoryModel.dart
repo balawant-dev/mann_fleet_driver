@@ -6,13 +6,14 @@ class BookingHistoryModel {
   String? message;
   List<Data>? data;
 
-  BookingHistoryModel(
-      {this.status,
-        this.totalResult,
-        this.totalPage,
-        this.currentPage,
-        this.message,
-        this.data});
+  BookingHistoryModel({
+    this.status,
+    this.totalResult,
+    this.totalPage,
+    this.currentPage,
+    this.message,
+    this.data,
+  });
 
   BookingHistoryModel.fromJson(Map<String, dynamic> json) {
     status = json['status'];
@@ -53,8 +54,8 @@ class Data {
   String? paymentStatus;
   String? tripStatus;
   String? overallStatus;
-  double? estimatedFare;
-  double? prepaidAmount;
+  dynamic estimatedFare;
+  dynamic prepaidAmount;
   String? scheduledAt;
   String? createdAt;
   Driver? driver;
@@ -68,43 +69,44 @@ class Data {
   Null? cancelledAtIST;
   String? id;
 
-  Data(
-      {this.pickup,
-        this.dropoff,
-        this.sId,
-        this.bookingNumber,
-        this.segment,
-        this.region,
-        this.bookingType,
-        this.paymentStatus,
-        this.tripStatus,
-        this.overallStatus,
-        this.estimatedFare,
-        this.prepaidAmount,
-        this.scheduledAt,
-        this.createdAt,
-        this.driver,
-        this.vehicle,
-        this.createdAtIST,
-        this.scheduledAtIST,
-        this.paymentAtIST,
-        this.assignedAtIST,
-        this.tripStartAtIST,
-        this.tripEndAtIST,
-        this.cancelledAtIST,
-        this.id});
+  Data({
+    this.pickup,
+    this.dropoff,
+    this.sId,
+    this.bookingNumber,
+    this.segment,
+    this.region,
+    this.bookingType,
+    this.paymentStatus,
+    this.tripStatus,
+    this.overallStatus,
+    this.estimatedFare,
+    this.prepaidAmount,
+    this.scheduledAt,
+    this.createdAt,
+    this.driver,
+    this.vehicle,
+    this.createdAtIST,
+    this.scheduledAtIST,
+    this.paymentAtIST,
+    this.assignedAtIST,
+    this.tripStartAtIST,
+    this.tripEndAtIST,
+    this.cancelledAtIST,
+    this.id,
+  });
 
   Data.fromJson(Map<String, dynamic> json) {
     pickup =
-    json['pickup'] != null ? new Pickup.fromJson(json['pickup']) : null;
+        json['pickup'] != null ? new Pickup.fromJson(json['pickup']) : null;
     dropoff =
-    json['dropoff'] != null ? new Pickup.fromJson(json['dropoff']) : null;
+        json['dropoff'] != null ? new Pickup.fromJson(json['dropoff']) : null;
     sId = json['_id'];
     bookingNumber = json['bookingNumber'];
     segment =
-    json['segment'] != null ? new Segment.fromJson(json['segment']) : null;
+        json['segment'] != null ? new Segment.fromJson(json['segment']) : null;
     region =
-    json['region'] != null ? new Region.fromJson(json['region']) : null;
+        json['region'] != null ? new Region.fromJson(json['region']) : null;
     bookingType = json['bookingType'];
     paymentStatus = json['paymentStatus'];
     tripStatus = json['tripStatus'];
@@ -114,9 +116,9 @@ class Data {
     scheduledAt = json['scheduledAt'];
     createdAt = json['createdAt'];
     driver =
-    json['driver'] != null ? new Driver.fromJson(json['driver']) : null;
+        json['driver'] != null ? new Driver.fromJson(json['driver']) : null;
     vehicle =
-    json['vehicle'] != null ? new Vehicle.fromJson(json['vehicle']) : null;
+        json['vehicle'] != null ? new Vehicle.fromJson(json['vehicle']) : null;
     createdAtIST = json['createdAtIST'];
     scheduledAtIST = json['scheduledAtIST'];
     paymentAtIST = json['paymentAtIST'];
@@ -234,8 +236,14 @@ class Driver {
   String? profilePic;
   String? id;
 
-  Driver(
-      {this.sId, this.phone, this.rating, this.name, this.profilePic, this.id});
+  Driver({
+    this.sId,
+    this.phone,
+    this.rating,
+    this.name,
+    this.profilePic,
+    this.id,
+  });
 
   Driver.fromJson(Map<String, dynamic> json) {
     sId = json['_id'];

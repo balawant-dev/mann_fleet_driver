@@ -4,8 +4,6 @@ class ApiConstants {
   static const String baseUrl = 'https://admin.mannfleetpartners.com';
   // static const String baseUrl = 'http://3.7.202.40:9020';
 
-
-
   static const String verifyOtp = '/api/driver/verifyOtp';
 
   static const String signUp = '/api/driver/signUp';
@@ -14,9 +12,11 @@ class ApiConstants {
   static const String booking = '/api/driver/booking';
   static const String profile = '/api/driver/profile';
   static const String verifyAadhaar = '/api/driver/verifyAadhaar';
-  static const String verifyCompleteAadhaar = '/api/driver/verifyCompleteAadhaar';
+  static const String verifyCompleteAadhaar =
+      '/api/driver/verifyCompleteAadhaar';
   static const String fuelLogs = '/api/driver/fuelLogs';
-  static const String getMyAssignedBookings = '/api/driver/getMyAssignedBookings';
+  static const String getMyAssignedBookings =
+      '/api/driver/getMyAssignedBookings';
   static const String banner = '/api/driver/banner?type=driver';
   static const String acceptBooking = '/api/driver/acceptBooking';
   static const String startTrip = '/api/driver/startTrip';
@@ -26,6 +26,7 @@ class ApiConstants {
   static const String updateDriverLocation = '/api/driver/updateDriverLocation';
   static const String bookingHistory = '/api/driver/bookingHistory';
   static const String completeTrip = '/api/driver/completeTrip';
+  static const String checkFinalFare = '/api/driver/checkFinalFare';
   static const String notifications = '/api/driver/notifications';
   static const String scanQr = '/api/driver/scanQr';
   static const String pickupVerification = '/api/driver/pickupVerification';

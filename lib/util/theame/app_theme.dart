@@ -1,14 +1,11 @@
-
 import 'package:flutter/material.dart';
 
 class AppTheme {
-
   /// Main Brand Color
-  static const Color primaryColor =  Color(0xFF03045E);
+  static const Color primaryColor = Color(0xFF03045E);
 
   /// Light Theme
   static ThemeData lightTheme = ThemeData(
-
     useMaterial3: true,
 
     primaryColor: primaryColor,
@@ -27,17 +24,13 @@ class AppTheme {
       style: ElevatedButton.styleFrom(
         backgroundColor: primaryColor,
         foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     ),
 
     /// Text Button
     textButtonTheme: TextButtonThemeData(
-      style: TextButton.styleFrom(
-        foregroundColor: primaryColor,
-      ),
+      style: TextButton.styleFrom(foregroundColor: primaryColor),
     ),
 
     /// Outlined Button
@@ -45,9 +38,7 @@ class AppTheme {
       style: OutlinedButton.styleFrom(
         foregroundColor: primaryColor,
         side: const BorderSide(color: primaryColor),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     ),
 
@@ -97,12 +88,11 @@ class AppTheme {
     ),
 
     /// Tab Bar Theme
-    tabBarTheme:  TabBarTheme(
+    tabBarTheme: TabBarThemeData(
       labelColor: primaryColor,
       unselectedLabelColor: Colors.grey,
       indicatorColor: primaryColor,
     ),
-
   );
 }
 
@@ -212,4 +202,3 @@ class AppTheme {
 //
 //   );
 // }
-

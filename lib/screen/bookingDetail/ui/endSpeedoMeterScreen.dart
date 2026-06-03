@@ -4,11 +4,11 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:mann_fleet_driver/widget/commonAppBar.dart';
 import 'package:provider/provider.dart';
+import '../../../widget/commonTextFormField.dart';
 import '../../../widget/motionToastHelper.dart';
 import '../../../widget/navigator_method.dart';
 import '../../../widget/showLoaderFunction.dart';
 import '../../home_screen/provider/newBookingProvider.dart';
-
 
 class UploadSpeedoMeterImageScreen extends StatelessWidget {
   final String id;
@@ -29,11 +29,18 @@ class UploadSpeedoMeterImageScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-         
-
             const SizedBox(height: 10),
 
             _speedometerCard(provider),
+
+            const SizedBox(height: 10),
+            CommonTextFormField(
+              labelText: 'Odometer Reading',
+              isRequired: true,
+              controller: provider.speedoMetervalue,
+              keyboardType: TextInputType.number,
+              hintText: 'Enter KM',
+            ),
 
             const SizedBox(height: 30),
             ElevatedButton(
@@ -76,18 +83,11 @@ class UploadSpeedoMeterImageScreen extends StatelessWidget {
               child: const Text("Next"),
             ),
             const SizedBox(height: 30),
-
-
           ],
         ),
       ),
     );
   }
-
-
-
-
-
 
   Widget _speedometerCard(NewBookingProvider provider) {
     return Container(
@@ -109,9 +109,12 @@ class UploadSpeedoMeterImageScreen extends StatelessWidget {
               color: const Color(0xFFF1F5F9),
             ),
             child:
-            provider.speedometerEndImage == null
-                ? const Icon(Icons.speed, size: 60, color: Colors.grey)
-                : Image.file(provider.speedometerEndImage!, fit: BoxFit.cover),
+                provider.speedometerEndImage == null
+                    ? const Icon(Icons.speed, size: 60, color: Colors.grey)
+                    : Image.file(
+                      provider.speedometerEndImage!,
+                      fit: BoxFit.cover,
+                    ),
           ),
 
           const Divider(),

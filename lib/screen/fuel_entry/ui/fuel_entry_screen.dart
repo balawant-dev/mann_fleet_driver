@@ -32,6 +32,7 @@ class _FuelEntryScreenState extends State<FuelEntryScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<EditVehicleDetailsPro>().getVehicleApi(context: context);
       context.read<FuelEntryProvider>().getCurrentLocation();
+      context.read<FuelEntryProvider>().setVehicleNumber(context);
     });
   }
 

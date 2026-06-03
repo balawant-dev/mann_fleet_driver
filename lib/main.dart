@@ -23,14 +23,10 @@ import 'package:provider/provider.dart';
 import 'apiservice/services/firebaseService.dart';
 import 'firebase_options.dart';
 
-
-
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   /// Initialize Firebase Service
   await FirebaseService.init();
@@ -40,10 +36,8 @@ void main() async{
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-
   @override
   Widget build(BuildContext context) {
-
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => RegisterProvider()),
@@ -67,21 +61,21 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Fleet Pilot',
         debugShowCheckedModeBanner: false,
-       theme: AppTheme.lightTheme,
-      //  home: const RegisterScreen(),
-     //home: const PickupScreen(),
-     home: const SplashScreen(),
-  //home: const PerformanceScreen(),
- // home: const MyBookingScreen(),
- //      );
+        theme: AppTheme.lightTheme,
+        //  home: const RegisterScreen(),
+        //home: const PickupScreen(),
+        home: const SplashScreen(),
 
-//     return MaterialApp(
-//       title: 'Mann Fleet Driver',
-//       debugShowCheckedModeBanner: false,
-//      // home: const SplashScreen(),
-//       home: const FuelEntryScreen(),
+        //home: const PerformanceScreen(),
+        // home: const MyBookingScreen(),
+        //      );
 
-      )    );
+        //     return MaterialApp(
+        //       title: 'Mann Fleet Driver',
+        //       debugShowCheckedModeBanner: false,
+        //      // home: const SplashScreen(),
+        //       home: const FuelEntryScreen(),
+      ),
+    );
   }
 }
-

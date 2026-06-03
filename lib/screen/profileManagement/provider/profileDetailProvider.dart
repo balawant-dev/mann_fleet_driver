@@ -1,19 +1,14 @@
-
 import 'package:flutter/material.dart';
-
 
 import '../../../apiservice/services/secure_storage_service.dart';
 import '../model/getProfileModel.dart';
 
 import '../repo/profileRepo.dart';
 
-
-
 class ProfileDetailProvider extends ChangeNotifier {
   final api = ProfileRepo();
 
   GetProfileModel? getProfileModel;
-
 
   bool isLoading = false;
 
@@ -22,29 +17,34 @@ class ProfileDetailProvider extends ChangeNotifier {
       isLoading = true;
       notifyListeners();
 
-      final res = await api.getProfileApi( context: context);
+      final res = await api.getProfileApi(context: context);
       getProfileModel = res;
-      if(res!=null||res.status==true){
+      if (res != null || res.status == true) {
         print("Get Profile Successfully");
 
-        await SecureStorageService.saveFirstUser(res.data?.driver?.firstUser ?? false);
-        await SecureStorageService.saveProfileComplete(res.data?.driver?.isProfileComplete ?? false);
-        await SecureStorageService.saveVerified(res.data?.driver?.isVerified ?? false);
+        await SecureStorageService.saveFirstUser(
+          res.data?.driver?.firstUser ?? false,
+        );
+        await SecureStorageService.saveProfileComplete(
+          res.data?.driver?.isProfileComplete ?? false,
+        );
+        await SecureStorageService.saveVerified(
+          res.data?.driver?.isVerified ?? false,
+        );
 
         final isFirstUser = await SecureStorageService.getFirstUser();
-        final isProfileComplete = await SecureStorageService.getProfileComplete();
+        final isProfileComplete =
+            await SecureStorageService.getProfileComplete();
         final isVerified = await SecureStorageService.getVerified();
-        print("Api with location storage isFirstUser : ${isFirstUser}  ,isProfileComplete:${isProfileComplete},isVerified ${isVerified}");
+        print(
+          "Api with location storage isFirstUser : ${isFirstUser}  ,isProfileComplete:${isProfileComplete},isVerified ${isVerified}",
+        );
       }
-
     } catch (e) {
       debugPrint("Error in Get Profile: $e");
     } finally {
       isLoading = false;
       notifyListeners();
     }
-
   }
-
-
 }

@@ -47,15 +47,15 @@ class BookingCard extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: const Color(0xFFF8FAFC),        // ← Changed: Soft elegant background
+          color: const Color(0xFFF8FAFC), // ← Changed: Soft elegant background
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: const Color(0xFFE2E8F0),      // ← Changed: Cleaner border
+            color: const Color(0xFFE2E8F0), // ← Changed: Cleaner border
             width: 1.2,
           ),
           boxShadow: const [
             BoxShadow(
-              color: Color(0x0A000000),           // ← Softer shadow
+              color: Color(0x0A000000), // ← Softer shadow
               blurRadius: 8,
               offset: Offset(0, 3),
             ),
@@ -72,18 +72,28 @@ class BookingCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      CustomText(title, size: 18, weight: FontWeight.w700, color: ColorResource.black),
+                      CustomText(
+                        title,
+                        size: 18,
+                        weight: FontWeight.w700,
+                        color: ColorResource.black,
+                      ),
                       const SizedBox(height: 8),
-                      CustomText(dateTime, size: 14, weight: FontWeight.w500, color: ColorResource.grayText),
+                      CustomText(
+                        dateTime,
+                        size: 14,
+                        weight: FontWeight.w500,
+                        color: ColorResource.grayText,
+                      ),
                     ],
                   ),
                 ),
-                CustomText(
-                  "₹$price",
-                  size: 22,
-                  weight: FontWeight.w700,
-                  color: ColorResource.green,
-                ),
+                // CustomText(
+                //   "₹$price",
+                //   size: 22,
+                //   weight: FontWeight.w700,
+                //   color: ColorResource.green,
+                // ),
               ],
             ),
 
@@ -92,7 +102,12 @@ class BookingCard extends StatelessWidget {
 
             /// Booking Info
             const SizedBox(height: 10),
-            CustomText("BOOKING INFO", size: 14, weight: FontWeight.w400, color: ColorResource.grayText),
+            CustomText(
+              "BOOKING INFO",
+              size: 16,
+              weight: FontWeight.bold,
+              color: ColorResource.black,
+            ),
             const SizedBox(height: 10),
 
             Row(
@@ -101,23 +116,63 @@ class BookingCard extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CustomText("BOOKING TYPE", size: 12, weight: FontWeight.w500, color: ColorResource.grayText),
-                    CustomText(bookingType.toUpperCase(), size: 14, weight: FontWeight.w700, color: ColorResource.black),
+                    CustomText(
+                      "BOOKING TYPE",
+                      size: 12,
+                      weight: FontWeight.w500,
+                      color: ColorResource.grayText,
+                    ),
+                    CustomText(
+                      bookingType.toUpperCase(),
+                      size: 14,
+                      weight: FontWeight.w700,
+                      color: ColorResource.black,
+                    ),
                     const SizedBox(height: 10),
                     //tripStatus
-                    CustomText("TRIP STATUS", size: 12, weight: FontWeight.w500, color: ColorResource.grayText),
-                     CustomText(tripStatus.toUpperCase(), size: 14, weight: FontWeight.w700, color: ColorResource.black),
+                    CustomText(
+                      "TRIP STATUS",
+                      size: 12,
+                      weight: FontWeight.w500,
+                      color: ColorResource.grayText,
+                    ),
+                    CustomText(
+                      tripStatus.toUpperCase(),
+                      size: 14,
+                      weight: FontWeight.w700,
+                      color: ColorResource.black,
+                    ),
                   ],
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     //Vehicle
-                    CustomText("VEHICLE NO", size: 12, weight: FontWeight.w500, color: ColorResource.grayText),
-                    CustomText(vehicleNo, size: 14, weight: FontWeight.w700, color: ColorResource.black),
+                    CustomText(
+                      "VEHICLE NO",
+                      size: 12,
+                      weight: FontWeight.w500,
+                      color: ColorResource.grayText,
+                    ),
+                    CustomText(
+                      vehicleNo,
+                      size: 14,
+                      weight: FontWeight.w700,
+                      color: ColorResource.black,
+                    ),
                     const SizedBox(height: 10),
-                    CustomText("DRIVER STATUS", size: 12, weight: FontWeight.w500, color: ColorResource.grayText),
-                    CustomText(driverStatus.toUpperCase(), size: 14, weight: FontWeight.w700, color: ColorResource.black),
+                    CustomText(
+                      "DRIVER STATUS",
+                      size: 12,
+                      weight: FontWeight.w500,
+                      color: ColorResource.grayText,
+                    ),
+                    CustomText(
+                      driverStatus.toUpperCase(),
+                      size: 14,
+                      weight: FontWeight.w700,
+                      color: ColorResource.black,
+                    ),
                   ],
                 ),
               ],
@@ -128,7 +183,12 @@ class BookingCard extends StatelessWidget {
 
             /// Route
             const SizedBox(height: 10),
-            CustomText("ROUTE", size: 14, weight: FontWeight.w400, color: ColorResource.grayText),
+            CustomText(
+              "ROUTE",
+              size: 14,
+              weight: FontWeight.w400,
+              color: ColorResource.grayText,
+            ),
             const SizedBox(height: 8),
 
             RichText(
@@ -136,11 +196,19 @@ class BookingCard extends StatelessWidget {
                 children: [
                   const TextSpan(
                     text: "Pickup: ",
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: ColorResource.grayText),
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: ColorResource.grayText,
+                    ),
                   ),
                   TextSpan(
                     text: pickupAddress,
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: ColorResource.black),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: ColorResource.black,
+                    ),
                   ),
                 ],
               ),
@@ -153,11 +221,19 @@ class BookingCard extends StatelessWidget {
                 children: [
                   const TextSpan(
                     text: "Drop: ",
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: ColorResource.grayText),
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: ColorResource.grayText,
+                    ),
                   ),
                   TextSpan(
                     text: dropAddress,
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: ColorResource.black),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: ColorResource.black,
+                    ),
                   ),
                 ],
               ),
@@ -171,10 +247,15 @@ class BookingCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                CustomText("Vehicle Model", size: 14, color: ColorResource.grayText),
+                CustomText(
+                  "Vehicle Model",
+                  size: 14,
+                  color: ColorResource.grayText,
+                ),
                 CustomText(vehicleModel, size: 14, color: ColorResource.black),
               ],
-            ),    Row(
+            ),
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 CustomText("Color", size: 14, color: ColorResource.grayText),
@@ -183,7 +264,7 @@ class BookingCard extends StatelessWidget {
             ),
 
             const SizedBox(height: 20),
-            button
+            button,
 
             // Action Buttons will be added from parent screen
             // We will leave space here or you can pass a child widget if needed

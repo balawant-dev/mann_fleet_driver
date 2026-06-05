@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../apiservice/services/secure_storage_service.dart';
+import '../model/checkMandatoryUpdate.dart';
 import '../model/getProfileModel.dart';
 
 import '../repo/profileRepo.dart';
@@ -42,6 +43,30 @@ class ProfileDetailProvider extends ChangeNotifier {
       }
     } catch (e) {
       debugPrint("Error in Get Profile: $e");
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  PlatformDependenciesModel? platformDependenciesModel;
+  String? errorMessage;
+
+  Future<void> getPlatformDependenciesApi({
+    required BuildContext context,
+  }) async {
+    isLoading = true;
+    notifyListeners();
+
+    try {
+      final res = await api.getPlatformDependenciesApi(context: context);
+
+      platformDependenciesModel = res;
+
+      errorMessage = null;
+    } catch (e) {
+      errorMessage = e.toString();
+      platformDependenciesModel = null;
     } finally {
       isLoading = false;
       notifyListeners();

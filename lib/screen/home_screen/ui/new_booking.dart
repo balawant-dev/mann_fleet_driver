@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
@@ -89,6 +91,35 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
     }
   }
 
+  Timer? locationTimer;
+
+  void startLocationUpdates({
+    required BuildContext context,
+    required String bookingId,
+  }) {
+    _getCurrentLocation();
+
+    /// every 10 seconds
+    locationTimer = Timer.periodic(const Duration(seconds: 10), (timer) async {
+      await context.read<NewBookingProvider>().updateDriverLocationApi(
+        id: bookingId,
+        lng: currentLng ?? 0.0,
+        lat: currentLat ?? 0.0,
+        context: context,
+      );
+    });
+  }
+
+  void stopLocationUpdates() {
+    locationTimer?.cancel();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    stopLocationUpdates();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<NewBookingProvider>(
@@ -127,163 +158,177 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
 
         return Stack(
           children: [
-            SingleChildScrollView(
-              child: Column(
-                children: [
-                  if (provider.getBannerModel != null &&
-                      provider.getBannerModel!.data!.isNotEmpty)
-                    Column(
-                      children: [
-                        CarouselSlider(
-                          options: CarouselOptions(
-                            height: 150,
-                            autoPlay: true,
-                            enlargeCenterPage: true,
-                            viewportFraction: 0.95,
-                            onPageChanged: (index, reason) {
-                              setState(() {
-                                currentIndex = index;
-                              });
-                            },
+            RefreshIndicator(
+              onRefresh: () async {
+                context.read<NewBookingProvider>().getBannerApi(
+                  context: context,
+                );
+                context.read<NewBookingProvider>().getNewBooking(
+                  context: context,
+                );
+              },
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Column(
+                  children: [
+                    if (provider.getBannerModel != null &&
+                        provider.getBannerModel!.data!.isNotEmpty)
+                      Column(
+                        children: [
+                          CarouselSlider(
+                            options: CarouselOptions(
+                              height: 150,
+                              autoPlay: true,
+                              enlargeCenterPage: true,
+                              viewportFraction: 0.95,
+                              onPageChanged: (index, reason) {
+                                setState(() {
+                                  currentIndex = index;
+                                });
+                              },
+                            ),
+                            items:
+                                provider.getBannerModel!.data!.map((item) {
+                                  return ClipRRect(
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: CustomImageView(
+                                      imagePath: item.image,
+                                      width: MediaQuery.of(context).size.width,
+                                      fit: BoxFit.cover,
+                                      imageType: ImageType.network,
+                                    ),
+                                  );
+                                }).toList(),
                           ),
-                          items:
-                              provider.getBannerModel!.data!.map((item) {
-                                return ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: CustomImageView(
-                                    imagePath: item.image,
-                                    width: MediaQuery.of(context).size.width,
-                                    fit: BoxFit.cover,
-                                    imageType: ImageType.network,
-                                  ),
-                                );
-                              }).toList(),
-                        ),
-                        const SizedBox(height: 10),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: List.generate(banners.length, (index) {
-                            bool isActive = index == currentIndex;
+                          const SizedBox(height: 10),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: List.generate(banners.length, (index) {
+                              bool isActive = index == currentIndex;
 
-                            return AnimatedContainer(
-                              duration: const Duration(milliseconds: 300),
-                              margin: const EdgeInsets.symmetric(horizontal: 4),
-                              height: 8,
-                              width: isActive ? 20 : 8,
-                              decoration: BoxDecoration(
-                                color:
-                                    isActive
-                                        ? ColorResource.primaryColor
-                                        : Colors.grey.shade300,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                            );
-                          }),
-                        ),
+                              return AnimatedContainer(
+                                duration: const Duration(milliseconds: 300),
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 4,
+                                ),
+                                height: 8,
+                                width: isActive ? 20 : 8,
+                                decoration: BoxDecoration(
+                                  color:
+                                      isActive
+                                          ? ColorResource.primaryColor
+                                          : Colors.grey.shade300,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                              );
+                            }),
+                          ),
 
-                        // AnimatedSmoothIndicator(
-                        //   activeIndex: currentIndex,
-                        //   count: provider.getBannerModel!.data!.length,
-                        //   effect: ExpandingDotsEffect(
-                        //     dotHeight: 8,
-                        //     dotWidth: 8,
-                        //     expansionFactor: 3,
-                        //     spacing: 6,
-                        //     radius: 20,
-                        //     dotColor: Colors.grey.shade300,
-                        //     activeDotColor: ColorResource.indigo,
-                        //   ),
-                        // ),
-                      ],
-                    ),
+                          // AnimatedSmoothIndicator(
+                          //   activeIndex: currentIndex,
+                          //   count: provider.getBannerModel!.data!.length,
+                          //   effect: ExpandingDotsEffect(
+                          //     dotHeight: 8,
+                          //     dotWidth: 8,
+                          //     expansionFactor: 3,
+                          //     spacing: 6,
+                          //     radius: 20,
+                          //     dotColor: Colors.grey.shade300,
+                          //     activeDotColor: ColorResource.indigo,
+                          //   ),
+                          // ),
+                        ],
+                      ),
 
-                  // const SizedBox(height: 10),
+                    // const SizedBox(height: 10),
 
-                  //   CustomImageView(
-                  //   //                  imagePath: AppImages.banner,
-                  //   imagePath: provider.getBannerModel!.data!.first.image,
-                  //   height: 150,
-                  //   width: MediaQuery.of(context).size.width,
-                  //   fit: BoxFit.cover,
-                  // ),
-                  const SizedBox(height: 10),
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: const BouncingScrollPhysics(),
-                    itemCount: bookings.length,
-                    itemBuilder: (context, index) {
-                      final booking = bookings[index];
+                    //   CustomImageView(
+                    //   //                  imagePath: AppImages.banner,
+                    //   imagePath: provider.getBannerModel!.data!.first.image,
+                    //   height: 150,
+                    //   width: MediaQuery.of(context).size.width,
+                    //   fit: BoxFit.cover,
+                    // ),
+                    const SizedBox(height: 10),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: const BouncingScrollPhysics(),
+                      itemCount: bookings.length,
+                      itemBuilder: (context, index) {
+                        final booking = bookings[index];
 
-                      final rawDate = booking.scheduledAtIST;
+                        final rawDate = booking.scheduledAtIST;
 
-                      String formattedDate = "4 Sep 2024";
-                      String formattedTime = "08:30 PM";
+                        String formattedDate = "4 Sep 2024";
+                        String formattedTime = "08:30 PM";
 
-                      if (rawDate != null && rawDate.isNotEmpty) {
-                        try {
-                          DateTime dateTime = DateFormat(
-                            'yyyy-MM-dd HH:mm:ss',
-                          ).parse(rawDate);
+                        if (rawDate != null && rawDate.isNotEmpty) {
+                          try {
+                            DateTime dateTime = DateFormat(
+                              'yyyy-MM-dd HH:mm:ss',
+                            ).parse(rawDate);
 
-                          formattedDate = DateFormat(
-                            'd MMM yyyy',
-                          ).format(dateTime);
+                            formattedDate = DateFormat(
+                              'd MMM yyyy',
+                            ).format(dateTime);
 
-                          formattedTime = DateFormat(
-                            'hh:mm a',
-                          ).format(dateTime);
-                        } catch (e) {
-                          debugPrint("Date parsing error: $e");
+                            formattedTime = DateFormat(
+                              'hh:mm a',
+                            ).format(dateTime);
+                          } catch (e) {
+                            debugPrint("Date parsing error: $e");
+                          }
                         }
-                      }
-                      final bookingId = booking.id ?? "";
-                      final driverStatus =
-                          booking.driverResponse?.status ?? "pending";
+                        final bookingId = booking.id ?? "";
+                        final driverStatus =
+                            booking.driverResponse?.status ?? "pending";
 
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 5.0),
-                        child: BookingCard(
-                          title:
-                              booking.segment?.name ??
-                              "Airport Taxi – Terminal 3",
-                          dateTime: "$formattedDate $formattedTime",
-                          price: booking.estimatedFare.toString(),
-                          bookingType: booking.bookingType ?? "One Way",
-                          vehicleNo: booking.vehicle?.carNumber ?? "",
-                          vehicleModel:
-                              booking.vehicle?.model ?? "Mercedes E-Class",
-                          color: booking.vehicle?.color ?? "White",
-                          bookingId: booking.id?.toString() ?? "",
-                          driverStatus:
-                              booking.driverResponse?.status ?? "pending",
-                          tripStatus: booking.tripStatus ?? "Not Started",
-                          pickupAddress:
-                              booking.pickup?.address ?? "Noida Sector 63",
-                          dropAddress:
-                              booking.dropoff?.address ?? "Delhi Airport",
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 5.0),
+                          child: BookingCard(
+                            title:
+                                booking.segment?.name ??
+                                "Airport Taxi – Terminal 3",
+                            dateTime: "$formattedDate $formattedTime",
+                            price: booking.estimatedFare.toString(),
+                            bookingType: booking.bookingType ?? "One Way",
+                            vehicleNo: booking.vehicle?.carNumber ?? "",
+                            vehicleModel:
+                                booking.vehicle?.model ?? "Mercedes E-Class",
+                            color: booking.vehicle?.color ?? "White",
+                            bookingId: booking.id?.toString() ?? "",
+                            driverStatus:
+                                booking.driverResponse?.status ?? "pending",
+                            tripStatus: booking.tripStatus ?? "Not Started",
+                            pickupAddress:
+                                booking.pickup?.address ?? "Noida Sector 63",
+                            dropAddress:
+                                booking.dropoff?.address ?? "Delhi Airport",
 
-                          onCardTap: () {
-                            navPush(
-                              context: context,
-                              action: BookingDetailScreen(
-                                id: booking.id.toString(),
-                              ),
-                            );
-                          },
-                          button: buildActionButtons(
-                            status: driverStatus,
-                            tripStatus: booking.tripStatus ?? "",
-                            bookingId: bookingId,
-                            provider: provider,
-                            isStartOtpVerified:
-                                booking.tripStartOtpVerify ?? false,
-                            isEndOtpVerified: booking.tripEndOtpVerify ?? false,
+                            onCardTap: () {
+                              navPush(
+                                context: context,
+                                action: BookingDetailScreen(
+                                  id: booking.id.toString(),
+                                ),
+                              );
+                            },
+                            button: buildActionButtons(
+                              status: driverStatus,
+                              tripStatus: booking.tripStatus ?? "",
+                              bookingId: bookingId,
+                              provider: provider,
+                              isStartOtpVerified:
+                                  booking.tripStartOtpVerify ?? false,
+                              isEndOtpVerified:
+                                  booking.tripEndOtpVerify ?? false,
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
-                ],
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
             if (provider.isLoading)

@@ -30,7 +30,7 @@ class PickupScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              "Multi-Angle Verification",
+              "Odometer Verification",
               style: TextStyle(
                 color: const Color(0xFF0F172A),
                 fontSize: 20,
@@ -118,7 +118,7 @@ class PickupScreen extends StatelessWidget {
 
             const SizedBox(height: 10),
 
-            _speedometerCard(provider),
+            _speedometerCard(provider, context),
             const SizedBox(height: 10),
             CommonTextFormField(
               labelText: 'Odometer Reading',
@@ -297,7 +297,7 @@ class PickupScreen extends StatelessWidget {
     );
   }
 
-  Widget _interiorCard(NewBookingProvider provider) {
+  Widget _interiorCard(NewBookingProvider provider, BuildContext context) {
     final image = provider.interior;
 
     return DottedBorder(
@@ -366,7 +366,7 @@ class PickupScreen extends StatelessWidget {
             const SizedBox(height: 16),
 
             GestureDetector(
-              onTap: () => provider.pickImage("interior"),
+              onTap: () => provider.pickImage("interior", context),
               child: Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(vertical: 12),
@@ -393,7 +393,7 @@ class PickupScreen extends StatelessWidget {
     );
   }
 
-  Widget _speedometerCard(NewBookingProvider provider) {
+  Widget _speedometerCard(NewBookingProvider provider, BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
@@ -435,9 +435,9 @@ class PickupScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(30),
                 ),
               ),
-              onPressed: () => provider.pickImage("speedometer"),
+              onPressed: () => provider.pickImage("speedometer", context),
               child: const Text(
-                "Retake Reading",
+                "Capture Odometer",
                 style: TextStyle(color: Colors.black),
               ),
             ),

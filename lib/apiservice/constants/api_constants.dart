@@ -19,6 +19,7 @@ class ApiConstants {
       '/api/driver/getMyAssignedBookings';
   static const String banner = '/api/driver/banner?type=driver';
   static const String acceptBooking = '/api/driver/acceptBooking';
+  static const String platformDependencies = '/api/user/platformDependencies';
   static const String startTrip = '/api/driver/startTrip';
   static const String verifyBookingOtp = '/api/driver/verifyBookingOtp';
   static const String driverCancelRequest = '/api/driver/driverCancelRequest';

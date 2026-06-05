@@ -31,7 +31,7 @@ class UploadSpeedoMeterImageScreen extends StatelessWidget {
           children: [
             const SizedBox(height: 10),
 
-            _speedometerCard(provider),
+            _speedometerCard(provider, context),
 
             const SizedBox(height: 10),
             CommonTextFormField(
@@ -89,7 +89,7 @@ class UploadSpeedoMeterImageScreen extends StatelessWidget {
     );
   }
 
-  Widget _speedometerCard(NewBookingProvider provider) {
+  Widget _speedometerCard(NewBookingProvider provider, BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
@@ -134,9 +134,10 @@ class UploadSpeedoMeterImageScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(30),
                 ),
               ),
-              onPressed: () => provider.pickImage("speedometerEndImage"),
+              onPressed:
+                  () => provider.pickImage("speedometerEndImage", context),
               child: const Text(
-                "Retake Reading",
+                "Capture Odometer",
                 style: TextStyle(color: Colors.black),
               ),
             ),

@@ -1,271 +1,3 @@
-// class BookingDetailModel {
-//   bool? status;
-//   String? message;
-//   BookingData? data;
-//
-//   BookingDetailModel({this.status, this.message, this.data});
-//
-//   BookingDetailModel.fromJson(Map<String, dynamic> json) {
-//     status = json['status'];
-//     message = json['message'];
-//     data = json['data'] != null ? BookingData.fromJson(json['data']) : null;
-//   }
-//
-//   Map<String, dynamic> toJson() {
-//     return {
-//       'status': status,
-//       'message': message,
-//       'data': data?.toJson(),
-//     };
-//   }
-// }
-//
-// class BookingData {
-//   Location? pickup;
-//   Location? dropoff;
-//   PricingSnapshot? pricingSnapshot;
-//   Payment? payment;
-//   FareBreakup? fareBreakup;
-//   User? user;
-//   Segment? segment;
-//   Region? region;
-//   Vehicle? vehicle;
-//
-//   String? bookingNumber;
-//   String? bookingType;
-//   String? paymentStatus;
-//   String? tripStatus;
-//   String? overallStatus;
-//   double? estimatedFare;
-//   double? prepaidAmount;
-//   String? otp;
-//
-//   BookingData({
-//     this.pickup,
-//     this.dropoff,
-//     this.pricingSnapshot,
-//     this.payment,
-//     this.fareBreakup,
-//     this.user,
-//     this.segment,
-//     this.region,
-//     this.vehicle,
-//     this.bookingNumber,
-//     this.bookingType,
-//     this.paymentStatus,
-//     this.tripStatus,
-//     this.overallStatus,
-//     this.estimatedFare,
-//     this.prepaidAmount,
-//     this.otp,
-//   });
-//
-//   BookingData.fromJson(Map<String, dynamic> json) {
-//     pickup = json['pickup'] != null ? Location.fromJson(json['pickup']) : null;
-//     dropoff = json['dropoff'] != null ? Location.fromJson(json['dropoff']) : null;
-//
-//     pricingSnapshot = json['pricingSnapshot'] != null
-//         ? PricingSnapshot.fromJson(json['pricingSnapshot'])
-//         : null;
-//
-//     payment = json['payment'] != null ? Payment.fromJson(json['payment']) : null;
-//
-//     fareBreakup = json['fareBreakup'] != null
-//         ? FareBreakup.fromJson(json['fareBreakup'])
-//         : null;
-//
-//     user = json['user'] != null ? User.fromJson(json['user']) : null;
-//     segment = json['segment'] != null ? Segment.fromJson(json['segment']) : null;
-//     region = json['region'] != null ? Region.fromJson(json['region']) : null;
-//     vehicle = json['vehicle'] != null ? Vehicle.fromJson(json['vehicle']) : null;
-//
-//     bookingNumber = json['bookingNumber'];
-//     bookingType = json['bookingType'];
-//     paymentStatus = json['paymentStatus'];
-//     tripStatus = json['tripStatus'];
-//     overallStatus = json['overallStatus'];
-//     estimatedFare = (json['estimatedFare'] as num?)?.toDouble();
-//     prepaidAmount = (json['prepaidAmount'] as num?)?.toDouble();
-//     otp = json['otp'];
-//   }
-//
-//   Map<String, dynamic> toJson() {
-//     return {
-//       'pickup': pickup?.toJson(),
-//       'dropoff': dropoff?.toJson(),
-//       'pricingSnapshot': pricingSnapshot?.toJson(),
-//       'payment': payment?.toJson(),
-//       'fareBreakup': fareBreakup?.toJson(),
-//       'user': user?.toJson(),
-//       'segment': segment?.toJson(),
-//       'region': region?.toJson(),
-//       'vehicle': vehicle?.toJson(),
-//       'bookingNumber': bookingNumber,
-//       'bookingType': bookingType,
-//       'paymentStatus': paymentStatus,
-//       'tripStatus': tripStatus,
-//       'overallStatus': overallStatus,
-//       'estimatedFare': estimatedFare,
-//       'prepaidAmount': prepaidAmount,
-//       'otp': otp,
-//     };
-//   }
-// }
-//
-//
-// class Location {
-//   double? lat;
-//   double? lng;
-//   String? address;
-//
-//   Location({this.lat, this.lng, this.address});
-//
-//   Location.fromJson(Map<String, dynamic> json) {
-//     lat = (json['lat'] as num?)?.toDouble();
-//     lng = (json['lng'] as num?)?.toDouble();
-//     address = json['address'];
-//   }
-//
-//   Map<String, dynamic> toJson() => {
-//     'lat': lat,
-//     'lng': lng,
-//     'address': address,
-//   };
-// }
-// class Payment {
-//   String? method;
-//   String? status;
-//   double? paidAmount;
-//
-//   Payment.fromJson(Map<String, dynamic> json) {
-//     method = json['method'];
-//     status = json['status'];
-//     paidAmount = (json['paidAmount'] as num?)?.toDouble();
-//   }
-//
-//   Map<String, dynamic> toJson() => {
-//     'method': method,
-//     'status': status,
-//     'paidAmount': paidAmount,
-//   };
-// }
-//
-//
-// class PricingSnapshot {
-//   double? baseFare;
-//   double? perKmRate;
-//   double? perMinRate;
-//   double? minFare;
-//   double? gstPercent;
-//
-//   PricingSnapshot.fromJson(Map<String, dynamic> json) {
-//     baseFare = (json['baseFare'] as num?)?.toDouble();
-//     perKmRate = (json['perKmRate'] as num?)?.toDouble();
-//     perMinRate = (json['perMinRate'] as num?)?.toDouble();
-//     minFare = (json['minFare'] as num?)?.toDouble();
-//     gstPercent = (json['gstPercent'] as num?)?.toDouble();
-//   }
-//
-//   Map<String, dynamic> toJson() => {
-//     'baseFare': baseFare,
-//     'perKmRate': perKmRate,
-//     'perMinRate': perMinRate,
-//     'minFare': minFare,
-//     'gstPercent': gstPercent,
-//   };
-// }
-//
-// class FareBreakup {
-//   FareEstimated? estimated;
-//
-//   FareBreakup.fromJson(Map<String, dynamic> json) {
-//     estimated = json['estimated'] != null
-//         ? FareEstimated.fromJson(json['estimated'])
-//         : null;
-//   }
-//
-//   Map<String, dynamic> toJson() => {
-//     'estimated': estimated?.toJson(),
-//   };
-// }
-//
-// class FareEstimated {
-//   double? totalFare;
-//
-//   FareEstimated.fromJson(Map<String, dynamic> json) {
-//     totalFare = (json['totalFare'] as num?)?.toDouble();
-//   }
-//
-//   Map<String, dynamic> toJson() => {
-//     'totalFare': totalFare,
-//   };
-// }
-//
-// class User {
-//   String? name;
-//   String? profilePic;
-//
-//   User.fromJson(Map<String, dynamic> json) {
-//     name = json['name'];
-//     profilePic = json['profilePic'];
-//   }
-//
-//   Map<String, dynamic> toJson() => {
-//     'name': name,
-//     'profilePic': profilePic,
-//   };
-// }
-//
-//
-// class Vehicle {
-//   String? brand;
-//   String? model;
-//   String? color;
-//   String? carNumber;
-//
-//   Vehicle.fromJson(Map<String, dynamic> json) {
-//     brand = json['brand'];
-//     model = json['model'];
-//     color = json['color'];
-//     carNumber = json['carNumber'];
-//   }
-//
-//   Map<String, dynamic> toJson() => {
-//     'brand': brand,
-//     'model': model,
-//     'color': color,
-//     'carNumber': carNumber,
-//   };
-// }
-//
-//
-// class Segment {
-//   String? name;
-//
-//   Segment.fromJson(Map<String, dynamic> json) {
-//     name = json['name'];
-//   }
-//
-//   Map<String, dynamic> toJson() => {'name': name};
-// }
-//
-// class Region {
-//   String? name;
-//   String? state;
-//
-//   Region.fromJson(Map<String, dynamic> json) {
-//     name = json['name'];
-//     state = json['state'];
-//   }
-//
-//   Map<String, dynamic> toJson() => {
-//     'name': name,
-//     'state': state,
-//   };
-// }
-
-
-
 class BookingDetailModel {
   bool? status;
   String? message;
@@ -280,11 +12,7 @@ class BookingDetailModel {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'status': status,
-      'message': message,
-      'data': data?.toJson(),
-    };
+    return {'status': status, 'message': message, 'data': data?.toJson()};
   }
 }
 
@@ -329,6 +57,35 @@ class BookingData {
   bool? finalImageUploaded;
   bool? pickupVerification;
 
+  DriverCurrentLocation? driverCurrentLocation;
+
+  String? travellerName;
+  String? travellerEmail;
+  String? travellerPhone;
+
+  bool? isCorporate;
+  String? approvalCorporateBooking;
+
+  String? paymentAt;
+
+  bool? isPickupAirport;
+  bool? isDropoffAirport;
+  bool? isAirportTrip;
+  bool? isGrayMatterTrip;
+
+  String? assignedAt;
+
+  String? createdAtIST;
+  String? scheduledAtIST;
+  String? paymentAtIST;
+  String? dropoffAtIST;
+  String? assignedAtIST;
+  String? tripStartAtIST;
+  String? tripEndAtIST;
+  String? cancelledAtIST;
+
+  AssignedBy? assignedBy;
+
   BookingData({
     this.pickup,
     this.dropoff,
@@ -368,25 +125,67 @@ class BookingData {
     this.tripStartOtpVerify,
     this.finalImageUploaded,
     this.pickupVerification,
+    this.driverCurrentLocation,
+    this.travellerName,
+    this.travellerEmail,
+    this.travellerPhone,
+    this.isCorporate,
+    this.approvalCorporateBooking,
+    this.paymentAt,
+    this.isPickupAirport,
+    this.isDropoffAirport,
+    this.isAirportTrip,
+    this.isGrayMatterTrip,
+    this.assignedAt,
+    this.createdAtIST,
+    this.scheduledAtIST,
+    this.paymentAtIST,
+    this.dropoffAtIST,
+    this.assignedAtIST,
+    this.tripStartAtIST,
+    this.tripEndAtIST,
+    this.cancelledAtIST,
+    this.assignedBy,
   });
 
   BookingData.fromJson(Map<String, dynamic> json) {
     pickup = json['pickup'] != null ? Location.fromJson(json['pickup']) : null;
-    dropoff = json['dropoff'] != null ? Location.fromJson(json['dropoff']) : null;
-    pricingSnapshot = json['pricingSnapshot'] != null ? PricingSnapshot.fromJson(json['pricingSnapshot']) : null;
-    payment = json['payment'] != null ? Payment.fromJson(json['payment']) : null;
-    extraCharge = json['extraCharge'] != null ? ExtraCharge.fromJson(json['extraCharge']) : null;
-    fareBreakup = json['fareBreakup'] != null ? FareBreakup.fromJson(json['fareBreakup']) : null;
+    dropoff =
+        json['dropoff'] != null ? Location.fromJson(json['dropoff']) : null;
+    pricingSnapshot =
+        json['pricingSnapshot'] != null
+            ? PricingSnapshot.fromJson(json['pricingSnapshot'])
+            : null;
+    payment =
+        json['payment'] != null ? Payment.fromJson(json['payment']) : null;
+    extraCharge =
+        json['extraCharge'] != null
+            ? ExtraCharge.fromJson(json['extraCharge'])
+            : null;
+    fareBreakup =
+        json['fareBreakup'] != null
+            ? FareBreakup.fromJson(json['fareBreakup'])
+            : null;
     actual = json['actual'] != null ? Actual.fromJson(json['actual']) : null;
-    intercity = json['intercity'] != null ? Intercity.fromJson(json['intercity']) : null;
+    intercity =
+        json['intercity'] != null
+            ? Intercity.fromJson(json['intercity'])
+            : null;
     hourly = json['hourly'] != null ? Hourly.fromJson(json['hourly']) : null;
-    roundTrip = json['roundTrip'] != null ? RoundTrip.fromJson(json['roundTrip']) : null;
-    driverResponse = json['driverResponse'] != null ? DriverResponse.fromJson(json['driverResponse']) : null;
+    roundTrip =
+        json['roundTrip'] != null
+            ? RoundTrip.fromJson(json['roundTrip'])
+            : null;
+    driverResponse =
+        json['driverResponse'] != null
+            ? DriverResponse.fromJson(json['driverResponse'])
+            : null;
 
     id = json['_id'];
     bookingNumber = json['bookingNumber'];
     user = json['user'] != null ? User.fromJson(json['user']) : null;
-    segment = json['segment'] != null ? Segment.fromJson(json['segment']) : null;
+    segment =
+        json['segment'] != null ? Segment.fromJson(json['segment']) : null;
     region = json['region'] != null ? Region.fromJson(json['region']) : null;
     bookingType = json['bookingType'];
     paymentStatus = json['paymentStatus'];
@@ -397,19 +196,57 @@ class BookingData {
     estimatedMins = (json['estimatedMins'] as num?)?.toDouble();
     estimatedFare = (json['estimatedFare'] as num?)?.toDouble();
     prepaidAmount = (json['prepaidAmount'] as num?)?.toDouble();
-    scheduledAt = json['scheduledAt'] != null ? DateTime.parse(json['scheduledAt']) : null;
+    scheduledAt =
+        json['scheduledAt'] != null
+            ? DateTime.parse(json['scheduledAt'])
+            : null;
     isScheduled = json['isScheduled'];
     otp = json['otp'];
     invoice = json['invoice'];
     createdAt = json['createdAt'];
-    updatedAt = json['updatedAt'] ;
+    updatedAt = json['updatedAt'];
     driver = json['driver'];
-    vehicle = json['vehicle'] != null ? Vehicle.fromJson(json['vehicle']) : null;
+    vehicle =
+        json['vehicle'] != null ? Vehicle.fromJson(json['vehicle']) : null;
     tripEndOtp = json['tripEndOtp'];
     tripEndOtpVerify = json['tripEndOtpVerify'];
     tripStartOtpVerify = json['tripStartOtpVerify'];
     finalImageUploaded = json['finalImageUploaded'];
     pickupVerification = json['pickupVerification'];
+    driverCurrentLocation =
+        json['driverCurrentLocation'] != null
+            ? DriverCurrentLocation.fromJson(json['driverCurrentLocation'])
+            : null;
+
+    travellerName = json['travellerName'];
+    travellerEmail = json['travellerEmail'];
+    travellerPhone = json['travellerPhone'];
+
+    isCorporate = json['isCorporate'];
+    approvalCorporateBooking = json['approvalCorporateBooking'];
+
+    paymentAt = json['paymentAt'];
+
+    isPickupAirport = json['isPickupAirport'];
+    isDropoffAirport = json['isDropoffAirport'];
+    isAirportTrip = json['isAirportTrip'];
+    isGrayMatterTrip = json['isGrayMatterTrip'];
+
+    assignedAt = json['assignedAt'];
+
+    createdAtIST = json['createdAtIST'];
+    scheduledAtIST = json['scheduledAtIST'];
+    paymentAtIST = json['paymentAtIST'];
+    dropoffAtIST = json['dropoffAtIST'];
+    assignedAtIST = json['assignedAtIST'];
+    tripStartAtIST = json['tripStartAtIST'];
+    tripEndAtIST = json['tripEndAtIST'];
+    cancelledAtIST = json['cancelledAtIST'];
+
+    assignedBy =
+        json['assignedBy'] != null
+            ? AssignedBy.fromJson(json['assignedBy'])
+            : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -452,6 +289,34 @@ class BookingData {
       'tripStartOtpVerify': tripStartOtpVerify,
       'finalImageUploaded': finalImageUploaded,
       'pickupVerification': pickupVerification,
+      'driverCurrentLocation': driverCurrentLocation?.toJson(),
+
+      'travellerName': travellerName,
+      'travellerEmail': travellerEmail,
+      'travellerPhone': travellerPhone,
+
+      'isCorporate': isCorporate,
+      'approvalCorporateBooking': approvalCorporateBooking,
+
+      'paymentAt': paymentAt,
+
+      'isPickupAirport': isPickupAirport,
+      'isDropoffAirport': isDropoffAirport,
+      'isAirportTrip': isAirportTrip,
+      'isGrayMatterTrip': isGrayMatterTrip,
+
+      'assignedAt': assignedAt,
+
+      'createdAtIST': createdAtIST,
+      'scheduledAtIST': scheduledAtIST,
+      'paymentAtIST': paymentAtIST,
+      'dropoffAtIST': dropoffAtIST,
+      'assignedAtIST': assignedAtIST,
+      'tripStartAtIST': tripStartAtIST,
+      'tripEndAtIST': tripEndAtIST,
+      'cancelledAtIST': cancelledAtIST,
+
+      'assignedBy': assignedBy?.toJson(),
     };
   }
 }
@@ -486,7 +351,10 @@ class PricingSnapshot {
   double? tollCharge;
 
   PricingSnapshot.fromJson(Map<String, dynamic> json) {
-    hourlyPackage = json['hourlyPackage'] != null ? HourlyPackage.fromJson(json['hourlyPackage']) : null;
+    hourlyPackage =
+        json['hourlyPackage'] != null
+            ? HourlyPackage.fromJson(json['hourlyPackage'])
+            : null;
     baseFare = (json['baseFare'] as num?)?.toDouble();
     perKmRate = (json['perKmRate'] as num?)?.toDouble();
     perMinRate = (json['perMinRate'] as num?)?.toDouble();
@@ -544,7 +412,10 @@ class Payment {
   String? transactionId;
 
   Payment.fromJson(Map<String, dynamic> json) {
-    extraPayment = json['extraPayment'] != null ? ExtraPayment.fromJson(json['extraPayment']) : null;
+    extraPayment =
+        json['extraPayment'] != null
+            ? ExtraPayment.fromJson(json['extraPayment'])
+            : null;
     method = json['method'];
     orderId = json['orderId'];
     gatewayRef = json['gatewayRef'];
@@ -599,7 +470,11 @@ class ExtraCharge {
     isPaid = json['isPaid'];
   }
 
-  Map<String, dynamic> toJson() => {'amount': amount, 'reason': reason, 'isPaid': isPaid};
+  Map<String, dynamic> toJson() => {
+    'amount': amount,
+    'reason': reason,
+    'isPaid': isPaid,
+  };
 }
 
 class FareBreakup {
@@ -607,11 +482,18 @@ class FareBreakup {
   FinalFare? finalFare;
 
   FareBreakup.fromJson(Map<String, dynamic> json) {
-    estimated = json['estimated'] != null ? EstimatedFare.fromJson(json['estimated']) : null;
-    finalFare = json['final'] != null ? FinalFare.fromJson(json['final']) : null;
+    estimated =
+        json['estimated'] != null
+            ? EstimatedFare.fromJson(json['estimated'])
+            : null;
+    finalFare =
+        json['final'] != null ? FinalFare.fromJson(json['final']) : null;
   }
 
-  Map<String, dynamic> toJson() => {'estimated': estimated?.toJson(), 'final': finalFare?.toJson()};
+  Map<String, dynamic> toJson() => {
+    'estimated': estimated?.toJson(),
+    'final': finalFare?.toJson(),
+  };
 }
 
 class EstimatedFare {
@@ -676,7 +558,10 @@ class Intercity {
     tollAmount = (json['tollAmount'] as num?)?.toDouble();
   }
 
-  Map<String, dynamic> toJson() => {'tripDays': tripDays, 'tollAmount': tollAmount};
+  Map<String, dynamic> toJson() => {
+    'tripDays': tripDays,
+    'tollAmount': tollAmount,
+  };
 }
 
 class Hourly {
@@ -712,7 +597,10 @@ class RoundTrip {
     returnFare = (json['returnFare'] as num?)?.toDouble();
   }
 
-  Map<String, dynamic> toJson() => {'returnStatus': returnStatus, 'returnFare': returnFare};
+  Map<String, dynamic> toJson() => {
+    'returnStatus': returnStatus,
+    'returnFare': returnFare,
+  };
 }
 
 class DriverResponse {
@@ -726,15 +614,21 @@ class DriverResponse {
 }
 
 class User {
+  String? id;
   String? name;
   String? profilePic;
 
   User.fromJson(Map<String, dynamic> json) {
+    id = json['_id'];
     name = json['name'];
     profilePic = json['profilePic'];
   }
 
-  Map<String, dynamic> toJson() => {'name': name, 'profilePic': profilePic};
+  Map<String, dynamic> toJson() => {
+    '_id': id,
+    'name': name,
+    'profilePic': profilePic,
+  };
 }
 
 class Segment {
@@ -762,13 +656,51 @@ class Region {
 }
 
 class Vehicle {
+  String? id;
   String? model;
   String? color;
 
   Vehicle.fromJson(Map<String, dynamic> json) {
+    id = json['_id'];
     model = json['model'];
     color = json['color'];
   }
 
-  Map<String, dynamic> toJson() => {'model': model, 'color': color};
+  Map<String, dynamic> toJson() => {'_id': id, 'model': model, 'color': color};
+}
+
+class DriverCurrentLocation {
+  double? lat;
+  double? lng;
+  String? updatedAt;
+
+  DriverCurrentLocation.fromJson(Map<String, dynamic> json) {
+    lat = (json['lat'] as num?)?.toDouble();
+    lng = (json['lng'] as num?)?.toDouble();
+    updatedAt = json['updatedAt'];
+  }
+
+  Map<String, dynamic> toJson() => {
+    'lat': lat,
+    'lng': lng,
+    'updatedAt': updatedAt,
+  };
+}
+
+class AssignedBy {
+  String? id;
+  String? email;
+  String? createdAtIST;
+
+  AssignedBy.fromJson(Map<String, dynamic> json) {
+    id = json['_id'];
+    email = json['email'];
+    createdAtIST = json['createdAtIST'];
+  }
+
+  Map<String, dynamic> toJson() => {
+    '_id': id,
+    'email': email,
+    'createdAtIST': createdAtIST,
+  };
 }

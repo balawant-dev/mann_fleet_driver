@@ -3,12 +3,14 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mann_fleet_driver/widget/motionToastHelper.dart';
 import 'package:mann_fleet_driver/widget/navigator_method.dart';
 import '../../../widget/showLoaderFunction.dart';
 import 'package:http/http.dart' as http;
 import '../../bookingDetail/model/bookingDetailModel.dart';
 import '../model/bookingAcceptedModel.dart';
 import '../model/bookingCancelModel.dart';
+import '../model/final_fare_preview_model.dart';
 import '../model/getBannerModel.dart';
 import '../model/newBookingModel.dart';
 import '../model/pickupVerificationModel.dart';
@@ -28,6 +30,7 @@ class NewBookingProvider extends ChangeNotifier {
   StartTripModel? startTripModel;
   GetBannerModel? getBannerModel;
   TripCompleteModel? tripCompleteModel;
+  FinalFarePreviewModel? finalFarePreviewModel;
   UpdateLocationModel? updateLocationModel;
   bool isLoading = false;
 
@@ -230,8 +233,12 @@ class NewBookingProvider extends ChangeNotifier {
       tripCompleteModel = res;
 
       if (res != null && res.status == true) {
-        // getNewBookingDetail(context: context,id: id);
-        // getNewBooking(context: context);
+        await getNewBookingDetail(context: context, id: id);
+        await getNewBooking(context: context);
+        Future.delayed(Duration(seconds: 1), () {
+          Navigator.pop(context);
+        });
+
         debugPrint("Complete trip 🎈🎈🎈🎈🎈🎈🎈🎈 for booking $id");
         return true;
       } else {
@@ -247,35 +254,9 @@ class NewBookingProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> getFinalFare({
+  Future<FarePreviewData?> checkFinalFare({
     required BuildContext context,
     required String id,
-  }) async {
-    try {
-      // isLoading = true;
-      notifyListeners();
-
-      final res = await api.getFinalFare(context: context, id: id);
-      tripCompleteModel = res;
-
-      if (res != null && res.status == true) {
-        debugPrint("Complete trip 🎈🎈🎈🎈🎈🎈🎈🎈 for booking $id");
-        return true;
-      } else {
-        debugPrint("Failed to start trip for booking $id");
-        return false;
-      }
-    } catch (e) {
-      debugPrint("Error starting trip $id: $e");
-      return false;
-    } finally {
-      // isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  Future<bool> checkFinalFare({
-    required BuildContext context,
     required String currentLat,
     required String currentLng,
     required String durationMins,
@@ -286,21 +267,22 @@ class NewBookingProvider extends ChangeNotifier {
 
       final res = await api.checkFinalFare(
         context: context,
+        id: id,
         currentLat: currentLat,
         currentLng: currentLng,
         durationMins: durationMins,
       );
-      tripCompleteModel = res;
+      finalFarePreviewModel = res;
 
       if (res != null && res.status == true) {
-        return true;
+        return res.data;
       } else {
         debugPrint("Failed to start trip for booking");
-        return false;
+        return null;
       }
     } catch (e) {
       debugPrint("Error starting trip: $e");
-      return false;
+      return null;
     } finally {
       // isLoading = false;
       notifyListeners();
@@ -357,59 +339,104 @@ class NewBookingProvider extends ChangeNotifier {
   TextEditingController speedoMetervalue = TextEditingController();
 
   final apiKey = "AIzaSyA2X6HG6ZE2pzrykNypPtoQ-KJR67gpWjM";
-  Future<void> scanOdometerDisplayWithGemini(File imageFile) async {
+  Future<void> scanOdometerDisplayWithGemini(
+    File imageFile,
+    BuildContext context,
+  ) async {
     try {
-      print("START Odometer OCR");
+      showLoader(context);
+      print("START ODOMETER OCR");
 
       final bytes = await imageFile.readAsBytes();
       final base64Image = base64Encode(bytes);
-      print("kkkk${base64Image}");
 
       final uri = Uri.parse(
         "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=$apiKey",
-        //  "https://generativelanguage.googleapis.com/v1beta/models?key=$apiKey",
       );
 
-      final response = await http.post(
-        uri,
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          "contents": [
-            {
-              "parts": [
-                {
-                  "text": """
-Extract odometer value and return ONLY JSON:
+      int retry = 0;
+      http.Response? response;
 
+      /// RETRY FOR 503
+      while (retry < 3) {
+        response = await http.post(
+          uri,
+          headers: {"Content-Type": "application/json"},
+          body: jsonEncode({
+            "contents": [
+              {
+                "parts": [
+                  {
+                    "text": """
+You are an odometer OCR validator.
+
+RULES:
+- Extract odometer reading if visible.
+- Accept dashboard photos, meter photos, and dashboard screenshots.
+- If image is unrelated or no odometer is visible, return error JSON.
+- If digits are partially visible, return the best possible reading.
+- Return ONLY valid JSON.
+- No markdown.
+- No explanation.
+
+If valid odometer:
 {
-  "km_reading": 0,
+  "success": true,
+  "km_reading": 12345
+}
+
+If invalid image:
+{
+  "success": false,
+  "error": "Invalid odometer image"
 }
 """,
-                },
-                {
-                  "inline_data": {
-                    "mime_type": "image/jpeg",
-                    "data": base64Image,
                   },
-                },
-              ],
-            },
-          ],
-        }),
-      );
+                  {
+                    "inline_data": {
+                      "mime_type": "image/jpeg",
+                      "data": base64Image,
+                    },
+                  },
+                ],
+              },
+            ],
+            "generationConfig": {"temperature": 0},
+          }),
+        );
 
-      print(response.statusCode);
+        print("STATUS => ${response.statusCode}");
+
+        /// HANDLE 503
+        if (response.statusCode == 503) {
+          retry++;
+
+          print("503 HEAVY USAGE RETRY => $retry");
+
+          await Future.delayed(Duration(seconds: 2 * retry));
+
+          continue;
+        }
+
+        break;
+      }
+
+      if (response == null) {
+        print("NO RESPONSE");
+        return;
+      }
+
       print(response.body);
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
 
         String rawText =
-            data["candidates"][0]["content"]["parts"][0]["text"] ?? "";
+            data["candidates"]?[0]?["content"]?["parts"]?[0]?["text"] ?? "";
 
         print("RAW => $rawText");
 
-        /// CLEAN JSON (IMPORTANT FIX)
+        /// CLEAN RESPONSE
         String cleaned =
             rawText
                 .replaceAll("```json", "")
@@ -417,14 +444,13 @@ Extract odometer value and return ONLY JSON:
                 .replaceAll("\n", "")
                 .trim();
 
-        /// SAFE JSON PARSE
         Map<String, dynamic> jsonData = {};
+
         try {
           jsonData = jsonDecode(cleaned);
         } catch (e) {
           print("JSON PARSE ERROR => $e");
 
-          /// fallback extraction
           final regex = RegExp(r'\{.*\}');
           final match = regex.firstMatch(rawText);
 
@@ -433,24 +459,62 @@ Extract odometer value and return ONLY JSON:
           }
         }
 
-        /// SAFE AUTO FILL
-        double kmReading = (jsonData["km_reading"] ?? 0).toDouble();
+        /// STRICT VALIDATION
+        bool success = jsonData["success"] == true;
 
-        speedoMetervalue.text =
-            kmReading > 0 ? kmReading.toStringAsFixed(2) : "";
+        if (!success) {
+          speedoMetervalue.clear();
+
+          print("INVALID ODOMETER IMAGE");
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Only odometer images are allowed")),
+          );
+
+          return;
+        }
+
+        double kmReading =
+            double.tryParse(jsonData["km_reading"].toString()) ?? 0;
+
+        if (kmReading <= 0) {
+          speedoMetervalue.clear();
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Odometer reading not detected")),
+          );
+
+          return;
+        }
+
+        speedoMetervalue.text = kmReading.toStringAsFixed(0);
 
         print("AUTO FILL DONE");
 
         notifyListeners();
       } else {
         print("ERROR RESPONSE => ${response.body}");
+
+        ToastHelper.show(
+          context,
+          message:
+              response.statusCode == 503
+                  ? "Server busy. Try again."
+                  : "Failed to scan odometer",
+        );
       }
     } catch (e) {
       print("OCR ERROR => $e");
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Something went wrong")));
+    } finally {
+      navPop(context: context);
     }
   }
 
-  Future pickImage(String type) async {
+  Future pickImage(String type, BuildContext context) async {
     final XFile? picked = await picker.pickImage(source: ImageSource.camera);
 
     if (picked == null) return;
@@ -474,11 +538,11 @@ Extract odometer value and return ONLY JSON:
         interior = file;
         break;
       case "speedometer":
-        scanOdometerDisplayWithGemini(file);
+        scanOdometerDisplayWithGemini(file, context);
         speedometer = file;
         break;
       case "speedometerEndImage":
-        scanOdometerDisplayWithGemini(file);
+        scanOdometerDisplayWithGemini(file, context);
         speedometerEndImage = file;
         break;
     }
@@ -538,8 +602,12 @@ Extract odometer value and return ONLY JSON:
         speedometerImage: speedometer?.path ?? "",
         speedoMetervalue: speedoMetervalue.text,
       );
-
+      Navigator.pop(context);
       pickupVerificationModel = res;
+      if (res.status == true) {
+        speedoMetervalue.clear();
+        speedometer = null;
+      }
       getNewBookingDetail(context: context, id: id);
     } catch (e) {
       debugPrint("Error: $e");
@@ -568,6 +636,10 @@ Extract odometer value and return ONLY JSON:
       );
 
       pickupVerificationModel = res;
+      if (res.status == true) {
+        speedoMetervalue.clear();
+        speedometer = null;
+      }
       getNewBookingDetail(context: context, id: id);
     } catch (e) {
       debugPrint("Error: $e");

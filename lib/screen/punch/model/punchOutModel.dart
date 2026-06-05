@@ -1,150 +1,113 @@
 class PunchOutModel {
-  bool? success;
+  bool? status;
   String? message;
-  Data? data;
-  ApiError? error;   // ✅ ADD THIS
-  PunchOutModel({this.success, this.message, this.data,
-    this.error
-  });
+  PunchOutData? data;
+  ApiError? error;
+
+  PunchOutModel({this.status, this.message, this.data, this.error});
 
   PunchOutModel.fromJson(Map<String, dynamic> json) {
-    success = json['success'];
+    status = json['status'];
     message = json['message'];
-    data = json['data'] != null ? new Data.fromJson(json['data']) : null;
+    data = json['data'] != null ? PunchOutData.fromJson(json['data']) : null;
+
     error = json['error'] != null ? ApiError.fromJson(json['error']) : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['success'] = this.success;
-    data['message'] = this.message;
-    if (this.data != null) {
-      data['data'] = this.data!.toJson();
+    final Map<String, dynamic> dataMap = {};
+
+    dataMap['status'] = status;
+    dataMap['message'] = message;
+
+    if (data != null) {
+      dataMap['data'] = data!.toJson();
     }
-    // if (this.error != null) {
-    //   data['error'] = this.error!.toJson();
-    // }
-    return data;
+
+    if (error != null) {
+      dataMap['error'] = error!.toJson();
+    }
+
+    return dataMap;
   }
 }
 
-class Data {
-  String? driverId;
-  String? name;
-  String? status;
-  String? punchInTime;
-  Location? location;
-  Vehicle? vehicle;
-  Shift? shift;
+class PunchOutData {
+  String? punchId;
+  String? punchInAt;
+  String? punchOutAt;
+  int? totalMinutes;
+  String? durationText;
+  PunchOutLocation? punchOutLocation;
+  String? distanceFromZone;
+  bool? punchOutValid;
+  dynamic warning;
 
-  Data(
-      {this.driverId,
-        this.name,
-        this.status,
-        this.punchInTime,
-        this.location,
-        this.vehicle,
-        this.shift});
+  PunchOutData({
+    this.punchId,
+    this.punchInAt,
+    this.punchOutAt,
+    this.totalMinutes,
+    this.durationText,
+    this.punchOutLocation,
+    this.distanceFromZone,
+    this.punchOutValid,
+    this.warning,
+  });
 
-  Data.fromJson(Map<String, dynamic> json) {
-    driverId = json['driverId'];
-    name = json['name'];
-    status = json['status'];
-    punchInTime = json['punchInTime'];
-    location = json['location'] != null
-        ? new Location.fromJson(json['location'])
-        : null;
-    vehicle =
-    json['vehicle'] != null ? new Vehicle.fromJson(json['vehicle']) : null;
-    shift = json['shift'] != null ? new Shift.fromJson(json['shift']) : null;
+  PunchOutData.fromJson(Map<String, dynamic> json) {
+    punchId = json['punchId'];
+    punchInAt = json['punchInAt'];
+    punchOutAt = json['punchOutAt'];
+    totalMinutes = json['totalMinutes'];
+    durationText = json['durationText'];
+
+    punchOutLocation =
+        json['punchOutLocation'] != null
+            ? PunchOutLocation.fromJson(json['punchOutLocation'])
+            : null;
+
+    distanceFromZone = json['distanceFromZone'];
+    punchOutValid = json['punchOutValid'];
+    warning = json['warning'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['driverId'] = this.driverId;
-    data['name'] = this.name;
-    data['status'] = this.status;
-    data['punchInTime'] = this.punchInTime;
-    if (this.location != null) {
-      data['location'] = this.location!.toJson();
+    final Map<String, dynamic> data = {};
+
+    data['punchId'] = punchId;
+    data['punchInAt'] = punchInAt;
+    data['punchOutAt'] = punchOutAt;
+    data['totalMinutes'] = totalMinutes;
+    data['durationText'] = durationText;
+
+    if (punchOutLocation != null) {
+      data['punchOutLocation'] = punchOutLocation!.toJson();
     }
-    if (this.vehicle != null) {
-      data['vehicle'] = this.vehicle!.toJson();
-    }
-    if (this.shift != null) {
-      data['shift'] = this.shift!.toJson();
-    }
+
+    data['distanceFromZone'] = distanceFromZone;
+    data['punchOutValid'] = punchOutValid;
+    data['warning'] = warning;
+
     return data;
   }
 }
 
-class Location {
-  double? latitude;
-  double? longitude;
-  String? address;
+class PunchOutLocation {
+  double? lat;
+  double? lng;
 
-  Location({this.latitude, this.longitude, this.address});
+  PunchOutLocation({this.lat, this.lng});
 
-  Location.fromJson(Map<String, dynamic> json) {
-    latitude = json['latitude'];
-    longitude = json['longitude'];
-    address = json['address'];
+  PunchOutLocation.fromJson(Map<String, dynamic> json) {
+    lat = (json['lat'] ?? 0).toDouble();
+    lng = (json['lng'] ?? 0).toDouble();
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['latitude'] = this.latitude;
-    data['longitude'] = this.longitude;
-    data['address'] = this.address;
-    return data;
+    return {'lat': lat, 'lng': lng};
   }
 }
-
-class Vehicle {
-  String? vehicleId;
-  String? vehicleType;
-  String? vehicleNumber;
-
-  Vehicle({this.vehicleId, this.vehicleType, this.vehicleNumber});
-
-  Vehicle.fromJson(Map<String, dynamic> json) {
-    vehicleId = json['vehicleId'];
-    vehicleType = json['vehicleType'];
-    vehicleNumber = json['vehicleNumber'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['vehicleId'] = this.vehicleId;
-    data['vehicleType'] = this.vehicleType;
-    data['vehicleNumber'] = this.vehicleNumber;
-    return data;
-  }
-}
-
-class Shift {
-  String? shiftId;
-  String? startTime;
-  String? endTime;
-
-  Shift({this.shiftId, this.startTime, this.endTime});
-
-  Shift.fromJson(Map<String, dynamic> json) {
-    shiftId = json['shiftId'];
-    startTime = json['startTime'];
-    endTime = json['endTime'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['shiftId'] = this.shiftId;
-    data['startTime'] = this.startTime;
-    data['endTime'] = this.endTime;
-    return data;
-  }
-}
-
-
 
 class ApiError {
   int? statusCode;

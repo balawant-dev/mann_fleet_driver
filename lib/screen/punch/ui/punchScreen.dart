@@ -6,7 +6,6 @@ import '../../../widget/commonAppBar.dart';
 import '../../../widget/showLoaderFunction.dart';
 import '../provider/punchProvider.dart';
 
-
 class PunchScreen extends StatefulWidget {
   const PunchScreen({super.key});
 
@@ -19,66 +18,76 @@ class _PunchScreenState extends State<PunchScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final provider = Provider.of<PunchProvider>(context, listen: false);
-      provider.loadAllData(context: context);
+      _onRefresh();
     });
+  }
+
+  Future<void> _onRefresh() async {
+    final provider = Provider.of<PunchProvider>(context, listen: false);
+    provider.loadAllData(context: context);
   }
 
   Future<void> _handlePunchAction(PunchProvider provider) async {
     final hasPermission = await _checkLocationPermission();
     if (!hasPermission) return;
 
-    showLoader(context); // ✅ SHOW LOADER
-
     try {
       final position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
-
+      final parentCtx = context;
       if (provider.isCurrentlyPunchedIn) {
-        await provider.postPunchOutApi(
+        showDialog(
           context: context,
-          lat: position.latitude.toString(),
-          lng: position.longitude.toString(),
+          builder: (context) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+              title: const Text(
+                "Punch Out",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+              ),
+              content: const Text("Are you sure you want to punch out?"),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text("No"),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    Navigator.pop(context);
+                    await provider.postPunchOutApi(
+                      context: parentCtx,
+                      lat: position.latitude.toString(),
+                      lng: position.longitude.toString(),
+                    );
+                  },
+                  child: const Text("Yes"),
+                ),
+              ],
+            );
+          },
         );
       } else {
+        showLoader(context); // ✅ SHOW LOADER
         await provider.postPunchInApi(
           context: context,
           lat: position.latitude.toString(),
           lng: position.longitude.toString(),
         );
+        Navigator.pop(context); // ✅ CLOSE LOADER
       }
 
-      // await provider.loadAllData(context: context); // ✅ IMPORTANT
+      await provider.loadAllData(context: context);
     } catch (e) {
       debugPrint("Punch Error: $e");
     } finally {
-      Navigator.pop(context); // ✅ CLOSE LOADER
+      await provider.loadAllData(context: context);
     }
   }
-
-  // Future<void> _handlePunchAction(PunchProvider provider) async {
-  //   final hasPermission = await _checkLocationPermission();
-  //   if (!hasPermission) return;
-  //
-  //   final position = await Geolocator.getCurrentPosition(
-  //     desiredAccuracy: LocationAccuracy.high,
-  //   );
-  //
-  //   if (provider.isCurrentlyPunchedIn) {
-  //     await provider.postPunchOutApi(
-  //       context: context,
-  //       lat: position.latitude.toString(),
-  //       lng: position.longitude.toString(),
-  //     );
-  //   } else {
-  //     await provider.postPunchInApi(
-  //       context: context,
-  //       lat: position.latitude.toString(),
-  //       lng: position.longitude.toString(),
-  //     );
-  //   }
-  // }
 
   Future<bool> _checkLocationPermission() async {
     LocationPermission permission = await Geolocator.checkPermission();
@@ -87,7 +96,9 @@ class _PunchScreenState extends State<PunchScreen> {
     }
     if (permission == LocationPermission.deniedForever) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Location permission is permanently denied")),
+        const SnackBar(
+          content: Text("Location permission is permanently denied"),
+        ),
       );
       return false;
     }
@@ -107,280 +118,330 @@ class _PunchScreenState extends State<PunchScreen> {
 
           final hasRegion = provider.hasAssignedRegion;
           final isPunchedIn = provider.isCurrentlyPunchedIn;
-          final regionName = provider.getPunchRegionsModel?.data?.punchRegion?.name ?? "No Region Assigned";
+          final regionName =
+              provider.getPunchRegionsModel?.data?.punchRegion?.name ??
+              "No Region Assigned";
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Status Card
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF8FAFC),        // ← Changed: Soft elegant background
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: const Color(0xFFE2E8F0),      // ← Changed: Cleaner border
-                      width: 1.2,
-                    ),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x0A000000),           // ← Softer shadow
-                        blurRadius: 8,
-                        offset: Offset(0, 3),
+          return RefreshIndicator(
+            onRefresh: _onRefresh,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Status Card
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    decoration: BoxDecoration(
+                      color: const Color(
+                        0xFFF8FAFC,
+                      ), // ← Changed: Soft elegant background
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: const Color(
+                          0xFFE2E8F0,
+                        ), // ← Changed: Cleaner border
+                        width: 1.2,
                       ),
-                    ],
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      children: [
-                        Icon(
-                          isPunchedIn ? Icons.check_circle : Icons.access_time,
-                          size: 80,
-                          color: isPunchedIn ? Colors.green : ColorResource.primaryColor,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          isPunchedIn ? "You are Punched In" : "Ready to Punch In",
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          "Region: $regionName",
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey[600],
-                          ),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0x0A000000), // ← Softer shadow
+                          blurRadius: 8,
+                          offset: Offset(0, 3),
                         ),
                       ],
                     ),
-                  ),
-                ),
-
-                const SizedBox(height: 30),
-
-                // Action Button
-                SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: ElevatedButton(
-
-                    //showLoader
-                    onPressed: hasRegion
-                        ? () => _handlePunchAction(provider)
-                        : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ColorResource.primaryColor,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 3,
-                    ),
-                    child: Text(
-                      isPunchedIn ? "Punch Out" : "Punch In",
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-
-                if (!hasRegion) ...[
-                  const SizedBox(height: 12),
-                  const Center(
-                    child: Text(
-                      "No punch region assigned. Contact Admin.",
-                      style: TextStyle(color: Colors.red),
-                    ),
-                  ),
-                ],
-
-                const SizedBox(height: 40),
-
-                // History Section
-                const Text(
-                  "Punch History",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 12),
-                // Replace this entire block:
-                // if (provider.getPunchHistoryModel?.data?.isNotEmpty ?? false)
-                //   Container(
-                //     height: 300,
-                //     decoration: BoxDecoration(
-                //       border: Border.all(color: Colors.grey.shade300),
-                //       borderRadius: BorderRadius.circular(12),
-                //     ),
-                //     child: const Center(child: Text("History will appear here")),
-                //   )
-                // else
-                //   const Center(child: Text("No punch history yet")),
-
-// WITH THIS CLEAN & PROFESSIONAL CODE:
-                const SizedBox(height: 12),
-
-                if (provider.getPunchHistoryModel?.data?.isEmpty ?? true)
-                  const Center(
                     child: Padding(
-                      padding: EdgeInsets.symmetric(vertical: 40),
+                      padding: const EdgeInsets.all(20),
                       child: Column(
                         children: [
-                          Icon(Icons.history, size: 60, color: Colors.grey),
-                          SizedBox(height: 12),
+                          Icon(
+                            isPunchedIn
+                                ? Icons.check_circle
+                                : Icons.access_time,
+                            size: 80,
+                            color:
+                                isPunchedIn
+                                    ? Colors.green
+                                    : ColorResource.primaryColor,
+                          ),
+                          const SizedBox(height: 16),
                           Text(
-                            "No punch history yet",
-                            style: TextStyle(fontSize: 16, color: Colors.grey),
+                            isPunchedIn
+                                ? "You are Punched In"
+                                : "Ready to Punch In",
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            "Region: $regionName",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey[600],
+                            ),
                           ),
                         ],
                       ),
                     ),
-                  )
-                else
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: provider.getPunchHistoryModel!.data!.length,
-                    itemBuilder: (context, index) {
-                      final item = provider.getPunchHistoryModel!.data![index];
+                  ),
 
-                      final punchInTime = item.punchInAtIST ?? item.punchInAt ?? "N/A";
-                      final punchOutTime = item.punchOutAtIST ?? item.punchOutAt ?? "Not Punched Out";
-                      final totalTime = item.totalMinutes != null
-                          ? _formatDuration(item.totalMinutes!)
-                          : "Ongoing";
-                      // final totalHours = item.totalMinutes != null
-                      //     ? item.totalMinutes! < 60
-                      //     ? "${item.totalMinutes} min"
-                      //     : "${(item.totalMinutes! / 60).toStringAsFixed(1)} hrs"
-                      //     : "Ongoing";
+                  const SizedBox(height: 30),
 
-                      final isValid = (item.punchInValid ?? false) && (item.punchOutValid ?? true);
+                  // Action Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton(
+                      //showLoader
+                      onPressed:
+                          hasRegion ? () => _handlePunchAction(provider) : null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ColorResource.primaryColor,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 3,
+                      ),
+                      child: Text(
+                        isPunchedIn ? "Punch Out" : "Punch In",
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
 
-                      return Container(
-                        width: MediaQuery.of(context).size.width,
-                        margin: const EdgeInsets.only(bottom: 12),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF8FAFC),        // ← Changed: Soft elegant background
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: const Color(0xFFE2E8F0),      // ← Changed: Cleaner border
-                            width: 1.2,
-                          ),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Color(0x0A000000),           // ← Softer shadow
-                              blurRadius: 8,
-                              offset: Offset(0, 3),
+                  if (!hasRegion) ...[
+                    const SizedBox(height: 12),
+                    const Center(
+                      child: Text(
+                        "No punch region assigned. Contact Admin.",
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
+                  ],
+
+                  const SizedBox(height: 40),
+
+                  // History Section
+                  const Text(
+                    "Punch History",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 12),
+                  // Replace this entire block:
+                  // if (provider.getPunchHistoryModel?.data?.isNotEmpty ?? false)
+                  //   Container(
+                  //     height: 300,
+                  //     decoration: BoxDecoration(
+                  //       border: Border.all(color: Colors.grey.shade300),
+                  //       borderRadius: BorderRadius.circular(12),
+                  //     ),
+                  //     child: const Center(child: Text("History will appear here")),
+                  //   )
+                  // else
+                  //   const Center(child: Text("No punch history yet")),
+
+                  // WITH THIS CLEAN & PROFESSIONAL CODE:
+                  const SizedBox(height: 12),
+
+                  if (provider.getPunchHistoryModel?.data?.isEmpty ?? true)
+                    const Center(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 40),
+                        child: Column(
+                          children: [
+                            Icon(Icons.history, size: 60, color: Colors.grey),
+                            SizedBox(height: 12),
+                            Text(
+                              "No punch history yet",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey,
+                              ),
                             ),
                           ],
                         ),
-                        // elevation: 2,
-                        // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Date & Status Row
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    _formatDate(item.punchInAt ?? item.createdAt ?? ""),
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                    decoration: BoxDecoration(
-                                      color: isValid ? Colors.green.shade50 : Colors.orange.shade50,
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Text(
-                                      item.status?.toUpperCase() ?? "COMPLETED",
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                        color: isValid ? Colors.green : Colors.orange,
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                      ),
+                    )
+                  else
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: provider.getPunchHistoryModel!.data!.length,
+                      itemBuilder: (context, index) {
+                        final item =
+                            provider.getPunchHistoryModel!.data![index];
+
+                        final punchInTime =
+                            item.punchInAtIST ?? item.punchInAt ?? "N/A";
+                        final punchOutTime =
+                            item.punchOutAtIST ??
+                            item.punchOutAt ??
+                            "Not Punched Out";
+                        final totalTime =
+                            item.totalMinutes != null
+                                ? _formatDuration(item.totalMinutes!)
+                                : "Ongoing";
+                        // final totalHours = item.totalMinutes != null
+                        //     ? item.totalMinutes! < 60
+                        //     ? "${item.totalMinutes} min"
+                        //     : "${(item.totalMinutes! / 60).toStringAsFixed(1)} hrs"
+                        //     : "Ongoing";
+
+                        final isValid =
+                            (item.punchInValid ?? false) &&
+                            (item.punchOutValid ?? true);
+
+                        return Container(
+                          width: MediaQuery.of(context).size.width,
+                          margin: const EdgeInsets.only(bottom: 12),
+                          decoration: BoxDecoration(
+                            color: const Color(
+                              0xFFF8FAFC,
+                            ), // ← Changed: Soft elegant background
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: const Color(
+                                0xFFE2E8F0,
+                              ), // ← Changed: Cleaner border
+                              width: 1.2,
+                            ),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Color(0x0A000000), // ← Softer shadow
+                                blurRadius: 8,
+                                offset: Offset(0, 3),
                               ),
-
-                              const Divider(height: 20),
-
-                              // Punch In
-                              _buildPunchRow(
-                                icon: Icons.login,
-                                title: "Punch In",
-                                time: punchInTime,
-                                distance: item.punchInDistanceFromZone,
-                                valid: item.punchInValid ?? false,
-                              ),
-
-                              const SizedBox(height: 12),
-
-                              // Punch Out
-                              _buildPunchRow(
-                                icon: Icons.logout,
-                                title: "Punch Out",
-                                time: punchOutTime,
-                                distance: item.punchOutDistanceFromZone,
-                                valid: item.punchOutValid ?? true,
-                              ),
-
-                              if (item.totalMinutes != null) ...[
-                                const Divider(height: 20),
+                            ],
+                          ),
+                          // elevation: 2,
+                          // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Date & Status Row
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    const Text("Total Time:", style: TextStyle(fontWeight: FontWeight.w500)),
                                     Text(
-                                      totalTime,
+                                      _formatDate(
+                                        item.punchInAt ?? item.createdAt ?? "",
+                                      ),
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 16,
-                                        color: ColorResource.primaryColor,
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 6,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color:
+                                            isValid
+                                                ? Colors.green.shade50
+                                                : Colors.orange.shade50,
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: Text(
+                                        item.status?.toUpperCase() ??
+                                            "COMPLETED",
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color:
+                                              isValid
+                                                  ? Colors.green
+                                                  : Colors.orange,
+                                        ),
                                       ),
                                     ),
                                   ],
                                 ),
+
+                                const Divider(height: 20),
+
+                                // Punch In
+                                _buildPunchRow(
+                                  icon: Icons.login,
+                                  title: "Punch In",
+                                  time: punchInTime,
+                                  distance: item.punchInDistanceFromZone,
+                                  valid: item.punchInValid ?? false,
+                                ),
+
+                                const SizedBox(height: 12),
+
+                                // Punch Out
+                                _buildPunchRow(
+                                  icon: Icons.logout,
+                                  title: "Punch Out",
+                                  time: punchOutTime,
+                                  distance: item.punchOutDistanceFromZone,
+                                  valid: item.punchOutValid ?? true,
+                                ),
+
+                                if (item.totalMinutes != null) ...[
+                                  const Divider(height: 20),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Text(
+                                        "Total Time:",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      Text(
+                                        totalTime,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                          color: ColorResource.primaryColor,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ],
-                            ],
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
-                // if (provider.getPunchHistoryModel?.data?.isNotEmpty ?? false)
-                // // Add ListView.builder for history here
-                //   Container(
-                //     height: 300,
-                //     decoration: BoxDecoration(
-                //       border: Border.all(color: Colors.grey.shade300),
-                //       borderRadius: BorderRadius.circular(12),
-                //     ),
-                //     child: const Center(child: Text("History will appear here")),
-                //   )
-                // else
-                //   const Center(child: Text("No punch history yet")),
-              ],
+                        );
+                      },
+                    ),
+                  // if (provider.getPunchHistoryModel?.data?.isNotEmpty ?? false)
+                  // // Add ListView.builder for history here
+                  //   Container(
+                  //     height: 300,
+                  //     decoration: BoxDecoration(
+                  //       border: Border.all(color: Colors.grey.shade300),
+                  //       borderRadius: BorderRadius.circular(12),
+                  //     ),
+                  //     child: const Center(child: Text("History will appear here")),
+                  //   )
+                  // else
+                  //   const Center(child: Text("No punch history yet")),
+                ],
+              ),
             ),
           );
         },
       ),
     );
   }
+
   String _formatDate(String dateString) {
     try {
       final date = DateTime.parse(dateString);
@@ -405,14 +466,8 @@ class _PunchScreenState extends State<PunchScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                title,
-                style: const TextStyle(fontWeight: FontWeight.w600),
-              ),
-              Text(
-                time,
-                style: const TextStyle(fontSize: 15),
-              ),
+              Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
+              Text(time, style: const TextStyle(fontSize: 15)),
             ],
           ),
         ),

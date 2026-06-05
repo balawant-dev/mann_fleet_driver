@@ -11,6 +11,7 @@ import '../../../../../apiservice/network/network_utils.dart';
 import '../../../../../apiservice/services/secure_storage_service.dart';
 import '../../auth/register/model/registerModel.dart';
 import '../model/aadharVerifyModel.dart';
+import '../model/checkMandatoryUpdate.dart';
 import '../model/complteAdharVarification.dart';
 import '../model/editProfileModel.dart';
 import '../model/getProfileModel.dart';
@@ -28,7 +29,6 @@ class ProfileRepo {
     required BuildContext context,
   }) async {
     try {
-
       FormData formData = FormData.fromMap({
         "name": name,
         "email": email,
@@ -58,36 +58,37 @@ class ProfileRepo {
       );
 
       return RegisterModel.fromJson(response);
-
     } on DioException catch (e) {
       if (e.error is NoInternetException) {
         showNoInternetScreen(
           context,
-          onRetry: () => updateBasicDetail(
-            name: name,
-            context: context,
-            phone: phone,
-            email: email,
-         currentAddress: currentAddress,
-            permanentAddress: permanentAddress,
-            gender: gender,
-            profilePic: profilePic,
-          ),
+          onRetry:
+              () => updateBasicDetail(
+                name: name,
+                context: context,
+                phone: phone,
+                email: email,
+                currentAddress: currentAddress,
+                permanentAddress: permanentAddress,
+                gender: gender,
+                profilePic: profilePic,
+              ),
         );
         throw NoInternetException();
       } else if (e.error is ServerException) {
         showServerErrorScreen(
           context,
-          onRetry: () => updateBasicDetail(
-            name: name,
-            context: context,
-            phone: phone,
-            email: email,
-            currentAddress: currentAddress,
-            permanentAddress: permanentAddress,
-            gender: gender,
-            profilePic: profilePic,
-          ),
+          onRetry:
+              () => updateBasicDetail(
+                name: name,
+                context: context,
+                phone: phone,
+                email: email,
+                currentAddress: currentAddress,
+                permanentAddress: permanentAddress,
+                gender: gender,
+                profilePic: profilePic,
+              ),
         );
         throw ServerException();
       } else if (e.error is UnauthorizedException) {
@@ -100,8 +101,6 @@ class ProfileRepo {
       throw ApiException(0, e.toString());
     }
   }
-
-
 
   Future<GetProfileModel> getProfileApi({required BuildContext context}) async {
     try {
@@ -132,6 +131,41 @@ class ProfileRepo {
       throw ApiException(0, e.toString());
     }
   }
+
+  Future<PlatformDependenciesModel> getPlatformDependenciesApi({
+    required BuildContext context,
+  }) async {
+    try {
+      final response = await _api.get(
+        ApiConstants.platformDependencies,
+        requiresAuth: false,
+      );
+
+      return PlatformDependenciesModel.fromJson(response);
+    } on DioException catch (e) {
+      if (e.error is NoInternetException) {
+        showNoInternetScreen(
+          context,
+          onRetry: () => getPlatformDependenciesApi(context: context),
+        );
+        throw NoInternetException();
+      } else if (e.error is ServerException) {
+        showServerErrorScreen(
+          context,
+          onRetry: () => getPlatformDependenciesApi(context: context),
+        );
+        throw ServerException();
+      } else if (e.error is UnauthorizedException) {
+        await SecureStorageService.logout(context);
+        throw UnauthorizedException();
+      } else {
+        rethrow;
+      }
+    } catch (e) {
+      throw ApiException(0, e.toString());
+    }
+  }
+
   Future<RegisterModel> updateDrivingCredentials({
     required String licenseNumber,
     required String licenseExpiry,
@@ -140,7 +174,6 @@ class ProfileRepo {
     required BuildContext context,
   }) async {
     try {
-
       FormData formData = FormData.fromMap({
         "licenseNumber": licenseNumber,
         "licenseExpiry": licenseExpiry,
@@ -149,7 +182,8 @@ class ProfileRepo {
           "licensePhoto": await MultipartFile.fromFile(
             licensePhoto.path,
             filename: licensePhoto.path.split('/').last,
-          ),    if (licenseBackPhoto != null)
+          ),
+        if (licenseBackPhoto != null)
           "licenseBackPhoto": await MultipartFile.fromFile(
             licenseBackPhoto.path,
             filename: licenseBackPhoto.path.split('/').last,
@@ -164,7 +198,6 @@ class ProfileRepo {
       );
 
       return RegisterModel.fromJson(response);
-
     } catch (e) {
       throw ApiException(0, e.toString());
     }
@@ -226,57 +259,37 @@ class ProfileRepo {
       );
 
       return RegisterModel.fromJson(response);
-
     } catch (e) {
       throw ApiException(0, e.toString());
     }
   }
 
-
-  Future<AadharVerifyModel> verifyAadhaar({
-
-    required String adharNumber,
-
-
-  }) async {
+  Future<AadharVerifyModel> verifyAadhaar({required String adharNumber}) async {
     try {
-
-
       final response = await _api.post(
         ApiConstants.verifyAadhaar,
-        data: {
-          "adharNumber":adharNumber
-        },
+        data: {"adharNumber": adharNumber},
         requiresAuth: true,
-
       );
 
       return AadharVerifyModel.fromJson(response);
-
     } catch (e) {
       throw ApiException(0, e.toString());
     }
-  }  Future<AadharVerificationComplteModel> verifyCompleteAadhaar({
+  }
 
+  Future<AadharVerificationComplteModel> verifyCompleteAadhaar({
     required String adharNumber,
     required String clientId,
-
   }) async {
     try {
-
-
       final response = await _api.post(
         ApiConstants.verifyCompleteAadhaar,
-        data: {
-          "adharNumber":adharNumber,
-          "clientId":clientId,
-        },
+        data: {"adharNumber": adharNumber, "clientId": clientId},
         requiresAuth: true,
-
       );
 
       return AadharVerificationComplteModel.fromJson(response);
-
     } catch (e) {
       throw ApiException(0, e.toString());
     }

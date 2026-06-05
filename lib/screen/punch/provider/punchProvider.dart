@@ -83,6 +83,7 @@ class PunchProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
   Future<void> postPunchInApi({
     required BuildContext context,
     required String lat,
@@ -108,17 +109,13 @@ class PunchProvider extends ChangeNotifier {
           message: res?.message ?? "Punched in successfully",
           type: ToastType.success,
         );
+        await loadAllData(context: context);
       } else {
         // Error Handling
-        String errorMsg = res?.error?.message ??
-            res?.message ??
-            "Something went wrong";
+        String errorMsg =
+            res?.error?.message ?? res?.message ?? "Something went wrong";
 
-        ToastHelper.show(
-          context,
-          message: errorMsg,
-          type: ToastType.error,
-        );
+        ToastHelper.show(context, message: errorMsg, type: ToastType.error);
       }
     } catch (e) {
       ToastHelper.show(
@@ -171,7 +168,6 @@ class PunchProvider extends ChangeNotifier {
   }) async {
     isLoading = true;
     notifyListeners();
-
     try {
       final res = await api.postPunchOutApi(
         context: context,
@@ -181,25 +177,21 @@ class PunchProvider extends ChangeNotifier {
 
       punchOutModel = res;
 
-      if (res?.success == true) {
+      if (res.status == true) {
         // Success
         ToastHelper.show(
           context,
           message: res.message ?? "Punched out successfully",
           type: ToastType.success,
         );
-        await loadAllData(context: context);
+        Future.delayed(const Duration(seconds: 1), () async {
+          await loadAllData(context: context);
+        });
       } else {
-        // Error Handling
-        String errorMsg = res.error?.message ??
-            res.message ??
-            "Something went wrong";
+        String errorMsg =
+            res.error?.message ?? res.message ?? "Something went wrong";
 
-        ToastHelper.show(
-          context,
-          message: errorMsg,   // Yeh "You are not punched in." dikhega
-          type: ToastType.error,
-        );
+        ToastHelper.show(context, message: errorMsg, type: ToastType.error);
       }
     } catch (e) {
       ToastHelper.show(

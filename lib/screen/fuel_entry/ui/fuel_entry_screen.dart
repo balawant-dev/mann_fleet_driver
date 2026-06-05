@@ -295,7 +295,7 @@ class _FuelEntryScreenState extends State<FuelEntryScreen> {
                   leading: Icon(Icons.camera, size: 55),
                   onTap: () {
                     Navigator.pop(context);
-                    provider.pickImage(type, ImageSource.camera);
+                    provider.pickImage(type, ImageSource.camera, context);
                   },
                 ),
                 SizedBox(height: 30),

@@ -13,6 +13,7 @@ import '../../auth/register/model/registerModel.dart';
 import '../../bookingDetail/model/bookingDetailModel.dart';
 import '../model/bookingAcceptedModel.dart';
 import '../model/bookingCancelModel.dart';
+import '../model/final_fare_preview_model.dart';
 import '../model/getBannerModel.dart';
 import '../model/newBookingModel.dart';
 import '../model/pickupVerificationModel.dart';
@@ -137,7 +138,7 @@ class NewBookingRepo {
   }) async {
     try {
       final response = await _api.get(
-        "${ApiConstants.acceptBooking}/${id}?currentLat=$currentLat&currentLng =$currentLng",
+        "${ApiConstants.acceptBooking}/$id?currentLat=$currentLat&currentLng =$currentLng",
         requiresAuth: true,
       );
       //   await SecureStorageService.saveToken(response['token']);
@@ -264,15 +265,16 @@ class NewBookingRepo {
     }
   }
 
-  Future<TripCompleteModel> checkFinalFare({
+  Future<FinalFarePreviewModel> checkFinalFare({
     required BuildContext context,
+    required String id,
     required String currentLat,
     required String currentLng,
     required String durationMins,
   }) async {
     try {
       final response = await _api.post(
-        ApiConstants.checkFinalFare,
+        "${ApiConstants.checkFinalFare}/$id",
         requiresAuth: true,
         data: {
           "currentLat": currentLat,
@@ -280,7 +282,7 @@ class NewBookingRepo {
           "durationMins": durationMins,
         },
       );
-      return TripCompleteModel.fromJson(response);
+      return FinalFarePreviewModel.fromJson(response);
     } on DioException catch (e) {
       if (e.error is NoInternetException) {
         showNoInternetScreen(
@@ -288,6 +290,7 @@ class NewBookingRepo {
           onRetry:
               () => checkFinalFare(
                 context: context,
+                id: id,
                 currentLat: currentLat,
                 currentLng: currentLng,
                 durationMins: durationMins,
@@ -300,6 +303,7 @@ class NewBookingRepo {
           onRetry:
               () => checkFinalFare(
                 context: context,
+                id: id,
                 currentLat: currentLat,
                 currentLng: currentLng,
                 durationMins: durationMins,
@@ -611,9 +615,14 @@ class NewBookingRepo {
             speedometerImage,
             filename: speedometerImage.split('/').last,
           ),
-        if (speedoMetervalue.isNotEmpty) "speedoMetervalue": speedoMetervalue,
+        if (speedoMetervalue.isNotEmpty)
+          "speedoMetervalueEnd": speedoMetervalue,
       });
 
+      print(formData.fields.first.value);
+      print(formData.fields.first.key);
+      print(formData.files.first.key);
+      print(formData.files.first.value);
       final response = await _api.patchMultipart(
         "${ApiConstants.pickupVerification}/${id}",
         data: formData, // 👈 important
@@ -643,7 +652,6 @@ class NewBookingRepo {
                 id: id,
                 context: context,
                 speedoMetervalue: speedoMetervalue,
-
                 speedometerImage: speedometerImage,
               ),
         );

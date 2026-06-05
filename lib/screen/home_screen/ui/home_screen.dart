@@ -6,7 +6,6 @@ import 'package:mann_fleet_driver/widget/customImageView.dart';
 import 'package:mann_fleet_driver/widget/custom_text.dart';
 import 'package:provider/provider.dart';
 
-
 import '../../../widget/navigator_method.dart';
 import '../../drawer/ui/custom_drawer.dart';
 
@@ -15,6 +14,7 @@ import '../../profileManagement/screen/personal_profile_screen.dart';
 import '../provider/newBookingProvider.dart';
 
 import 'new_booking.dart';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -23,10 +23,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
-
 
   int selectedTab = 0;
   @override
@@ -39,6 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final vm = Provider.of<ProfileDetailProvider>(context, listen: false);
     vm.getProfileApi(context: context);
   }
+
   String _getGreeting() {
     final hour = DateTime.now().hour;
 
@@ -52,27 +50,28 @@ class _HomeScreenState extends State<HomeScreen> {
       return "Good Night";
     }
   }
+
   @override
   Widget build(BuildContext context) {
-    return Consumer2<ProfileDetailProvider,NewBookingProvider>(builder: (context, profilePro,provider, child) {
-      // if (profilePro.getProfileModel==null||profilePro.getProfileModel!.data==null) {
-      //   return const Center(child: CircularProgressIndicator());
-      // }
-      return Scaffold(
-        backgroundColor: Colors.white,
-
-        key: _scaffoldKey,
-        drawer: const CustomDrawer(),
-
-        appBar: AppBar(
+    return Consumer2<ProfileDetailProvider, NewBookingProvider>(
+      builder: (context, profilePro, provider, child) {
+        // if (profilePro.getProfileModel==null||profilePro.getProfileModel!.data==null) {
+        //   return const Center(child: CircularProgressIndicator());
+        // }
+        return Scaffold(
           backgroundColor: Colors.white,
-          elevation: 0,
-          automaticallyImplyLeading: false,
-          title: Row(
-            children: [
 
-              GestureDetector(
-                  onTap: (){
+          key: _scaffoldKey,
+          drawer: const CustomDrawer(),
+
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            automaticallyImplyLeading: false,
+            title: Row(
+              children: [
+                GestureDetector(
+                  onTap: () {
                     _scaffoldKey.currentState!.openDrawer();
                   },
                   child: CustomImageView(
@@ -80,80 +79,79 @@ class _HomeScreenState extends State<HomeScreen> {
                     width: 26,
                     height: 19,
                     // fit: BoxFit.cover,
-                  )),
+                  ),
+                ),
 
-              // CustomImageView(
-              //     imagePath: AppImages.menuImage,
-              //   width: 26,
-              //   height: 19,
-              //   fit: BoxFit.cover,
-              //
-              // ),
-              const SizedBox(width: 10,),
-              GestureDetector(
-                onTap: (){
-                  navPush(context: context, action: PersonalProfileScreen());
-                },
+                // CustomImageView(
+                //     imagePath: AppImages.menuImage,
+                //   width: 26,
+                //   height: 19,
+                //   fit: BoxFit.cover,
+                //
+                // ),
+                const SizedBox(width: 10),
+                GestureDetector(
+                  onTap: () {
+                    navPush(context: context, action: PersonalProfileScreen());
+                  },
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CustomText(
+                        _getGreeting(),
+                        size: 16,
+                        weight: FontWeight.w400,
+                      ),
+                      CustomText(
+                        profilePro.getProfileModel?.data?.driver?.name ??
+                            "Update Profile",
+                        size: 12,
+                        weight: FontWeight.w700,
+                        color: ColorResource.black,
+                      ),
+                    ],
+                  ),
+                ),
+                Spacer(),
+                GestureDetector(
+                  onTap: () {
+                    navPush(context: context, action: NotificationScreen());
+                  },
+                  child: CustomImageView(
+                    imagePath: AppIcons.bellIcon,
+                    fit: BoxFit.cover,
+                    width: 17,
+                    height: 20,
+                  ),
+                ),
+
+                // SizedBox(width: 20,),
+
+                // CustomImageView(
+                //   imagePath: AppIcons.callIcon,
+                //   fit: BoxFit.cover,
+                //   width: 20,
+                //   height: 20,
+                // )
+              ],
+            ),
+          ),
+          body: RefreshIndicator(
+            onRefresh: () async {
+              await provider.getNewBooking(context: context);
+            },
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.all(15),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    CustomText(
-                      _getGreeting(),
-                      size: 16,
-                      weight: FontWeight.w400,
-                    ),
-                    CustomText(
-                      profilePro.getProfileModel?.data?.driver?.name??"Update Profile",
-                      size: 12,
-                      weight: FontWeight.w700,
-                      color: ColorResource.black,
-                    )
-                  ],
+                  children: [NewBookingScreen()],
                 ),
-              ),
-              Spacer(),
-              GestureDetector(
-                onTap: (){
-                  navPush(context: context, action: NotificationScreen());
-                },
-                child: CustomImageView(
-                  imagePath: AppIcons.bellIcon,
-                  fit: BoxFit.cover,
-                  width: 17,
-                  height: 20,
-                ),
-              ),
-              // SizedBox(width: 20,),
-
-
-              // CustomImageView(
-              //   imagePath: AppIcons.callIcon,
-              //   fit: BoxFit.cover,
-              //   width: 20,
-              //   height: 20,
-              // )
-
-            ],
-          ),
-        ),
-        body: RefreshIndicator(
-          onRefresh: () async {
-            await provider.getNewBooking(context: context);
-          },
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.all(15),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  NewBookingScreen()
-
-                ],
               ),
             ),
           ),
-        ),
-      );
-    },);
+        );
+      },
+    );
   }
 }

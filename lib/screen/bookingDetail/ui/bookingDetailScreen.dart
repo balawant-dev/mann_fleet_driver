@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
@@ -34,6 +36,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
         context: context,
         id: widget.id,
       );
+      startLocationUpdates(context: context, bookingId: widget.id);
     });
     _getCurrentLocation();
   }
@@ -96,30 +99,34 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
       return;
     }
 
-    final getMinutes = await provider.getFinalFare(
+    final tripCompleted = await provider.checkFinalFare(
+      context: context,
       id: bookingId,
-      context: context,
-    );
-
-    print(getMinutes);
-
-    bool tripCompleted = await provider.checkFinalFare(
-      context: context,
       currentLat: currentLat.toString(),
       currentLng: currentLng.toString(),
-      durationMins: "12",
+      durationMins: "",
     );
 
-    if (tripCompleted) {
-      ToastHelper.show(
-        context,
-        message: "Trip Completed Successfully 🎉",
-        type: ToastType.success,
-      );
-
-      // Refresh detail
-      await provider.getNewBookingDetail(context: context, id: bookingId);
+    if (tripCompleted != null &&
+        tripCompleted.fare.adjustmentType.toLowerCase() == "none") {
+      // await provider.completeTripApi(
+      //   context: context,
+      //   id: bookingId,
+      //   currentLat: currentLat.toString(),
+      //   currentLng: currentLng.toString(),
+      // );
     }
+
+    // if (tripCompleted) {
+    //   ToastHelper.show(
+    //     context,
+    //     message: "Trip Completed Successfully 🎉",
+    //     type: ToastType.success,
+    //   );
+    //
+    //   // Refresh detail
+    //   await provider.getNewBookingDetail(context: context, id: bookingId);
+    // }
   }
 
   Future<bool> _getCurrentLocation() async {
@@ -158,6 +165,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
       currentLat = position.latitude;
       currentLng = position.longitude;
 
+      setState(() {});
       debugPrint("📍 Current Location: $currentLat, $currentLng");
       return true;
     } catch (e) {
@@ -169,6 +177,35 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
       );
       return false;
     }
+  }
+
+  Timer? locationTimer;
+
+  void startLocationUpdates({
+    required BuildContext context,
+    required String bookingId,
+  }) {
+    _getCurrentLocation();
+
+    /// every 10 seconds
+    locationTimer = Timer.periodic(const Duration(seconds: 10), (timer) async {
+      await context.read<NewBookingProvider>().updateDriverLocationApi(
+        id: bookingId,
+        lng: currentLng ?? 0.0,
+        lat: currentLat ?? 0.0,
+        context: context,
+      );
+    });
+  }
+
+  void stopLocationUpdates() {
+    locationTimer?.cancel();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    stopLocationUpdates();
   }
 
   @override
@@ -636,7 +673,67 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                         CustomText(color, size: 14, color: ColorResource.black),
                       ],
                     ),
-
+                    if (data?.driverResponse?.status == "accepted" &&
+                        data?.travellerName != null &&
+                        data?.travellerPhone != null) ...[
+                      const SizedBox(height: 10),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: CustomText(
+                          "Traveller Information",
+                          size: 16,
+                          align: TextAlign.start,
+                          weight: FontWeight.bold,
+                          color: ColorResource.black,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          CustomText(
+                            "Traveller Name",
+                            size: 14,
+                            color: ColorResource.grayText,
+                          ),
+                          CustomText(
+                            data?.travellerName ?? "",
+                            size: 14,
+                            color: ColorResource.black,
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          CustomText(
+                            "Traveller Mobile",
+                            size: 14,
+                            color: ColorResource.grayText,
+                          ),
+                          CustomText(
+                            data?.travellerPhone ?? "",
+                            size: 14,
+                            color: ColorResource.black,
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          CustomText(
+                            "Traveller E-mail",
+                            size: 14,
+                            color: ColorResource.grayText,
+                          ),
+                          CustomText(
+                            data?.travellerEmail ?? "",
+                            size: 14,
+                            color: ColorResource.black,
+                          ),
+                        ],
+                      ),
+                    ],
                     const SizedBox(height: 25),
 
                     /// 🔹 BUTTON
@@ -866,9 +963,10 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                     type: ToastType.success,
                   );
                   // 🔥🔥🔥 MAIN CHANGE - End OTP ke baad Complete Trip API call
-                  // if (type == "end") {
-                  //   await _completeTripAfterEndOtp(bookingId);
-                  // }
+                  if (type == "end") {
+                    // await _completeTripAfterEndOtp(bookingId);
+                    await _checkFinalFareAfterEndOtp(bookingId);
+                  }
                   // ScaffoldMessenger.of(context).showSnackBar(
                   //   SnackBar(content: Text("OTP Verified ($type) ✅")),
                   // );

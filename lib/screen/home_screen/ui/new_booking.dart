@@ -169,7 +169,7 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
                 );
               },
               child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
+                physics: const NeverScrollableScrollPhysics(),
                 child: Column(
                   children: [
                     if (provider.getBannerModel != null &&
@@ -206,7 +206,6 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: List.generate(banners.length, (index) {
                               bool isActive = index == currentIndex;
-
                               return AnimatedContainer(
                                 duration: const Duration(milliseconds: 300),
                                 margin: const EdgeInsets.symmetric(
@@ -224,32 +223,8 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
                               );
                             }),
                           ),
-
-                          // AnimatedSmoothIndicator(
-                          //   activeIndex: currentIndex,
-                          //   count: provider.getBannerModel!.data!.length,
-                          //   effect: ExpandingDotsEffect(
-                          //     dotHeight: 8,
-                          //     dotWidth: 8,
-                          //     expansionFactor: 3,
-                          //     spacing: 6,
-                          //     radius: 20,
-                          //     dotColor: Colors.grey.shade300,
-                          //     activeDotColor: ColorResource.indigo,
-                          //   ),
-                          // ),
                         ],
                       ),
-
-                    // const SizedBox(height: 10),
-
-                    //   CustomImageView(
-                    //   //                  imagePath: AppImages.banner,
-                    //   imagePath: provider.getBannerModel!.data!.first.image,
-                    //   height: 150,
-                    //   width: MediaQuery.of(context).size.width,
-                    //   fit: BoxFit.cover,
-                    // ),
                     const SizedBox(height: 10),
                     ListView.builder(
                       shrinkWrap: true,

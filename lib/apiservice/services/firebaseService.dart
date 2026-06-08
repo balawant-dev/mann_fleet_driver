@@ -1,5 +1,3 @@
-
-
 import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
@@ -7,12 +5,10 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class FirebaseService {
-
   static final FirebaseMessaging _messaging = FirebaseMessaging.instance;
 
   /// initialize all services
   static Future<void> init() async {
-
     await _requestPermission();
 
     await _initializeAwesome();
@@ -31,24 +27,21 @@ class FirebaseService {
 
   /// Awesome Notification initialize
   static Future<void> _initializeAwesome() async {
-
-    await AwesomeNotifications().initialize(
-      null,
-      [
-        NotificationChannel(
-          channelKey: 'basic_channel',
-          channelName: 'Basic Notifications',
-          channelDescription: 'Notification channel for basic tests',
-          importance: NotificationImportance.High,
-          channelShowBadge: true,
-        )
-      ],
-    );
+    await AwesomeNotifications().initialize(null, [
+      NotificationChannel(
+        channelKey: 'basic_channel',
+        channelName: 'Basic Notifications',
+        channelDescription: 'Notification channel for basic tests',
+        importance: NotificationImportance.High,
+        channelShowBadge: true,
+        playSound: true,
+        soundSource: 'resource://raw/sound',
+      ),
+    ]);
   }
 
   /// Device ID
   static Future<void> _printDeviceId() async {
-
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     final prefs = await SharedPreferences.getInstance();
 
@@ -77,7 +70,6 @@ class FirebaseService {
     String? token = await _messaging.getToken();
 
     if (token != null) {
-
       final prefs = await SharedPreferences.getInstance();
 
       await prefs.setString("deviceToken", token);
@@ -88,9 +80,7 @@ class FirebaseService {
 
   /// Foreground notification
   static void _listenForegroundNotification() {
-
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-
       print("Notification Title : ${message.notification?.title}");
       print("Notification Body : ${message.notification?.body}");
 

@@ -286,6 +286,55 @@ class NewBookingRepo {
     }
   }
 
+  Future<bool> extraPaymentCash({
+    required BuildContext context,
+    required String id,
+    required String currentLat,
+    required String currentLng,
+  }) async {
+    try {
+      final response = await _api.post(
+        "${ApiConstants.extraPaymentCash}/$id",
+        data: {"currentLat": currentLat, "currentLng": currentLng},
+        requiresAuth: true,
+      );
+      return response['status'];
+    } on DioException catch (e) {
+      if (e.error is UnauthorizedException) {
+        await SecureStorageService.logout(context);
+        throw UnauthorizedException();
+      } else {
+        rethrow;
+      }
+    } catch (e) {
+      throw ApiException(0, e.toString());
+    }
+  }
+
+  Future<bool> waiveExtraPayment({
+    required BuildContext context,
+    required String id,
+    required String reason,
+  }) async {
+    try {
+      final response = await _api.post(
+        "${ApiConstants.waiveExtraPayment}/$id",
+        requiresAuth: true,
+        data: {"reason": reason},
+      );
+      return response['status'];
+    } on DioException catch (e) {
+      if (e.error is UnauthorizedException) {
+        await SecureStorageService.logout(context);
+        throw UnauthorizedException();
+      } else {
+        rethrow;
+      }
+    } catch (e) {
+      throw ApiException(0, e.toString());
+    }
+  }
+
   Future<FinalFarePreviewModel> checkFinalFare({
     required BuildContext context,
     required String id,
@@ -329,6 +378,102 @@ class NewBookingRepo {
                 currentLng: currentLng,
                 durationMins: durationMins,
               ),
+        );
+        throw ServerException();
+      } else if (e.error is UnauthorizedException) {
+        await SecureStorageService.logout(context);
+        throw UnauthorizedException();
+      } else {
+        rethrow;
+      }
+    } catch (e) {
+      throw ApiException(0, e.toString());
+    }
+  }
+
+  Future<String> extraPaymentStatus({
+    required BuildContext context,
+    required String id,
+  }) async {
+    try {
+      final response = await _api.get(
+        "${ApiConstants.extraPaymentStatus}/$id",
+        requiresAuth: true,
+      );
+      return response['data']['extraPayment']['status'];
+    } on DioException catch (e) {
+      if (e.error is NoInternetException) {
+        showNoInternetScreen(
+          context,
+          onRetry: () => extraPaymentStatus(context: context, id: id),
+        );
+        throw NoInternetException();
+      } else if (e.error is ServerException) {
+        showServerErrorScreen(
+          context,
+          onRetry: () => extraPaymentStatus(context: context, id: id),
+        );
+        throw ServerException();
+      } else if (e.error is UnauthorizedException) {
+        await SecureStorageService.logout(context);
+        throw UnauthorizedException();
+      } else {
+        rethrow;
+      }
+    } catch (e) {
+      throw ApiException(0, e.toString());
+    }
+  }
+
+  Future<bool> checkDriverPickupRange({
+    required BuildContext context,
+    required String id,
+    required double currentLat,
+    required double currentLng,
+  }) async {
+    try {
+      final response = await _api.post(
+        "${ApiConstants.checkDriverPickupRange}/$id",
+        data: {"currentLat": currentLat, "currentLng": currentLng},
+        requiresAuth: true,
+      );
+      return response['data']['isInRange'];
+    } on DioException catch (e) {
+      if (e.error is UnauthorizedException) {
+        await SecureStorageService.logout(context);
+        throw UnauthorizedException();
+      } else {
+        rethrow;
+      }
+    } catch (e) {
+      throw ApiException(0, e.toString());
+    }
+  }
+
+  Future<bool> driverArrived({
+    required BuildContext context,
+    required String id,
+    required double currentLat,
+    required double currentLng,
+  }) async {
+    try {
+      final response = await _api.post(
+        "${ApiConstants.driverArrived}/$id",
+        data: {"currentLat": currentLat, "currentLng": currentLng},
+        requiresAuth: true,
+      );
+      return response['status'];
+    } on DioException catch (e) {
+      if (e.error is NoInternetException) {
+        showNoInternetScreen(
+          context,
+          onRetry: () => startTripApi(context: context, id: id),
+        );
+        throw NoInternetException();
+      } else if (e.error is ServerException) {
+        showServerErrorScreen(
+          context,
+          onRetry: () => startTripApi(context: context, id: id),
         );
         throw ServerException();
       } else if (e.error is UnauthorizedException) {

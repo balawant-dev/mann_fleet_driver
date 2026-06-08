@@ -141,12 +141,10 @@ class _HomeScreenState extends State<HomeScreen> {
               await provider.getNewBooking(context: context);
             },
             child: SingleChildScrollView(
-              child: Padding(
-                padding: EdgeInsets.all(15),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [NewBookingScreen()],
-                ),
+              padding: EdgeInsets.all(15),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [NewBookingScreen()],
               ),
             ),
           ),

@@ -54,19 +54,30 @@ class Data {
   String? paymentStatus;
   String? tripStatus;
   String? overallStatus;
+
   dynamic estimatedFare;
   dynamic prepaidAmount;
+
   String? scheduledAt;
   String? createdAt;
+
+  String? paymentAt;
+  String? assignedAt;
+  String? tripStartAt;
+  String? tripEndAt;
+  String? cancelledAt;
+
   Driver? driver;
   Vehicle? vehicle;
+
   String? createdAtIST;
   String? scheduledAtIST;
-  Null? paymentAtIST;
-  Null? assignedAtIST;
-  Null? tripStartAtIST;
-  Null? tripEndAtIST;
-  Null? cancelledAtIST;
+  String? paymentAtIST;
+  String? assignedAtIST;
+  String? tripStartAtIST;
+  String? tripEndAtIST;
+  String? cancelledAtIST;
+
   String? id;
 
   Data({
@@ -84,6 +95,11 @@ class Data {
     this.prepaidAmount,
     this.scheduledAt,
     this.createdAt,
+    this.paymentAt,
+    this.assignedAt,
+    this.tripStartAt,
+    this.tripEndAt,
+    this.cancelledAt,
     this.driver,
     this.vehicle,
     this.createdAtIST,
@@ -97,28 +113,40 @@ class Data {
   });
 
   Data.fromJson(Map<String, dynamic> json) {
-    pickup =
-        json['pickup'] != null ? new Pickup.fromJson(json['pickup']) : null;
-    dropoff =
-        json['dropoff'] != null ? new Pickup.fromJson(json['dropoff']) : null;
+    pickup = json['pickup'] != null ? Pickup.fromJson(json['pickup']) : null;
+
+    dropoff = json['dropoff'] != null ? Pickup.fromJson(json['dropoff']) : null;
+
     sId = json['_id'];
     bookingNumber = json['bookingNumber'];
+
     segment =
-        json['segment'] != null ? new Segment.fromJson(json['segment']) : null;
-    region =
-        json['region'] != null ? new Region.fromJson(json['region']) : null;
+        json['segment'] != null ? Segment.fromJson(json['segment']) : null;
+
+    region = json['region'] != null ? Region.fromJson(json['region']) : null;
+
     bookingType = json['bookingType'];
     paymentStatus = json['paymentStatus'];
     tripStatus = json['tripStatus'];
     overallStatus = json['overallStatus'];
+
     estimatedFare = json['estimatedFare'];
     prepaidAmount = json['prepaidAmount'];
+
     scheduledAt = json['scheduledAt'];
     createdAt = json['createdAt'];
-    driver =
-        json['driver'] != null ? new Driver.fromJson(json['driver']) : null;
+
+    paymentAt = json['paymentAt'];
+    assignedAt = json['assignedAt'];
+    tripStartAt = json['tripStartAt'];
+    tripEndAt = json['tripEndAt'];
+    cancelledAt = json['cancelledAt'];
+
+    driver = json['driver'] != null ? Driver.fromJson(json['driver']) : null;
+
     vehicle =
-        json['vehicle'] != null ? new Vehicle.fromJson(json['vehicle']) : null;
+        json['vehicle'] != null ? Vehicle.fromJson(json['vehicle']) : null;
+
     createdAtIST = json['createdAtIST'];
     scheduledAtIST = json['scheduledAtIST'];
     paymentAtIST = json['paymentAtIST'];
@@ -126,47 +154,67 @@ class Data {
     tripStartAtIST = json['tripStartAtIST'];
     tripEndAtIST = json['tripEndAtIST'];
     cancelledAtIST = json['cancelledAtIST'];
+
     id = json['id'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.pickup != null) {
-      data['pickup'] = this.pickup!.toJson();
+    final Map<String, dynamic> data = {};
+
+    if (pickup != null) {
+      data['pickup'] = pickup!.toJson();
     }
-    if (this.dropoff != null) {
-      data['dropoff'] = this.dropoff!.toJson();
+
+    if (dropoff != null) {
+      data['dropoff'] = dropoff!.toJson();
     }
-    data['_id'] = this.sId;
-    data['bookingNumber'] = this.bookingNumber;
-    if (this.segment != null) {
-      data['segment'] = this.segment!.toJson();
+
+    data['_id'] = sId;
+    data['bookingNumber'] = bookingNumber;
+
+    if (segment != null) {
+      data['segment'] = segment!.toJson();
     }
-    if (this.region != null) {
-      data['region'] = this.region!.toJson();
+
+    if (region != null) {
+      data['region'] = region!.toJson();
     }
-    data['bookingType'] = this.bookingType;
-    data['paymentStatus'] = this.paymentStatus;
-    data['tripStatus'] = this.tripStatus;
-    data['overallStatus'] = this.overallStatus;
-    data['estimatedFare'] = this.estimatedFare;
-    data['prepaidAmount'] = this.prepaidAmount;
-    data['scheduledAt'] = this.scheduledAt;
-    data['createdAt'] = this.createdAt;
-    if (this.driver != null) {
-      data['driver'] = this.driver!.toJson();
+
+    data['bookingType'] = bookingType;
+    data['paymentStatus'] = paymentStatus;
+    data['tripStatus'] = tripStatus;
+    data['overallStatus'] = overallStatus;
+
+    data['estimatedFare'] = estimatedFare;
+    data['prepaidAmount'] = prepaidAmount;
+
+    data['scheduledAt'] = scheduledAt;
+    data['createdAt'] = createdAt;
+
+    data['paymentAt'] = paymentAt;
+    data['assignedAt'] = assignedAt;
+    data['tripStartAt'] = tripStartAt;
+    data['tripEndAt'] = tripEndAt;
+    data['cancelledAt'] = cancelledAt;
+
+    if (driver != null) {
+      data['driver'] = driver!.toJson();
     }
-    if (this.vehicle != null) {
-      data['vehicle'] = this.vehicle!.toJson();
+
+    if (vehicle != null) {
+      data['vehicle'] = vehicle!.toJson();
     }
-    data['createdAtIST'] = this.createdAtIST;
-    data['scheduledAtIST'] = this.scheduledAtIST;
-    data['paymentAtIST'] = this.paymentAtIST;
-    data['assignedAtIST'] = this.assignedAtIST;
-    data['tripStartAtIST'] = this.tripStartAtIST;
-    data['tripEndAtIST'] = this.tripEndAtIST;
-    data['cancelledAtIST'] = this.cancelledAtIST;
-    data['id'] = this.id;
+
+    data['createdAtIST'] = createdAtIST;
+    data['scheduledAtIST'] = scheduledAtIST;
+    data['paymentAtIST'] = paymentAtIST;
+    data['assignedAtIST'] = assignedAtIST;
+    data['tripStartAtIST'] = tripStartAtIST;
+    data['tripEndAtIST'] = tripEndAtIST;
+    data['cancelledAtIST'] = cancelledAtIST;
+
+    data['id'] = id;
+
     return data;
   }
 }
@@ -231,7 +279,7 @@ class Region {
 class Driver {
   String? sId;
   String? phone;
-  int? rating;
+  dynamic? rating;
   String? name;
   String? profilePic;
   String? id;

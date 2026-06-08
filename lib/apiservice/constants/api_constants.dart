@@ -21,6 +21,9 @@ class ApiConstants {
   static const String acceptBooking = '/api/driver/acceptBooking';
   static const String platformDependencies = '/api/user/platformDependencies';
   static const String startTrip = '/api/driver/startTrip';
+  static const String driverArrived = '/api/driver/driverArrived';
+  static const String checkDriverPickupRange =
+      '/api/driver/checkDriverPickupRange';
   static const String verifyBookingOtp = '/api/driver/verifyBookingOtp';
   static const String driverCancelRequest = '/api/driver/driverCancelRequest';
   static const String bookingDetail = '/api/driver/booking';
@@ -28,7 +31,10 @@ class ApiConstants {
   static const String bookingHistory = '/api/driver/bookingHistory';
   static const String completeTrip = '/api/driver/completeTrip';
   static const String finalFare = '/api/driver/finalFare';
+  static const String waiveExtraPayment = '/api/driver/waiveExtraPayment';
+  static const String extraPaymentCash = '/api/driver/extraPaymentCash';
   static const String checkFinalFare = '/api/driver/checkFinalFare';
+  static const String extraPaymentStatus = '/api/driver/extraPaymentStatus';
   static const String notifications = '/api/driver/notifications';
   static const String scanQr = '/api/driver/scanQr';
   static const String pickupVerification = '/api/driver/pickupVerification';

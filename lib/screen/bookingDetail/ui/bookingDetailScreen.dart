@@ -2,13 +2,17 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
+import 'package:mann_fleet_driver/screen/home_screen/ui/payment_qr_screen.dart';
 import 'package:mann_fleet_driver/widget/commonAppButton.dart';
 import 'package:mann_fleet_driver/widget/navigator_method.dart';
 import '../../../util/color/app_colors.dart';
+import '../../../util/theame/app_theme.dart';
 import '../../../widget/commonAppBar.dart';
 import '../../../widget/custom_text.dart';
 import '../../../widget/motionToastHelper.dart';
 import '../../../widget/showLoaderFunction.dart';
+import '../../bottomBar/bottomBar.dart';
+import '../../home_screen/model/final_fare_preview_model.dart';
 import '../../home_screen/provider/newBookingProvider.dart';
 import '../../pickup/ui/pickUpScreen.dart';
 import 'package:provider/provider.dart';
@@ -82,7 +86,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
 
   Future<void> _checkFinalFareAfterEndOtp(String bookingId) async {
     final provider = context.read<NewBookingProvider>();
-
+    showLoader(context);
     // Get current location
     bool hasLocation = await _getCurrentLocation();
 
@@ -104,21 +108,19 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
     );
 
     if (status != null && status.fare.adjustmentType.toLowerCase() == "none") {
-      await provider.completeTripApi(
-        context: context,
-        id: bookingId,
-        currentLat: currentLat.toString(),
-        currentLng: currentLng.toString(),
-      );
+      Navigator.pop(context);
+      showBookingCompletionDialog(context, false, status);
     } else if (status != null &&
         status.fare.adjustmentType.toLowerCase() != "none") {
-      await provider.payFinalFare(
-        context: context,
-        id: bookingId,
-        currentLat: currentLat.toString(),
-        currentLng: currentLng.toString(),
-        durationMins: "",
-      );
+      Navigator.pop(context);
+      showBookingCompletionDialog(context, true, status);
+      // await provider.payFinalFare(
+      //   context: context,
+      //   id: bookingId,
+      //   currentLat: currentLat.toString(),
+      //   currentLng: currentLng.toString(),
+      //   durationMins: "",
+      // );
     }
 
     // if (tripCompleted) {
@@ -798,9 +800,71 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
     print(">>>>>>>finalImageUploaded>>>>>>>>>>>>>>>>>${finalImageUploaded}");
 
     /// 🔹 1. Pickup Pending
-    if (status == "accepted" && !pickupDone) {
+    if (status == "accepted" && tripStatus == "driver_enroute" && !pickupDone) {
       return CommonAppButton(
         text: "Reporting to Client",
+        onPressed: () async {
+          showLoader(context);
+          await _getCurrentLocation();
+          final status = await context
+              .read<NewBookingProvider>()
+              .checkDriverPickupRange(
+                context: context,
+                id: widget.id,
+                currentLat: currentLat,
+                currentLng: currentLng,
+              );
+
+          if (!status) {
+            final confirm = await showDialog<bool>(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: const Text("Pickup Confirmation"),
+                  content: const Text(
+                    "Are you sure you want to pick up the user from a different location?",
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context, false);
+                        Navigator.pop(context);
+                      },
+                      child: const Text("No"),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context, true);
+                      },
+                      child: const Text("Yes"),
+                    ),
+                  ],
+                );
+              },
+            );
+
+            if (confirm != true) return;
+          }
+
+          final success = await context
+              .read<NewBookingProvider>()
+              .driverArrived(
+                context: context,
+                id: widget.id,
+                currentLat: currentLat,
+                currentLng: currentLng,
+              );
+
+          if (!success) return;
+          Navigator.pop(context);
+          navPush(context: context, action: PickupScreen(id: widget.id));
+        },
+      );
+    }
+
+    if (status == "accepted" && tripStatus == "arrived" && !pickupDone) {
+      return CommonAppButton(
+        text: "Next",
         onPressed: () {
           navPush(context: context, action: PickupScreen(id: widget.id));
         },
@@ -839,14 +903,33 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
         },
       );
     }
-
-    /// 🔹 4. End OTP
-    if (tripStatus == "in_progress" && !isEndOtpVerified) {
+    if (tripStatus == "arrived" && isStartOtpVerified && !isEndOtpVerified) {
       return CommonAppButton(
-        text: "Verify End OTP",
-        onPressed: () => showOtpDialog(widget.id, "end"),
+        text: "Next",
+        onPressed: () {
+          _checkFinalFareAfterEndOtp(widget.id);
+        },
       );
     }
+
+    if (tripStatus == "in_progress" &&
+        isStartOtpVerified &&
+        !isEndOtpVerified) {
+      return CommonAppButton(
+        text: "End Trip",
+        onPressed: () {
+          _checkFinalFareAfterEndOtp(widget.id);
+        },
+      );
+    }
+    //
+    // /// 🔹 4. End OTP
+    // if (tripStatus == "in_progress" && !isEndOtpVerified) {
+    //   return CommonAppButton(
+    //     text: "Verify End OTP",
+    //     onPressed: () => showOtpDialog(widget.id, "end"),
+    //   );
+    // }
 
     /// 🔹 5. Completed
     if (tripStatus == "in_progress" && isEndOtpVerified) {
@@ -858,8 +941,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
         onPressed: () async {
           if (finalImageUploaded == true) {
             showLoader(context);
-            // await _completeTripAfterEndOtp(widget.id);
-            await _checkFinalFareAfterEndOtp(widget.id);
+            await _completeTripAfterEndOtp(widget.id);
             navPop(context: context);
           } else {
             navPush(
@@ -967,9 +1049,31 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                     message: "OTP Verified ($type) ✅",
                     type: ToastType.success,
                   );
+                  if (type.toString() == "start") {
+                    bool success = await context
+                        .read<NewBookingProvider>()
+                        .startTripApi(context: context, id: widget.id);
+
+                    if (success) {
+                      ToastHelper.show(
+                        context,
+                        message: "Trip Started 🚗",
+                        type: ToastType.success,
+                      );
+                    }
+                  }
                   if (type == "end") {
-                    // await _completeTripAfterEndOtp(bookingId);
-                    await _checkFinalFareAfterEndOtp(bookingId);
+                    final status = await Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder:
+                            (context) =>
+                                UploadSpeedoMeterImageScreen(id: widget.id),
+                      ),
+                    );
+
+                    if (status == true) {
+                      await _completeTripAfterEndOtp(widget.id);
+                    }
                   }
                 }
               },
@@ -979,5 +1083,269 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
         );
       },
     );
+  }
+
+  void showBookingCompletionDialog(
+    BuildContext context,
+    bool isAdjust,
+    FarePreviewData status,
+  ) {
+    String? selectedPaymentMode = 'select_method';
+    final controller = TextEditingController();
+    final provider = context.read<NewBookingProvider>();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'Booking Information',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Start Time
+                    _buildInfoRow(
+                      'Start Time',
+                      formatDateTime(status.trip.tripStartAt),
+                    ), // Replace with your variable
+                    const Divider(),
+
+                    // End Time
+                    _buildInfoRow(
+                      'End Time',
+                      formatDateTime(status.trip.checkedAt),
+                    ),
+                    const Divider(),
+
+                    // Total Amount
+                    _buildInfoRow(
+                      'Est. Amount',
+                      '₹${status.fare.estimatedFare.toString()}',
+                    ), // Replace with your variable
+                    const Divider(),
+
+                    // Extra Amount
+                    _buildInfoRow(
+                      'Final Amount',
+                      '₹${status.fare.finalFare.toString()}',
+                    ),
+                    const Divider(),
+                    _buildInfoRow(
+                      'Amount Needs\nTo Be Collected',
+                      highlight: true,
+                      '₹${status.fare.adjustmentAmount.toString()}',
+                    ), // Replace with your variable
+                    const Divider(),
+
+                    // Extra Duration
+                    // _buildInfoRow(
+                    //   'Extra Duration',
+                    //   '45 mins',
+                    // ), // Replace with your variable
+                    const SizedBox(height: 16),
+
+                    // Dropdown
+                    if (isAdjust)
+                      const Text(
+                        'Payment Mode',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    const SizedBox(height: 8),
+                    if (isAdjust)
+                      DropdownButtonFormField<String>(
+                        value: selectedPaymentMode,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                        ),
+                        items: const [
+                          DropdownMenuItem(
+                            value: 'select_method',
+                            child: Text('Select Method'),
+                          ),
+                          DropdownMenuItem(value: 'cash', child: Text('Cash')),
+                          DropdownMenuItem(
+                            value: 'online',
+                            child: Text('Online'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'force_complete',
+                            child: Text('Force Complete'),
+                          ),
+                        ],
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedPaymentMode = newValue;
+                          });
+                        },
+                      ),
+                    SizedBox(height: 6),
+                    if (isAdjust && selectedPaymentMode == 'force_complete')
+                      TextField(
+                        controller: controller,
+                        decoration: InputDecoration(hint: Text("Enter Reason")),
+                      ),
+                  ],
+                ),
+              );
+            },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryColor,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              onPressed: () async {
+                await _getCurrentLocation();
+                print(isAdjust);
+                if (isAdjust) {
+                  if (selectedPaymentMode == 'select_method') {
+                    ToastHelper.show(
+                      context,
+                      message: "Please select a payment method",
+                      type: ToastType.error,
+                    );
+                  } else {
+                    if (selectedPaymentMode == 'force_complete') {
+                      if (controller.text.length > 10) {
+                        final success = await provider.waiveExtraPayment(
+                          context: context,
+                          id: widget.id,
+                          reason: controller.text,
+                        );
+                        if (success) {
+                          Navigator.pop(context);
+                          Future.delayed(const Duration(seconds: 1), () {
+                            navPushReplace(
+                              context: context,
+                              action: const MainScreen(),
+                            );
+                          });
+                        }
+                      } else {
+                        ToastHelper.show(
+                          context,
+                          message: "Please enter a reason (min 10 char)",
+                          type: ToastType.error,
+                        );
+                      }
+                    } else if (selectedPaymentMode == 'cash') {
+                      final success = await provider.extraPaymentCash(
+                        context: context,
+                        id: widget.id,
+                        currentLat: currentLat.toString(),
+                        currentLng: currentLng.toString(),
+                      );
+                      if (success) {
+                        Navigator.pop(context);
+                        Future.delayed(const Duration(seconds: 1), () {
+                          showOtpDialog(widget.id, "end");
+                        });
+                      }
+                    } else {
+                      final data = await provider.payFinalFare(
+                        context: context,
+                        id: widget.id,
+                        currentLat: currentLat.toString(),
+                        currentLng: currentLng.toString(),
+                        durationMins: "",
+                      );
+                      if (data != null) {
+                        final status = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => PaymentQrScreen(data: data.data),
+                          ),
+                        );
+
+                        print("STATUS => $status");
+
+                        if (status == true && mounted) {
+                          Navigator.pop(context);
+
+                          Future.delayed(const Duration(seconds: 1), () {
+                            if (mounted) {
+                              showOtpDialog(widget.id, "end");
+                            }
+                          });
+                        }
+                      }
+                    }
+                  }
+                } else {
+                  Navigator.pop(context);
+                  Future.delayed(const Duration(seconds: 1), () {
+                    showOtpDialog(widget.id, "end");
+                  });
+                }
+              },
+              child: const Text('Proceed'),
+            ),
+          ],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        );
+      },
+    );
+  }
+
+  // Helper widget for clean info rows
+  Widget _buildInfoRow(String label, String value, {bool? highlight = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: highlight! ? 18 : 16,
+              color: highlight ? Colors.teal : Colors.grey,
+            ),
+          ),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String formatDateTime(String rawDate) {
+    try {
+      DateTime dateTime = DateTime.parse(rawDate).toLocal();
+
+      final formattedDate = DateFormat('d MMM yyyy').format(dateTime);
+      final formattedTime = DateFormat('hh:mm a').format(dateTime);
+
+      return "$formattedDate $formattedTime";
+    } catch (e) {
+      debugPrint("Date parsing error: $e");
+      return "";
+    }
   }
 }

@@ -51,144 +51,154 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
             // return const Center(child: Text("No bookings found"));
           }
 
-          return ListView.builder(
-            padding: const EdgeInsets.all(12),
-            itemCount: list.length,
-            itemBuilder: (context, index) {
-              final item = list[index];
+          return RefreshIndicator(
+            onRefresh: () async {
+              Provider.of<BookingHistoryProvider>(
+                context,
+                listen: false,
+              ).fetchBookings(context);
+            },
+            child: ListView.builder(
+              padding: const EdgeInsets.all(12),
+              itemCount: list.length,
+              itemBuilder: (context, index) {
+                final item = list[index];
 
-              final rawDate = item.scheduledAtIST;
+                final rawDate = item.scheduledAtIST;
 
-              String formattedDate = "4 Sep 2024";
-              String formattedTime = "08:30 PM";
+                String formattedDate = "4 Sep 2024";
+                String formattedTime = "08:30 PM";
 
-              DateTime? parsedDate;
+                DateTime? parsedDate;
 
-              if (rawDate != null && rawDate.isNotEmpty) {
-                try {
-                  parsedDate = DateFormat('yyyy-MM-dd HH:mm:ss').parse(rawDate);
+                if (rawDate != null && rawDate.isNotEmpty) {
+                  try {
+                    parsedDate = DateFormat(
+                      'yyyy-MM-dd HH:mm:ss',
+                    ).parse(rawDate);
 
-                  formattedDate = DateFormat('d MMM yyyy').format(parsedDate);
+                    formattedDate = DateFormat('d MMM yyyy').format(parsedDate);
 
-                  formattedTime = DateFormat('hh:mm a').format(parsedDate);
-                } catch (e) {
-                  debugPrint("Date parsing error: $e");
+                    formattedTime = DateFormat('hh:mm a').format(parsedDate);
+                  } catch (e) {
+                    debugPrint("Date parsing error: $e");
+                  }
                 }
-              }
-              return Container(
-                margin: const EdgeInsets.only(bottom: 12),
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: Colors.grey.shade200),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Booking Number + Status
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          item.bookingNumber ?? "-",
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.green.shade50,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            item.tripStatus ?? "",
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.green.shade700,
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: Colors.grey.shade200),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.04),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Booking Number + Status
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            item.bookingNumber ?? "-",
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 10),
-
-                    // Pickup
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.radio_button_checked,
-                          size: 14,
-                          color: Colors.green,
-                        ),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            item.pickup?.address ?? "",
-                            style: const TextStyle(fontSize: 13),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.green.shade50,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              item.tripStatus ?? "",
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.green.shade700,
+                              ),
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
 
-                    const SizedBox(height: 6),
+                      const SizedBox(height: 10),
 
-                    // Drop
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.location_on,
-                          size: 14,
-                          color: Colors.red,
-                        ),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            item.dropoff?.address ?? "",
-                            style: const TextStyle(fontSize: 13),
+                      // Pickup
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.radio_button_checked,
+                            size: 14,
+                            color: Colors.green,
                           ),
-                        ),
-                      ],
-                    ),
-
-                    const Divider(height: 20),
-
-                    // Bottom Info
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        // Text(
-                        //   "₹ ${item.estimatedFare ?? 0}",
-                        //   style: const TextStyle(
-                        //     fontWeight: FontWeight.w600,
-                        //   ),
-                        // ),
-                        Text(
-                          "$formattedDate $formattedTime",
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey.shade600,
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              item.pickup?.address ?? "",
+                              style: const TextStyle(fontSize: 13),
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              );
-            },
+                        ],
+                      ),
+
+                      const SizedBox(height: 6),
+
+                      // Drop
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.location_on,
+                            size: 14,
+                            color: Colors.red,
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              item.dropoff?.address ?? "",
+                              style: const TextStyle(fontSize: 13),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const Divider(height: 20),
+
+                      // Bottom Info
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          // Text(
+                          //   "₹ ${item.estimatedFare ?? 0}",
+                          //   style: const TextStyle(
+                          //     fontWeight: FontWeight.w600,
+                          //   ),
+                          // ),
+                          Text(
+                            "$formattedDate $formattedTime",
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
           );
         },
       ),

@@ -215,7 +215,6 @@ class _OtpScreenState extends State<OtpScreen> {
                       fcmToken: deviceToken,
                       deviceID: deviceId,
                     );
-
                     Navigator.pop(context);
 
                     if (otpProvider.verifyOtpModel != null &&

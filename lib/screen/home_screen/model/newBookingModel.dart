@@ -25,8 +25,8 @@ class NewBookingModel {
 class NewBookingData {
   Pickup? pickup;
   Pickup? dropoff;
-  DriverResponse? driverResponse; // ← added (was missing)
-  String? id; // ← renamed from _id / sId / id confusion
+  DriverResponse? driverResponse;
+  String? id;
   String? bookingNumber;
   User? user;
   Segment? segment;

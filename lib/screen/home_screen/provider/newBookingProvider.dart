@@ -186,6 +186,76 @@ class NewBookingProvider extends ChangeNotifier {
     }
   }
 
+  Future<bool> driverArrived({
+    required BuildContext context,
+    required String id,
+    required double currentLat,
+    required double currentLng,
+  }) async {
+    try {
+      // isLoading = true;
+      notifyListeners();
+
+      final res = await api.driverArrived(
+        context: context,
+        id: id,
+        currentLat: currentLat,
+        currentLng: currentLng,
+      );
+
+      if (res != null && res == true) {
+        getNewBookingDetail(context: context, id: id);
+        getNewBooking(context: context);
+        debugPrint("Trip started successfully for booking $id");
+        return true;
+      } else {
+        debugPrint("Failed to start trip for booking $id");
+        return false;
+      }
+    } catch (e) {
+      debugPrint("Error starting trip $id: $e");
+      return false;
+    } finally {
+      // isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> checkDriverPickupRange({
+    required BuildContext context,
+    required String id,
+    required double currentLat,
+    required double currentLng,
+  }) async {
+    try {
+      // isLoading = true;
+      notifyListeners();
+
+      final res = await api.checkDriverPickupRange(
+        context: context,
+        id: id,
+        currentLat: currentLat,
+        currentLng: currentLng,
+      );
+
+      if (res != null && res == true) {
+        getNewBookingDetail(context: context, id: id);
+        getNewBooking(context: context);
+        debugPrint("Trip started successfully for booking $id");
+        return true;
+      } else {
+        debugPrint("Failed to start trip for booking $id");
+        return false;
+      }
+    } catch (e) {
+      debugPrint("Error starting trip $id: $e");
+      return false;
+    } finally {
+      // isLoading = false;
+      notifyListeners();
+    }
+  }
+
   // ── Start trip ─────────────────────────────────────────────────────────────
   Future<bool> startTripApi({
     required BuildContext context,
@@ -199,7 +269,7 @@ class NewBookingProvider extends ChangeNotifier {
       startTripModel = res;
 
       if (res != null && res.status == true) {
-        getNewBookingDetail(context: context, id: id);
+        await getNewBookingDetail(context: context, id: id);
         getNewBooking(context: context);
         debugPrint("Trip started successfully for booking $id");
         return true;
@@ -256,7 +326,7 @@ class NewBookingProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> payFinalFare({
+  Future<TripExtraPaymentResponse?> payFinalFare({
     required BuildContext context,
     required String id,
     required String currentLat,
@@ -279,9 +349,76 @@ class NewBookingProvider extends ChangeNotifier {
       if (res != null && res.status == true) {
         await getNewBookingDetail(context: context, id: id);
         await getNewBooking(context: context);
-        Future.delayed(Duration(seconds: 1), () {
-          Navigator.pop(context);
-        });
+
+        debugPrint("Complete trip 🎈🎈🎈🎈🎈🎈🎈🎈 for booking $id");
+        return res;
+      } else {
+        debugPrint("Failed to start trip for booking $id");
+        return null;
+      }
+    } catch (e) {
+      debugPrint("Error starting trip $id: $e");
+      return null;
+    } finally {
+      // isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> extraPaymentCash({
+    required BuildContext context,
+    required String id,
+    required String currentLat,
+    required String currentLng,
+  }) async {
+    try {
+      // isLoading = true;
+      notifyListeners();
+
+      final res = await api.extraPaymentCash(
+        context: context,
+        id: id,
+        currentLat: currentLat,
+        currentLng: currentLng,
+      );
+
+      if (res != null && res == true) {
+        await getNewBookingDetail(context: context, id: id);
+        await getNewBooking(context: context);
+
+        debugPrint("Complete trip 🎈🎈🎈🎈🎈🎈🎈🎈 for booking $id");
+        return true;
+      } else {
+        debugPrint("Failed to start trip for booking $id");
+        return false;
+      }
+    } catch (e) {
+      debugPrint("Error starting trip $id: $e");
+      return false;
+    } finally {
+      // isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> waiveExtraPayment({
+    required BuildContext context,
+    required String id,
+    required String reason,
+  }) async {
+    try {
+      // isLoading = true;
+      notifyListeners();
+
+      final res = await api.waiveExtraPayment(
+        context: context,
+        id: id,
+        reason: reason,
+      );
+
+      if (res != null && res == true) {
+        await getNewBookingDetail(context: context, id: id);
+        await getNewBooking(context: context);
 
         debugPrint("Complete trip 🎈🎈🎈🎈🎈🎈🎈🎈 for booking $id");
         return true;
@@ -320,6 +457,32 @@ class NewBookingProvider extends ChangeNotifier {
 
       if (res != null && res.status == true) {
         return res.data;
+      } else {
+        debugPrint("Failed to start trip for booking");
+        return null;
+      }
+    } catch (e) {
+      debugPrint("Error starting trip: $e");
+      return null;
+    } finally {
+      // isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool?> checkPaymentStatus({
+    required BuildContext context,
+    required String id,
+  }) async {
+    try {
+      // isLoading = true;
+      notifyListeners();
+
+      final res = await api.extraPaymentStatus(context: context, id: id);
+
+      if (res != null && res == "success") {
+        ToastHelper.show(context, message: "Payment Success");
+        return true;
       } else {
         debugPrint("Failed to start trip for booking");
         return null;

@@ -1,8 +1,46 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:provider/provider.dart';
+import '../model/extra_charges_payment_model.dart';
+import '../provider/newBookingProvider.dart';
 
-class PaymentQrScreen extends StatelessWidget {
-  const PaymentQrScreen({super.key});
+class PaymentQrScreen extends StatefulWidget {
+  final TripExtraPaymentData data;
+  const PaymentQrScreen({super.key, required this.data});
+
+  @override
+  State<PaymentQrScreen> createState() => _PaymentQrScreenState();
+}
+
+class _PaymentQrScreenState extends State<PaymentQrScreen> {
+  Timer? _paymentTimer;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final provider = Provider.of<NewBookingProvider>(context, listen: false);
+
+    _paymentTimer = Timer.periodic(const Duration(seconds: 3), (_) async {
+      final success = await provider.checkPaymentStatus(
+        context: context,
+        id: widget.data.bookingId,
+      );
+
+      print(success);
+
+      if (success == true && mounted) {
+        _paymentTimer?.cancel();
+        Navigator.of(context).pop(true);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _paymentTimer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -10,43 +48,48 @@ class PaymentQrScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Scan & Pay')),
       body: Padding(
         padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.network(
-              "https://api.qrserver.com/v1/create-qr-code/?size=400x400&margin=10&data=https%3A%2F%2Frzp.io%2Frzp%2FtuyrvGd",
-              height: 260,
-              width: 260,
-            ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.network(
+                widget.data.extraPaymentOrder.qrCodeUrl,
+                height: 260,
+                width: 260,
+              ),
 
-            const SizedBox(height: 20),
+              const SizedBox(height: 20),
 
-            Text(
-              '₹${6772 / 100}',
-              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-            ),
+              Text(
+                '₹${widget.data.extraPaymentOrder.amount / 100}',
+                style: const TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
 
-            const SizedBox(height: 10),
+              const SizedBox(height: 10),
 
-            Text(
-              "Extra distance: +17.3 km, Extra time: +30 mins",
-              textAlign: TextAlign.center,
-            ),
+              Text(
+                widget.data.extraPaymentOrder.description,
+                textAlign: TextAlign.center,
+              ),
 
-            const SizedBox(height: 30),
+              const SizedBox(height: 30),
 
-            ElevatedButton(
-              onPressed: () async {
-                final url = "https://rzp.io/rzp/tuyrvGd";
-
-                await launchUrl(
-                  Uri.parse(url),
-                  mode: LaunchMode.externalApplication,
-                );
-              },
-              child: const Text('Open Payment Link'),
-            ),
-          ],
+              // ElevatedButton(
+              //   onPressed: () async {
+              //     final url = data.extraPaymentOrder.paymentLink;
+              //
+              //     await launchUrl(
+              //       Uri.parse(url),
+              //       mode: LaunchMode.externalApplication,
+              //     );
+              //   },
+              //   child: const Text('Open Payment Link'),
+              // ),
+            ],
+          ),
         ),
       ),
     );

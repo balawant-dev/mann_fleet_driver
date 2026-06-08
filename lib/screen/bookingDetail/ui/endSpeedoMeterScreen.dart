@@ -69,7 +69,7 @@ class UploadSpeedoMeterImageScreen extends StatelessWidget {
                   id: id,
                 );
 
-                navPop(context: context); // loader close
+                navPop(context: context);
 
                 ToastHelper.show(
                   context,
@@ -78,7 +78,9 @@ class UploadSpeedoMeterImageScreen extends StatelessWidget {
                 );
 
                 /// ✅ Back with result
-                Navigator.pop(context, true);
+                Future.delayed(const Duration(seconds: 1), () {
+                  Navigator.of(context).pop(true);
+                });
               },
               child: const Text("Next"),
             ),

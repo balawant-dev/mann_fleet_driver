@@ -1,11 +1,9 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:mann_fleet_driver/widget/commonAppButton.dart';
 import 'package:mann_fleet_driver/widget/navigator_method.dart';
-
 import '../../../util/color/app_colors.dart';
 import '../../../widget/commonAppBar.dart';
 import '../../../widget/custom_text.dart';
@@ -13,9 +11,7 @@ import '../../../widget/motionToastHelper.dart';
 import '../../../widget/showLoaderFunction.dart';
 import '../../home_screen/provider/newBookingProvider.dart';
 import '../../pickup/ui/pickUpScreen.dart';
-
 import 'package:provider/provider.dart';
-
 import 'endSpeedoMeterScreen.dart';
 import 'mapRedirection.dart';
 
@@ -99,7 +95,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
       return;
     }
 
-    final tripCompleted = await provider.checkFinalFare(
+    final status = await provider.checkFinalFare(
       context: context,
       id: bookingId,
       currentLat: currentLat.toString(),
@@ -107,14 +103,22 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
       durationMins: "",
     );
 
-    if (tripCompleted != null &&
-        tripCompleted.fare.adjustmentType.toLowerCase() == "none") {
-      // await provider.completeTripApi(
-      //   context: context,
-      //   id: bookingId,
-      //   currentLat: currentLat.toString(),
-      //   currentLng: currentLng.toString(),
-      // );
+    if (status != null && status.fare.adjustmentType.toLowerCase() == "none") {
+      await provider.completeTripApi(
+        context: context,
+        id: bookingId,
+        currentLat: currentLat.toString(),
+        currentLng: currentLng.toString(),
+      );
+    } else if (status != null &&
+        status.fare.adjustmentType.toLowerCase() != "none") {
+      await provider.payFinalFare(
+        context: context,
+        id: bookingId,
+        currentLat: currentLat.toString(),
+        currentLng: currentLng.toString(),
+        durationMins: "",
+      );
     }
 
     // if (tripCompleted) {
@@ -854,7 +858,8 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
         onPressed: () async {
           if (finalImageUploaded == true) {
             showLoader(context);
-            await _completeTripAfterEndOtp(widget.id);
+            // await _completeTripAfterEndOtp(widget.id);
+            await _checkFinalFareAfterEndOtp(widget.id);
             navPop(context: context);
           } else {
             navPush(
@@ -962,14 +967,10 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                     message: "OTP Verified ($type) ✅",
                     type: ToastType.success,
                   );
-                  // 🔥🔥🔥 MAIN CHANGE - End OTP ke baad Complete Trip API call
                   if (type == "end") {
                     // await _completeTripAfterEndOtp(bookingId);
                     await _checkFinalFareAfterEndOtp(bookingId);
                   }
-                  // ScaffoldMessenger.of(context).showSnackBar(
-                  //   SnackBar(content: Text("OTP Verified ($type) ✅")),
-                  // );
                 }
               },
               child: const Text("Verify"),

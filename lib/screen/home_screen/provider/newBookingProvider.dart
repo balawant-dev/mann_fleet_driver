@@ -10,6 +10,7 @@ import 'package:http/http.dart' as http;
 import '../../bookingDetail/model/bookingDetailModel.dart';
 import '../model/bookingAcceptedModel.dart';
 import '../model/bookingCancelModel.dart';
+import '../model/extra_charges_payment_model.dart';
 import '../model/final_fare_preview_model.dart';
 import '../model/getBannerModel.dart';
 import '../model/newBookingModel.dart';
@@ -30,6 +31,7 @@ class NewBookingProvider extends ChangeNotifier {
   StartTripModel? startTripModel;
   GetBannerModel? getBannerModel;
   TripCompleteModel? tripCompleteModel;
+  TripExtraPaymentResponse? tripExtraPaymentResponse;
   FinalFarePreviewModel? finalFarePreviewModel;
   UpdateLocationModel? updateLocationModel;
   bool isLoading = false;
@@ -231,6 +233,48 @@ class NewBookingProvider extends ChangeNotifier {
         currentLng: currentLng,
       );
       tripCompleteModel = res;
+
+      if (res != null && res.status == true) {
+        await getNewBookingDetail(context: context, id: id);
+        await getNewBooking(context: context);
+        Future.delayed(Duration(seconds: 1), () {
+          Navigator.pop(context);
+        });
+
+        debugPrint("Complete trip 🎈🎈🎈🎈🎈🎈🎈🎈 for booking $id");
+        return true;
+      } else {
+        debugPrint("Failed to start trip for booking $id");
+        return false;
+      }
+    } catch (e) {
+      debugPrint("Error starting trip $id: $e");
+      return false;
+    } finally {
+      // isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> payFinalFare({
+    required BuildContext context,
+    required String id,
+    required String currentLat,
+    required String currentLng,
+    required String durationMins,
+  }) async {
+    try {
+      // isLoading = true;
+      notifyListeners();
+
+      final res = await api.payFinalFare(
+        context: context,
+        id: id,
+        currentLat: currentLat,
+        currentLng: currentLng,
+        durationMins: durationMins,
+      );
+      tripExtraPaymentResponse = res;
 
       if (res != null && res.status == true) {
         await getNewBookingDetail(context: context, id: id);

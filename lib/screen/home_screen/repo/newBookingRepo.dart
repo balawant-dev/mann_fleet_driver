@@ -13,6 +13,7 @@ import '../../auth/register/model/registerModel.dart';
 import '../../bookingDetail/model/bookingDetailModel.dart';
 import '../model/bookingAcceptedModel.dart';
 import '../model/bookingCancelModel.dart';
+import '../model/extra_charges_payment_model.dart';
 import '../model/final_fare_preview_model.dart';
 import '../model/getBannerModel.dart';
 import '../model/newBookingModel.dart';
@@ -231,27 +232,47 @@ class NewBookingRepo {
     }
   }
 
-  Future<TripCompleteModel> getFinalFare({
+  Future<TripExtraPaymentResponse> payFinalFare({
     required BuildContext context,
     required String id,
+    required String currentLat,
+    required String currentLng,
+    required String durationMins,
   }) async {
     try {
-      final response = await _api.get(
-        "${ApiConstants.completeTrip}/$id",
+      final response = await _api.post(
+        "${ApiConstants.finalFare}/$id",
         requiresAuth: true,
+        data: {
+          "currentLat": currentLat,
+          "currentLng": currentLng,
+          "durationMins": durationMins,
+        },
       );
-      return TripCompleteModel.fromJson(response);
+      return TripExtraPaymentResponse.fromJson(response);
     } on DioException catch (e) {
       if (e.error is NoInternetException) {
         showNoInternetScreen(
           context,
-          onRetry: () => getFinalFare(context: context, id: id),
+          onRetry:
+              () => completeTripApi(
+                context: context,
+                id: id,
+                currentLat: currentLat,
+                currentLng: currentLng,
+              ),
         );
         throw NoInternetException();
       } else if (e.error is ServerException) {
         showServerErrorScreen(
           context,
-          onRetry: () => getFinalFare(context: context, id: id),
+          onRetry:
+              () => completeTripApi(
+                context: context,
+                id: id,
+                currentLat: currentLat,
+                currentLng: currentLng,
+              ),
         );
         throw ServerException();
       } else if (e.error is UnauthorizedException) {

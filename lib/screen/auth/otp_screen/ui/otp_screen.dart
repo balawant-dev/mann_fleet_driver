@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:io';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:mann_fleet_driver/screen/profileManagement/screen/profileManagementScreen.dart';
@@ -6,6 +8,7 @@ import 'package:mann_fleet_driver/util/image_resource/image_resource.dart';
 import 'package:mann_fleet_driver/widget/customImageView.dart';
 import 'package:mann_fleet_driver/widget/navigator_method.dart';
 import 'package:pinput/pinput.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../apiservice/services/secure_storage_service.dart';
 import '../../../../util/color/app_colors.dart';
 import '../../../../widget/commonAppButton.dart';
@@ -19,7 +22,6 @@ import '../../register/ui/registerScreen.dart';
 import '../otpProvider/otpProvider.dart';
 import 'package:provider/provider.dart';
 
-
 class OtpScreen extends StatefulWidget {
   final String mobileNumber;
 
@@ -30,7 +32,6 @@ class OtpScreen extends StatefulWidget {
 }
 
 class _OtpScreenState extends State<OtpScreen> {
-
   final TextEditingController otpController = TextEditingController();
 
   int secondsRemaining = 59;
@@ -41,6 +42,7 @@ class _OtpScreenState extends State<OtpScreen> {
     super.initState();
     startTimer();
   }
+
   bool get isOtpValid => otpController.text.length == 4;
   void startTimer() {
     timer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -59,16 +61,12 @@ class _OtpScreenState extends State<OtpScreen> {
 
     showLoader(context);
 
-    await provider.resendOtpApi(
-      context: context,
-      phone: widget.mobileNumber,
-    );
+    await provider.resendOtpApi(context: context, phone: widget.mobileNumber);
 
     Navigator.pop(context);
 
     if (provider.resendOtpModel != null &&
         provider.resendOtpModel!.status == true) {
-
       setState(() {
         secondsRemaining = 24;
       });
@@ -76,18 +74,17 @@ class _OtpScreenState extends State<OtpScreen> {
       startTimer();
       ToastHelper.show(
         context,
-        message:"OTP Resent Successfully",
+        message: "OTP Resent Successfully",
         type: ToastType.success,
       );
 
       // ScaffoldMessenger.of(context).showSnackBar(
       //   const SnackBar(content: Text("OTP Resent Successfully")),
       // );
-
     } else {
       ToastHelper.show(
         context,
-        message:"Failed to resend OTP",
+        message: "Failed to resend OTP",
         type: ToastType.error,
       );
 
@@ -106,24 +103,16 @@ class _OtpScreenState extends State<OtpScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     final defaultPinTheme = PinTheme(
       width: 60,
       height: 60,
-      textStyle: const TextStyle(
-        fontSize: 20,
-        fontWeight: FontWeight.w600,
-      ),
+      textStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.grey.shade300),
         boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 6,
-            offset: Offset(0,3),
-          )
+          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
         ],
       ),
     );
@@ -142,7 +131,6 @@ class _OtpScreenState extends State<OtpScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               children: [
-
                 const SizedBox(height: 310),
 
                 const Text(
@@ -177,17 +165,15 @@ class _OtpScreenState extends State<OtpScreen> {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    SizedBox(width: 10,),
+                    SizedBox(width: 10),
                     CustomImageView(
-
-                        // imagePath: "assets/images/editImage.png",
-
-                        imagePath: AppImages.editImage,
+                      // imagePath: "assets/images/editImage.png",
+                      imagePath: AppImages.editImage,
 
                       fit: BoxFit.cover,
                       height: 14,
                       width: 14,
-                    )
+                    ),
                   ],
                 ),
 
@@ -202,25 +188,38 @@ class _OtpScreenState extends State<OtpScreen> {
 
                   /// 🔥 AUTO VERIFY HERE
                   onCompleted: (value) async {
+                    final prefs = await SharedPreferences.getInstance();
+                    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+
+                    AndroidDeviceInfo androidInfo =
+                        await deviceInfo.androidInfo;
+
+                    String deviceId = androidInfo.id;
+                    String deviceType = androidInfo.type;
+
+                    print("DEVICE ID : $deviceId");
+                    print("DEVICE TYPE : $deviceType");
+
                     showLoader(context);
 
                     final otpProvider = context.read<OtpProvider>();
-                    final profileProvider = context.read<ProfileDetailProvider>();
+                    final profileProvider =
+                        context.read<ProfileDetailProvider>();
+                    final deviceToken = prefs.getString('deviceToken') ?? '';
 
                     /// 🔹 VERIFY OTP
                     await otpProvider.verifyOtp(
                       context: context,
                       phone: widget.mobileNumber,
                       otp: value,
-                      fcmToken: "temp_token",
-                      deviceID: "temp_device",
+                      fcmToken: deviceToken,
+                      deviceID: deviceId,
                     );
 
                     Navigator.pop(context);
 
                     if (otpProvider.verifyOtpModel != null &&
                         otpProvider.verifyOtpModel!.status == true) {
-
                       /// 🔹 GET PROFILE
                       showLoader(context);
 
@@ -228,11 +227,18 @@ class _OtpScreenState extends State<OtpScreen> {
 
                       Navigator.pop(context);
 
-                      final driver = profileProvider.getProfileModel?.data?.driver;
+                      final driver =
+                          profileProvider.getProfileModel?.data?.driver;
 
-                      await SecureStorageService.saveFirstUser(driver?.firstUser ?? false);
-                      await SecureStorageService.saveProfileComplete(driver?.isProfileComplete ?? false);
-                      await SecureStorageService.saveVerified(driver?.isVerified ?? false);
+                      await SecureStorageService.saveFirstUser(
+                        driver?.firstUser ?? false,
+                      );
+                      await SecureStorageService.saveProfileComplete(
+                        driver?.isProfileComplete ?? false,
+                      );
+                      await SecureStorageService.saveVerified(
+                        driver?.isVerified ?? false,
+                      );
 
                       if (driver == null) {
                         _showError("Something went wrong");
@@ -260,13 +266,13 @@ class _OtpScreenState extends State<OtpScreen> {
                           action: const MainScreen(),
                         );
                       }
-
                     } else {
                       _showError("Invalid OTP");
                     }
                   },
                 ),
                 const SizedBox(height: 25),
+
                 //
 
                 // CommonAppButton(
@@ -359,8 +365,6 @@ class _OtpScreenState extends State<OtpScreen> {
                 //       : null,
                 //
                 // ),
-
-
                 const SizedBox(height: 20),
 
                 Text(
@@ -373,49 +377,49 @@ class _OtpScreenState extends State<OtpScreen> {
                 const SizedBox(height: 5),
                 secondsRemaining > 0
                     ? Text.rich(
-                  TextSpan(
-                    children: [
                       TextSpan(
-                        text: 'Send OTP again in ',
-                        style: TextStyle(
-                          color: Colors.black.withValues(alpha: 0.90),
-                          fontSize: 12,
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w400,
-                        ),
+                        children: [
+                          TextSpan(
+                            text: 'Send OTP again in ',
+                            style: TextStyle(
+                              color: Colors.black.withValues(alpha: 0.90),
+                              fontSize: 12,
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                          TextSpan(
+                            text: '0:$secondsRemaining',
+                            style: const TextStyle(
+                              color: Color(0xFF00A642),
+                              fontSize: 12,
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          TextSpan(
+                            text: ' sec',
+                            style: TextStyle(
+                              color: Colors.black.withValues(alpha: 0.90),
+                              fontSize: 12,
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
                       ),
-                      TextSpan(
-                        text: '0:$secondsRemaining',
-                        style: const TextStyle(
-                          color: Color(0xFF00A642),
-                          fontSize: 12,
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      TextSpan(
-                        text: ' sec',
-                        style: TextStyle(
-                          color: Colors.black.withValues(alpha: 0.90),
-                          fontSize: 12,
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ],
-                  ),
-                )
+                    )
                     : GestureDetector(
-                  onTap: resendOtp,
-                  child: const Text(
-                    "Resend OTP",
-                    style: TextStyle(
-                      color: Color(0xFF00A642),
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
+                      onTap: resendOtp,
+                      child: const Text(
+                        "Resend OTP",
+                        style: TextStyle(
+                          color: Color(0xFF00A642),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
                 const SizedBox(height: 40),
               ],
             ),
@@ -424,9 +428,8 @@ class _OtpScreenState extends State<OtpScreen> {
       ),
     );
   }
+
   void _showError(String msg) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(msg)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
 }
-

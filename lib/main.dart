@@ -1,8 +1,10 @@
-import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_core/firebase_core.dart' hide FirebaseService;
 import 'package:flutter/material.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:mann_fleet_driver/screen/auth/login_screen/provider/loginProvider.dart';
 import 'package:mann_fleet_driver/screen/auth/otp_screen/otpProvider/otpProvider.dart';
 import 'package:mann_fleet_driver/screen/auth/register/provider/registerProvider.dart';
+import 'package:mann_fleet_driver/screen/bookingDetail/services/location_tracking_service.dart';
 import 'package:mann_fleet_driver/screen/bookingHistory/provider/bookingHistoryPro.dart';
 import 'package:mann_fleet_driver/screen/cms/viewModel/cmsPro.dart';
 import 'package:mann_fleet_driver/screen/fuel_entry/pro/fuelEntryPro.dart';
@@ -19,17 +21,40 @@ import 'package:mann_fleet_driver/screen/vehicle/provider/vehicle_details_provid
 import 'package:mann_fleet_driver/screen/splash_screen/ui/splash_screen.dart';
 import 'package:mann_fleet_driver/util/theame/app_theme.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'apiservice/services/firebaseService.dart';
 import 'firebase_options.dart';
-
+@pragma('vm:entry-point')
+void startCallback() {
+  FlutterForegroundTask.setTaskHandler(
+    LocationTrackingService(),
+  );
+}
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   /// Initialize Firebase Service
   await FirebaseService.init();
+  FlutterForegroundTask.init(
+    androidNotificationOptions: AndroidNotificationOptions(
+      channelId: 'driver_tracking',
+      channelName: 'Driver Tracking',
+      channelDescription: 'Location Tracking Service',
+    ),
+    iosNotificationOptions: const IOSNotificationOptions(),
+    foregroundTaskOptions: ForegroundTaskOptions(
+      eventAction: ForegroundTaskEventAction.repeat(5000),
+      autoRunOnBoot: false,
+      autoRunOnMyPackageReplaced: false,
+      allowWakeLock: true,
+      allowWifiLock: true,
+      allowAutoRestart: true,
+    ),
+  );
   runApp(const MyApp());
 }
 

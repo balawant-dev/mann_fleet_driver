@@ -29,12 +29,12 @@ android {
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = 24
         targetSdk = flutter.targetSdkVersion
-        versionCode = 15
-        versionName = "1.2.3"
+        versionCode = 16
+        versionName = "1.2.4"
     }
     signingConfigs {
         create("release") {
-            storeFile = file("/Users/apple/StudioProjects/mann_fleet_driver/android/app/fleet_pilot.jks")
+            storeFile = file("fleet_pilot.jks")
             storePassword = "123456"
             keyAlias = "fleet_pilot"
             keyPassword = "123456"

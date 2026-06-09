@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:mann_fleet_driver/screen/home_screen/ui/payment_qr_screen.dart';
@@ -11,7 +12,9 @@ import 'package:mann_fleet_driver/util/image_resource/image_resource.dart';
 
 import 'package:mann_fleet_driver/widget/custom_text.dart';
 import 'package:mann_fleet_driver/widget/navigator_method.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../main.dart';
 import '../../../widget/empty/noAssignedBookingScreen.dart';
 import '../../../widget/motionToastHelper.dart';
 import '../../bookingDetail/ui/bookingDetailScreen.dart';
@@ -430,11 +433,24 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
             title: "Accept",
             color: Colors.green,
             onTap: () async {
+              final prefs = await SharedPreferences.getInstance();
+
+              await prefs.setString(
+                "tracking_booking_id",
+                bookingId,
+              );
               bool success = await provider.acceptBookingApi(
                 context: context,
                 id: bookingId,
                 currentLng: currentLng ?? 0.0,
                 currentLat: currentLat ?? 0.0,
+              );
+
+              await FlutterForegroundTask.startService(
+                serviceId: 100,
+                notificationTitle: 'Driver Tracking',
+                notificationText: 'Location tracking active',
+                callback: startCallback,
               );
 
               if (success) {
@@ -459,7 +475,13 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
         child: button(
           title: "Go to Detail",
           color: Colors.blue,
-          onTap: () {
+          onTap: () async{
+            final prefs = await SharedPreferences.getInstance();
+
+            await prefs.setString(
+              "tracking_booking_id",
+              bookingId,
+            );
             navPush(
               context: context,
               action: BookingDetailScreen(id: bookingId),

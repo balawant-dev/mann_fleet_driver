@@ -664,6 +664,25 @@ class NewBookingRepo {
     }
   }
 
+
+  Future<UpdateLocationModel> updateDriverLocationBackgroundApi({
+    required String id,
+    required double lat,
+    required double lng,
+  }) async {
+    print("On time update location success|||||||||||||||||||||||||||||");
+    final response = await _api.patch(
+      "${ApiConstants.updateDriverLocation}/$id",
+      requiresAuth: true,
+      data: {
+        "lat": lat,
+        "lng": lng,
+      },
+    );
+
+    return UpdateLocationModel.fromJson(response);
+  }
+
   Future<PickupVerificationModel> pickupVerificationApi({
     required String id,
 

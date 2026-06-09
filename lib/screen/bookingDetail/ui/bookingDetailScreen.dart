@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:mann_fleet_driver/screen/home_screen/ui/payment_qr_screen.dart';
 import 'package:mann_fleet_driver/widget/commonAppButton.dart';
 import 'package:mann_fleet_driver/widget/navigator_method.dart';
+import '../../../main.dart';
 import '../../../util/color/app_colors.dart';
 import '../../../util/theame/app_theme.dart';
 import '../../../widget/commonAppBar.dart';
@@ -31,12 +33,19 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
+    Future.microtask(() async{
       context.read<NewBookingProvider>().getNewBookingDetail(
         context: context,
         id: widget.id,
       );
-      startLocationUpdates(context: context, bookingId: widget.id);
+
+      await FlutterForegroundTask.startService(
+        serviceId: 100,
+        notificationTitle: 'Driver Tracking',
+        notificationText: 'Location tracking active',
+        callback: startCallback,
+      );
+    //  startLocationUpdates(context: context, bookingId: widget.id);
     });
     _getCurrentLocation();
   }
@@ -80,7 +89,9 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
         type: ToastType.success,
       );
 
+
       await provider.getNewBookingDetail(context: context, id: bookingId);
+      await FlutterForegroundTask.stopService();
     }
   }
 
@@ -186,33 +197,69 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
   }
 
   Timer? locationTimer;
-
+  StreamSubscription<Position>? _positionStream;
   void startLocationUpdates({
     required BuildContext context,
     required String bookingId,
   }) {
-    _getCurrentLocation();
+    const LocationSettings locationSettings = LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 100, // 100 meter move
+    );
 
-    /// every 10 seconds
-    locationTimer = Timer.periodic(const Duration(seconds: 10), (timer) async {
+    _positionStream = Geolocator.getPositionStream(
+      locationSettings: locationSettings,
+    ).listen((Position position) async {
+
+      currentLat = position.latitude;
+      currentLng = position.longitude;
+
+      debugPrint(
+        "Location Changed => $currentLat, $currentLng",
+      );
+
       await context.read<NewBookingProvider>().updateDriverLocationApi(
         id: bookingId,
-        lng: currentLng ?? 0.0,
-        lat: currentLat ?? 0.0,
+        lat: currentLat,
+        lng: currentLng,
         context: context,
       );
     });
   }
-
   void stopLocationUpdates() {
-    locationTimer?.cancel();
+    _positionStream?.cancel();
   }
-
   @override
   void dispose() {
-    super.dispose();
     stopLocationUpdates();
+    super.dispose();
   }
+  // void startLocationUpdates({
+  //   required BuildContext context,
+  //   required String bookingId,
+  // }) {
+  //   _getCurrentLocation();
+  //   String pickupTime= context.read<NewBookingProvider>().bookingDetailModel!.data!.scheduledAtIST.toString();//"2026-06-09 12:11:00",
+  //   /// every 10 seconds
+  //   locationTimer = Timer.periodic(const Duration(seconds: 10), (timer) async {
+  //     await context.read<NewBookingProvider>().updateDriverLocationApi(
+  //       id: bookingId,
+  //       lng: currentLng ?? 0.0,
+  //       lat: currentLat ?? 0.0,
+  //       context: context,
+  //     );
+  //   });
+  // }
+
+  // void stopLocationUpdates() {
+  //   locationTimer?.cancel();
+  // }
+  //
+  // @override
+  // void dispose() {
+  //   super.dispose();
+  //   stopLocationUpdates();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -954,6 +1001,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
       );
     }
     if (tripStatus == "completed" && isEndOtpVerified) {
+
       print("Booking complte ho gya");
       print(tripStatus);
       return const Text("Trip Completed ✅");

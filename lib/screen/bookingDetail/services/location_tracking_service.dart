@@ -18,7 +18,7 @@ class LocationTrackingService extends TaskHandler {
     _positionStream = Geolocator.getPositionStream(
       locationSettings: const LocationSettings(
         accuracy: LocationAccuracy.high,
-        distanceFilter: 50,
+        distanceFilter: 30,
       ),
     ).listen((position) async {
       final prefs = await SharedPreferences.getInstance();

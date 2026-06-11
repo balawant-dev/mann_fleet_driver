@@ -5,8 +5,13 @@ class PlatformDependenciesModel {
   String? message;
   List<Data>? data;
 
-  PlatformDependenciesModel(
-      {this.status, this.totalResult, this.totalPage, this.message, this.data});
+  PlatformDependenciesModel({
+    this.status,
+    this.totalResult,
+    this.totalPage,
+    this.message,
+    this.data,
+  });
 
   PlatformDependenciesModel.fromJson(Map<String, dynamic> json) {
     status = json['status'];
@@ -67,19 +72,26 @@ class Name {
   String? googleMapKey;
   String? rAZORKEY;
   String? rAZORKEYSECRET;
+  String? rGEMNI_API_KEY;
+  String? rGEMNI_API_VERSION;
 
-  Name(
-      {this.userAppVersion,
-        this.driverAppVersion,
-        this.googleMapKey,
-        this.rAZORKEY,
-        this.rAZORKEYSECRET});
+  Name({
+    this.userAppVersion,
+    this.driverAppVersion,
+    this.googleMapKey,
+    this.rAZORKEY,
+    this.rGEMNI_API_KEY,
+    this.rGEMNI_API_VERSION,
+    this.rAZORKEYSECRET,
+  });
 
   Name.fromJson(Map<String, dynamic> json) {
     userAppVersion = json['userAppVersion'];
     driverAppVersion = json['driverAppVersion'];
     googleMapKey = json['googleMapKey'];
     rAZORKEY = json['RAZOR_KEY'];
+    rGEMNI_API_KEY = json['GEMNI_API_KEY'];
+    rGEMNI_API_VERSION = json['GEMNI_API_VERSION'];
     rAZORKEYSECRET = json['RAZOR_KEY_SECRET'];
   }
 
@@ -90,6 +102,8 @@ class Name {
     data['googleMapKey'] = this.googleMapKey;
     data['RAZOR_KEY'] = this.rAZORKEY;
     data['RAZOR_KEY_SECRET'] = this.rAZORKEYSECRET;
+    data['GEMNI_API_KEY'] = this.rGEMNI_API_KEY;
+    data['GEMNI_API_VERSION'] = this.rGEMNI_API_VERSION;
     return data;
   }
 }

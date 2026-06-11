@@ -33,7 +33,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() async{
+    Future.microtask(() async {
       context.read<NewBookingProvider>().getNewBookingDetail(
         context: context,
         id: widget.id,
@@ -45,7 +45,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
         notificationText: 'Location tracking active',
         callback: startCallback,
       );
-    //  startLocationUpdates(context: context, bookingId: widget.id);
+      //  startLocationUpdates(context: context, bookingId: widget.id);
     });
     _getCurrentLocation();
   }
@@ -89,7 +89,6 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
         type: ToastType.success,
       );
 
-
       await provider.getNewBookingDetail(context: context, id: bookingId);
       await FlutterForegroundTask.stopService();
     }
@@ -117,14 +116,19 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
       currentLng: currentLng.toString(),
       durationMins: "",
     );
-
     if (status != null && status.fare.adjustmentType.toLowerCase() == "none") {
       Navigator.pop(context);
       showBookingCompletionDialog(context, false, status);
     } else if (status != null &&
         status.fare.adjustmentType.toLowerCase() != "none") {
       Navigator.pop(context);
-      showBookingCompletionDialog(context, true, status);
+      if (!status.isExtraPaymentPending &&
+          status.extraPaymentCompleted != null &&
+          status.extraPaymentCompleted == true) {
+        showOtpDialog(bookingId, "end");
+      } else {
+        showBookingCompletionDialog(context, true, status);
+      }
       // await provider.payFinalFare(
       //   context: context,
       //   id: bookingId,
@@ -210,13 +214,10 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
     _positionStream = Geolocator.getPositionStream(
       locationSettings: locationSettings,
     ).listen((Position position) async {
-
       currentLat = position.latitude;
       currentLng = position.longitude;
 
-      debugPrint(
-        "Location Changed => $currentLat, $currentLng",
-      );
+      debugPrint("Location Changed => $currentLat, $currentLng");
 
       await context.read<NewBookingProvider>().updateDriverLocationApi(
         id: bookingId,
@@ -226,9 +227,11 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
       );
     });
   }
+
   void stopLocationUpdates() {
     _positionStream?.cancel();
   }
+
   @override
   void dispose() {
     stopLocationUpdates();
@@ -1001,7 +1004,6 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
       );
     }
     if (tripStatus == "completed" && isEndOtpVerified) {
-
       print("Booking complte ho gya");
       print(tripStatus);
       return const Text("Trip Completed ✅");
@@ -1159,14 +1161,18 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                     // Start Time
                     _buildInfoRow(
                       'Start Time',
-                      formatDateTime(status.trip.tripStartAt),
+                      formatDateTime(
+                        status.trip.tripStartAt ?? status.tripStartAt!,
+                      ),
                     ), // Replace with your variable
                     const Divider(),
 
                     // End Time
                     _buildInfoRow(
                       'End Time',
-                      formatDateTime(status.trip.checkedAt),
+                      formatDateTime(
+                        status.trip.checkedAt ?? status.checkedAt!,
+                      ),
                     ),
                     const Divider(),
 
@@ -1330,7 +1336,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
 
                         print("STATUS => $status");
 
-                        if (status == true && mounted) {
+                        if (status != null && status == true && mounted) {
                           Navigator.pop(context);
 
                           Future.delayed(const Duration(seconds: 1), () {

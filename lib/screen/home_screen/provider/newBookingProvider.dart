@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mann_fleet_driver/widget/motionToastHelper.dart';
 import 'package:mann_fleet_driver/widget/navigator_method.dart';
+import '../../../apiservice/services/secure_storage_service.dart';
 import '../../../widget/showLoaderFunction.dart';
 import 'package:http/http.dart' as http;
 import '../../bookingDetail/model/bookingDetailModel.dart';
+import '../../fuel_entry/service/googleGeminiService.dart';
 import '../model/bookingAcceptedModel.dart';
 import '../model/bookingCancelModel.dart';
 import '../model/extra_charges_payment_model.dart';
@@ -511,9 +513,9 @@ class NewBookingProvider extends ChangeNotifier {
         context: context,
         id: id,
         otp: otp,
-        type: type, //type value ["start", "end"]'
+        type: type,
       );
-      verifyBookingOtpModel = res; // ← fixed: was startTripModel
+      verifyBookingOtpModel = res;
 
       if (res != null && res.status == true) {
         // startTripApi(context: context,id: id);
@@ -527,6 +529,11 @@ class NewBookingProvider extends ChangeNotifier {
       }
     } catch (e) {
       debugPrint("Error verifying OTP for booking $id: $e");
+      ToastHelper.show(
+        context,
+        message: "Invalid OTP: Please Try Again",
+        type: ToastType.error,
+      );
       return false;
     } finally {
       // isLoading = false;
@@ -545,179 +552,209 @@ class NewBookingProvider extends ChangeNotifier {
   File? speedometerEndImage;
   TextEditingController speedoMetervalue = TextEditingController();
 
-  final apiKey = "AIzaSyA2X6HG6ZE2pzrykNypPtoQ-KJR67gpWjM";
+  //   Future<void> scanOdometerDisplayWithGemini(
+  //     File imageFile,
+  //     BuildContext context,
+  //   ) async {
+  //     try {
+  //       showLoader(context);
+  //       print("START ODOMETER OCR");
+  //       final api = await SecureStorageService.getGeminiToken();
+  //       final apiVersion = await SecureStorageService.getGeminiVersion();
+  //       print("API => $api");
+  //       print("VERSION => $apiVersion");
+  //       final bytes = await imageFile.readAsBytes();
+  //       final base64Image = base64Encode(bytes);
+  //
+  //       final uri = Uri.parse(
+  //         "https://generativelanguage.googleapis.com/v1beta/models/$apiVersion:generateContent?key=$api",
+  //       );
+  //
+  //       int retry = 0;
+  //       http.Response? response;
+  //
+  //       /// RETRY FOR 503
+  //       while (retry < 3) {
+  //         response = await http.post(
+  //           uri,
+  //           headers: {"Content-Type": "application/json"},
+  //           body: jsonEncode({
+  //             "contents": [
+  //               {
+  //                 "parts": [
+  //                   {
+  //                     "text": """
+  // You are an odometer OCR validator.
+  //
+  // RULES:
+  // - Extract odometer reading if visible.
+  // - Accept dashboard photos, meter photos, and dashboard screenshots.
+  // - If image is unrelated or no odometer is visible, return error JSON.
+  // - If digits are partially visible, return the best possible reading.
+  // - Return ONLY valid JSON.
+  // - No markdown.
+  // - No explanation.
+  //
+  // If valid odometer:
+  // {
+  //   "success": true,
+  //   "km_reading": 12345
+  // }
+  //
+  // If invalid image:
+  // {
+  //   "success": false,
+  //   "error": "Invalid odometer image"
+  // }
+  // """,
+  //                   },
+  //                   {
+  //                     "inline_data": {
+  //                       "mime_type": "image/jpeg",
+  //                       "data": base64Image,
+  //                     },
+  //                   },
+  //                 ],
+  //               },
+  //             ],
+  //             "generationConfig": {"temperature": 0},
+  //           }),
+  //         );
+  //
+  //         print("STATUS => ${response.statusCode}");
+  //
+  //         /// HANDLE 503
+  //         if (response.statusCode == 503) {
+  //           retry++;
+  //
+  //           print("503 HEAVY USAGE RETRY => $retry");
+  //
+  //           await Future.delayed(Duration(seconds: 2 * retry));
+  //
+  //           continue;
+  //         }
+  //
+  //         break;
+  //       }
+  //
+  //       if (response == null) {
+  //         print("NO RESPONSE");
+  //         return;
+  //       }
+  //
+  //       print(response.body);
+  //
+  //       if (response.statusCode == 200) {
+  //         final data = jsonDecode(response.body);
+  //
+  //         String rawText =
+  //             data["candidates"]?[0]?["content"]?["parts"]?[0]?["text"] ?? "";
+  //
+  //         print("RAW => $rawText");
+  //
+  //         /// CLEAN RESPONSE
+  //         String cleaned =
+  //             rawText
+  //                 .replaceAll("```json", "")
+  //                 .replaceAll("```", "")
+  //                 .replaceAll("\n", "")
+  //                 .trim();
+  //
+  //         Map<String, dynamic> jsonData = {};
+  //
+  //         try {
+  //           jsonData = jsonDecode(cleaned);
+  //         } catch (e) {
+  //           print("JSON PARSE ERROR => $e");
+  //
+  //           final regex = RegExp(r'\{.*\}');
+  //           final match = regex.firstMatch(rawText);
+  //
+  //           if (match != null) {
+  //             jsonData = jsonDecode(match.group(0)!);
+  //           }
+  //         }
+  //
+  //         /// STRICT VALIDATION
+  //         bool success = jsonData["success"] == true;
+  //
+  //         if (!success) {
+  //           speedoMetervalue.clear();
+  //
+  //           print("INVALID ODOMETER IMAGE");
+  //
+  //           ScaffoldMessenger.of(context).showSnackBar(
+  //             const SnackBar(content: Text("Only odometer images are allowed")),
+  //           );
+  //
+  //           return;
+  //         }
+  //
+  //         double kmReading =
+  //             double.tryParse(jsonData["km_reading"].toString()) ?? 0;
+  //
+  //         if (kmReading <= 0) {
+  //           speedoMetervalue.clear();
+  //
+  //           ScaffoldMessenger.of(context).showSnackBar(
+  //             const SnackBar(content: Text("Odometer reading not detected")),
+  //           );
+  //
+  //           return;
+  //         }
+  //
+  //         speedoMetervalue.text = kmReading.toStringAsFixed(0);
+  //
+  //         print("AUTO FILL DONE");
+  //
+  //         notifyListeners();
+  //       } else {
+  //         print("ERROR RESPONSE => ${response.body}");
+  //
+  //         ToastHelper.show(
+  //           context,
+  //           message:
+  //               response.statusCode == 503
+  //                   ? "Server busy. Try again."
+  //                   : "Failed to scan odometer",
+  //         );
+  //       }
+  //     } catch (e) {
+  //       print("OCR ERROR => $e");
+  //
+  //       ScaffoldMessenger.of(
+  //         context,
+  //       ).showSnackBar(const SnackBar(content: Text("Something went wrong")));
+  //     } finally {
+  //       navPop(context: context);
+  //     }
+  //   }
   Future<void> scanOdometerDisplayWithGemini(
     File imageFile,
     BuildContext context,
   ) async {
+    showLoader(context);
+
     try {
-      showLoader(context);
-      print("START ODOMETER OCR");
+      double reading = await getOdometerReadingFromImage(imageFile);
 
-      final bytes = await imageFile.readAsBytes();
-      final base64Image = base64Encode(bytes);
+      speedoMetervalue.text = reading.toStringAsFixed(0);
+      notifyListeners();
 
-      final uri = Uri.parse(
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=$apiKey",
-      );
-
-      int retry = 0;
-      http.Response? response;
-
-      /// RETRY FOR 503
-      while (retry < 3) {
-        response = await http.post(
-          uri,
-          headers: {"Content-Type": "application/json"},
-          body: jsonEncode({
-            "contents": [
-              {
-                "parts": [
-                  {
-                    "text": """
-You are an odometer OCR validator.
-
-RULES:
-- Extract odometer reading if visible.
-- Accept dashboard photos, meter photos, and dashboard screenshots.
-- If image is unrelated or no odometer is visible, return error JSON.
-- If digits are partially visible, return the best possible reading.
-- Return ONLY valid JSON.
-- No markdown.
-- No explanation.
-
-If valid odometer:
-{
-  "success": true,
-  "km_reading": 12345
-}
-
-If invalid image:
-{
-  "success": false,
-  "error": "Invalid odometer image"
-}
-""",
-                  },
-                  {
-                    "inline_data": {
-                      "mime_type": "image/jpeg",
-                      "data": base64Image,
-                    },
-                  },
-                ],
-              },
-            ],
-            "generationConfig": {"temperature": 0},
-          }),
-        );
-
-        print("STATUS => ${response.statusCode}");
-
-        /// HANDLE 503
-        if (response.statusCode == 503) {
-          retry++;
-
-          print("503 HEAVY USAGE RETRY => $retry");
-
-          await Future.delayed(Duration(seconds: 2 * retry));
-
-          continue;
-        }
-
-        break;
-      }
-
-      if (response == null) {
-        print("NO RESPONSE");
-        return;
-      }
-
-      print(response.body);
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-
-        String rawText =
-            data["candidates"]?[0]?["content"]?["parts"]?[0]?["text"] ?? "";
-
-        print("RAW => $rawText");
-
-        /// CLEAN RESPONSE
-        String cleaned =
-            rawText
-                .replaceAll("```json", "")
-                .replaceAll("```", "")
-                .replaceAll("\n", "")
-                .trim();
-
-        Map<String, dynamic> jsonData = {};
-
-        try {
-          jsonData = jsonDecode(cleaned);
-        } catch (e) {
-          print("JSON PARSE ERROR => $e");
-
-          final regex = RegExp(r'\{.*\}');
-          final match = regex.firstMatch(rawText);
-
-          if (match != null) {
-            jsonData = jsonDecode(match.group(0)!);
-          }
-        }
-
-        /// STRICT VALIDATION
-        bool success = jsonData["success"] == true;
-
-        if (!success) {
-          speedoMetervalue.clear();
-
-          print("INVALID ODOMETER IMAGE");
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Only odometer images are allowed")),
-          );
-
-          return;
-        }
-
-        double kmReading =
-            double.tryParse(jsonData["km_reading"].toString()) ?? 0;
-
-        if (kmReading <= 0) {
-          speedoMetervalue.clear();
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Odometer reading not detected")),
-          );
-
-          return;
-        }
-
-        speedoMetervalue.text = kmReading.toStringAsFixed(0);
-
-        print("AUTO FILL DONE");
-
-        notifyListeners();
-      } else {
-        print("ERROR RESPONSE => ${response.body}");
-
-        ToastHelper.show(
-          context,
-          message:
-              response.statusCode == 503
-                  ? "Server busy. Try again."
-                  : "Failed to scan odometer",
+      print("Odometer reading auto-filled successfully!");
+    } catch (error) {
+      if (context.mounted) {
+        speedoMetervalue.clear();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(error.toString().replaceFirst("Exception: ", "")),
+          ),
         );
       }
-    } catch (e) {
-      print("OCR ERROR => $e");
-
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Something went wrong")));
     } finally {
-      navPop(context: context);
+      if (context.mounted) {
+        navPop(context: context);
+      }
     }
   }
 

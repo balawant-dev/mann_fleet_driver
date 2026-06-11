@@ -62,5 +62,6 @@ class ApiConstants {
   static const String isAgentKey = 'isAgent';
   static const String isUserKey = 'isUser';
   static const String saveUserType = 'saveUserType';
-  static const String gemini = 'gemini';
+  static const String geminiKey = 'geminiKey';
+  static const String geminiVersion = 'geminiVersion';
 }

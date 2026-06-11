@@ -25,15 +25,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'apiservice/services/firebaseService.dart';
 import 'firebase_options.dart';
+
 @pragma('vm:entry-point')
 void startCallback() {
-  FlutterForegroundTask.setTaskHandler(
-    LocationTrackingService(),
-  );
+  FlutterForegroundTask.setTaskHandler(LocationTrackingService());
 }
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 

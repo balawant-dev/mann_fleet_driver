@@ -62,7 +62,16 @@ class ProfileDetailProvider extends ChangeNotifier {
       final res = await api.getPlatformDependenciesApi(context: context);
 
       platformDependenciesModel = res;
-
+      if (res.data != null &&
+          res.data!.first.name!.rGEMNI_API_KEY != null &&
+          res.data!.first.name!.rGEMNI_API_KEY!.isNotEmpty) {
+        await SecureStorageService.saveGeminiToken(
+          res.data!.first.name!.rGEMNI_API_KEY!,
+        );
+        await SecureStorageService.saveGeminiVersion(
+          res.data!.first.name!.rGEMNI_API_VERSION!,
+        );
+      }
       errorMessage = null;
     } catch (e) {
       errorMessage = e.toString();

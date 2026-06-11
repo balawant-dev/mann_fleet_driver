@@ -21,22 +21,21 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-
   TextEditingController mobileController = TextEditingController();
   String countryCode = "+91";
   bool isValid(LoginProvider provider) =>
       provider.mobileNumberController.text.length == 10;
   @override
   Widget build(BuildContext context) {
-    return  Consumer<LoginProvider>(
-        builder: (context, provider, child){
-          return Scaffold(
+    return Consumer<LoginProvider>(
+      builder: (context, provider, child) {
+        return Scaffold(
           resizeToAvoidBottomInset: false,
           body: SizedBox.expand(
             child: Container(
               decoration: const BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage("assets/images/loginImage.png"),
+                  image: AssetImage("assets/images/login.png"),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -46,8 +45,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   children: [
                     const SizedBox(height: 310),
-
-
 
                     /// Title
                     const Align(
@@ -67,13 +64,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     /// Mobile Input
                     Container(
                       height: 50,
-                      padding: const EdgeInsets.symmetric(horizontal: 5), // Side padding thodi kam ki
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 5,
+                      ), // Side padding thodi kam ki
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: Colors.black,
-                          width: 1.5,
-                        ),
+                        border: Border.all(color: Colors.black, width: 1.5),
                         color: Colors.white,
                       ),
                       child: Row(
@@ -82,9 +78,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           /// Country Picker
                           Theme(
                             // Isse picker ke andar ki default padding/margin control hoti hai
-                            data: Theme.of(context).copyWith(
-                              visualDensity: VisualDensity.compact,
-                            ),
+                            data: Theme.of(
+                              context,
+                            ).copyWith(visualDensity: VisualDensity.compact),
                             child: CountryCodePicker(
                               onChanged: (code) {
                                 countryCode = code.dialCode!;
@@ -94,7 +90,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               showFlag: false,
                               showDropDownButton: true,
                               padding: EdgeInsets.zero, // Zero padding
-                              margin: EdgeInsets.zero,  // Extra margin hatane ke liye
+                              margin:
+                                  EdgeInsets
+                                      .zero, // Extra margin hatane ke liye
                               textStyle: const TextStyle(fontSize: 14),
                             ),
                           ),
@@ -102,7 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           // Vertical Divider (Optional: agar dono ke beech halki line chahiye toh)
                           // Container(height: 20, width: 1, color: Colors.grey[300]),
 
-                       //   const SizedBox(width: 2), // Gap minimum rakha
+                          //   const SizedBox(width: 2), // Gap minimum rakha
 
                           /// Mobile TextField
                           Expanded(
@@ -127,62 +125,59 @@ class _LoginScreenState extends State<LoginScreen> {
                                 focusedBorder: InputBorder.none,
                                 errorBorder: InputBorder.none,
                                 disabledBorder: InputBorder.none,
-                                contentPadding: EdgeInsets.zero, // Default inner padding khatam
-                                isDense: true, // TextField ko compact banane ke liye
+                                contentPadding:
+                                    EdgeInsets
+                                        .zero, // Default inner padding khatam
+                                isDense:
+                                    true, // TextField ko compact banane ke liye
                               ),
                             ),
-                          )
+                          ),
                         ],
                       ),
                     ),
 
-
                     const SizedBox(height: 25),
                     CommonAppButton(
                       text: 'GetOTP',
-                      backgroundColor: isValid(provider) ? ColorResource.primaryColor : Colors.grey,
-                      onPressed: isValid(provider)
-                          ? () async {
+                      backgroundColor:
+                          isValid(provider)
+                              ? ColorResource.primaryColor
+                              : Colors.grey,
+                      onPressed:
+                          isValid(provider)
+                              ? () async {
+                                final phone =
+                                    provider.mobileNumberController.text;
 
-                        final phone = provider.mobileNumberController.text;
+                                showLoader(context);
 
-                        showLoader(context);
+                                final viewModel = context.read<LoginProvider>();
 
-                        final viewModel = context.read<LoginProvider>();
+                                await viewModel.sendOtp(
+                                  context: context,
+                                  phone: phone,
+                                  countryCode: provider.countryCode,
+                                );
 
-                        await viewModel.sendOtp(
-                          context: context,
-                          phone: phone,
-                          countryCode: provider.countryCode,
-                        );
+                                Navigator.pop(context);
 
-                        Navigator.pop(context);
-
-                        if (viewModel.signInModel != null &&
-                            viewModel.signInModel!.status == true) {
-
-                          navPush(
-                            context: context,
-                            action: OtpScreen(
-                              mobileNumber: phone,
-                            ),
-                          );
-
-                        } else {
-                          ToastHelper.show(
-                            context,
-                            message:"Failed to send OTP",
-                            type: ToastType.error,
-                          );
-
-
-                        }
-
-                      }
-                          : null,
+                                if (viewModel.signInModel != null &&
+                                    viewModel.signInModel!.status == true) {
+                                  navPush(
+                                    context: context,
+                                    action: OtpScreen(mobileNumber: phone),
+                                  );
+                                } else {
+                                  ToastHelper.show(
+                                    context,
+                                    message: "Failed to send OTP",
+                                    type: ToastType.error,
+                                  );
+                                }
+                              }
+                              : null,
                     ),
-
-
 
                     const SizedBox(height: 20),
 
@@ -199,19 +194,20 @@ class _LoginScreenState extends State<LoginScreen> {
                               fontWeight: FontWeight.w400,
                             ),
                           ),
-                           TextSpan(
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                navPush(
-                                  context: context,
-                                  action: const CMSContentScreen(
-                                    title: "Terms & Conditions",
-                                    type: CMSContentType.terms,
-                                  ),
-                                );
-                                // 👉 Navigate or open screen
-                                print("Terms clicked");
-                              },
+                          TextSpan(
+                            recognizer:
+                                TapGestureRecognizer()
+                                  ..onTap = () {
+                                    navPush(
+                                      context: context,
+                                      action: const CMSContentScreen(
+                                        title: "Terms & Conditions",
+                                        type: CMSContentType.terms,
+                                      ),
+                                    );
+                                    // 👉 Navigate or open screen
+                                    print("Terms clicked");
+                                  },
                             text: 'Terms of Use',
                             style: TextStyle(
                               color: Color(0xFF3E4959),
@@ -220,7 +216,6 @@ class _LoginScreenState extends State<LoginScreen> {
                               fontWeight: FontWeight.w700,
                               decoration: TextDecoration.underline,
                             ),
-
                           ),
                           TextSpan(
                             text: ' and\n ',
@@ -231,20 +226,21 @@ class _LoginScreenState extends State<LoginScreen> {
                               fontWeight: FontWeight.w400,
                             ),
                           ),
-                           TextSpan(
+                          TextSpan(
                             text: 'Privacy Policy',
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                navPush(
-                                  context: context,
-                                  action: const CMSContentScreen(
-                                    title: "Privacy Policy",
-                                    type: CMSContentType.privacy,
-                                  ),
-                                );
-                                // 👉 Navigate or open screen
-                                print("Policy clicked");
-                              },
+                            recognizer:
+                                TapGestureRecognizer()
+                                  ..onTap = () {
+                                    navPush(
+                                      context: context,
+                                      action: const CMSContentScreen(
+                                        title: "Privacy Policy",
+                                        type: CMSContentType.privacy,
+                                      ),
+                                    );
+                                    // 👉 Navigate or open screen
+                                    print("Policy clicked");
+                                  },
                             style: TextStyle(
                               color: Color(0xFF3E4959),
                               fontSize: 12,
@@ -259,14 +255,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
 
                     const SizedBox(height: 40),
-
                   ],
                 ),
               ),
             ),
           ),
         );
-      }
+      },
     );
   }
 }

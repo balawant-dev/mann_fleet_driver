@@ -1,6 +1,7 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../constants/api_constants.dart';
 import 'package:flutter/material.dart';
+
 class SecureStorageService {
   static const _storage = FlutterSecureStorage();
   static const firstUserKey = "firstUser";
@@ -15,8 +16,6 @@ class SecureStorageService {
   static Future<String?> getToken() async {
     return await _storage.read(key: ApiConstants.tokenKey);
   }
-
-
 
   /// FIRST USER
   static Future<void> saveFirstUser(bool value) async {
@@ -48,19 +47,29 @@ class SecureStorageService {
     return val == 'true';
   }
 
-
-
-
-
-
-
-
   /// IS AGENT
   static Future<void> saveIsAgent(bool value) async {
     await _storage.write(
       key: ApiConstants.isAgentKey,
       value: value.toString(), // true / false
     );
+  }
+
+  /// Gemini TOKEN
+  static Future<void> saveGeminiToken(String token) async {
+    await _storage.write(key: ApiConstants.geminiKey, value: token);
+  }
+
+  static Future<void> saveGeminiVersion(String version) async {
+    await _storage.write(key: ApiConstants.geminiVersion, value: version);
+  }
+
+  static Future<String?> getGeminiToken() async {
+    return await _storage.read(key: ApiConstants.geminiKey);
+  }
+
+  static Future<String?> getGeminiVersion() async {
+    return await _storage.read(key: ApiConstants.geminiVersion);
   }
 
   static Future<bool> getIsAgent() async {
@@ -82,8 +91,6 @@ class SecureStorageService {
   static Future<void> removeIsAgent() async {
     await _storage.delete(key: ApiConstants.isAgentKey);
   }
-
-
 
   static Future<void> removeToken() async {
     await _storage.delete(key: ApiConstants.tokenKey);

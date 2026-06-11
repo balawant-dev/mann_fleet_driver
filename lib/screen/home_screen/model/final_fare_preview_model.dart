@@ -25,17 +25,25 @@ class FinalFarePreviewModel {
 class FarePreviewData {
   final String bookingId;
   final String bookingNumber;
+  final String? tripStartAt;
+  final String? checkedAt;
   final Trip trip;
   final Fare fare;
   final FareBreakdown fareBreakdown;
+  final bool isExtraPaymentPending;
+  final bool? extraPaymentCompleted;
   final String nextStep;
 
   FarePreviewData({
     required this.bookingId,
     required this.bookingNumber,
+    required this.tripStartAt,
+    required this.checkedAt,
     required this.trip,
     required this.fare,
     required this.fareBreakdown,
+    required this.isExtraPaymentPending,
+    this.extraPaymentCompleted,
     required this.nextStep,
   });
 
@@ -43,9 +51,13 @@ class FarePreviewData {
     return FarePreviewData(
       bookingId: json['bookingId'] ?? '',
       bookingNumber: json['bookingNumber'] ?? '',
+      tripStartAt: json['tripStartAt'],
+      checkedAt: json['checkedAt'],
       trip: Trip.fromJson(json['trip'] ?? {}),
       fare: Fare.fromJson(json['fare'] ?? {}),
       fareBreakdown: FareBreakdown.fromJson(json['fareBreakdown'] ?? {}),
+      isExtraPaymentPending: json['isExtraPaymentPending'] ?? false,
+      extraPaymentCompleted: json['extraPaymentCompleted'],
       nextStep: json['nextStep'] ?? '',
     );
   }
@@ -56,7 +68,11 @@ class FarePreviewData {
       'bookingNumber': bookingNumber,
       'trip': trip.toJson(),
       'fare': fare.toJson(),
+      'tripStartAt': tripStartAt,
+      'checkedAt': checkedAt,
       'fareBreakdown': fareBreakdown.toJson(),
+      'isExtraPaymentPending': isExtraPaymentPending,
+      'extraPaymentCompleted': extraPaymentCompleted,
       'nextStep': nextStep,
     };
   }
@@ -73,11 +89,12 @@ class Trip {
   final bool kmWithinBuffer;
   final bool minWithinBuffer;
   final String durationSource;
-  final BufferConfig bufferConfig;
-  final String tripStartAt;
-  final String checkedAt;
-  final DriverLocation driverLocation;
   final String distanceSource;
+
+  final BufferConfig? bufferConfig;
+  final String? tripStartAt;
+  final String? checkedAt;
+  final DriverLocation? driverLocation;
 
   Trip({
     required this.estimatedKm,
@@ -90,11 +107,11 @@ class Trip {
     required this.kmWithinBuffer,
     required this.minWithinBuffer,
     required this.durationSource,
-    required this.bufferConfig,
-    required this.tripStartAt,
-    required this.checkedAt,
-    required this.driverLocation,
     required this.distanceSource,
+    this.bufferConfig,
+    this.tripStartAt,
+    this.checkedAt,
+    this.driverLocation,
   });
 
   factory Trip.fromJson(Map<String, dynamic> json) {
@@ -109,11 +126,17 @@ class Trip {
       kmWithinBuffer: json['kmWithinBuffer'] ?? false,
       minWithinBuffer: json['minWithinBuffer'] ?? false,
       durationSource: json['durationSource'] ?? '',
-      bufferConfig: BufferConfig.fromJson(json['bufferConfig'] ?? {}),
-      tripStartAt: json['tripStartAt'] ?? '',
-      checkedAt: json['checkedAt'] ?? '',
-      driverLocation: DriverLocation.fromJson(json['driverLocation'] ?? {}),
       distanceSource: json['distanceSource'] ?? '',
+      bufferConfig:
+          json['bufferConfig'] != null
+              ? BufferConfig.fromJson(json['bufferConfig'])
+              : null,
+      tripStartAt: json['tripStartAt'],
+      checkedAt: json['checkedAt'],
+      driverLocation:
+          json['driverLocation'] != null
+              ? DriverLocation.fromJson(json['driverLocation'])
+              : null,
     );
   }
 
@@ -129,11 +152,11 @@ class Trip {
       'kmWithinBuffer': kmWithinBuffer,
       'minWithinBuffer': minWithinBuffer,
       'durationSource': durationSource,
-      'bufferConfig': bufferConfig.toJson(),
+      'distanceSource': distanceSource,
+      'bufferConfig': bufferConfig?.toJson(),
       'tripStartAt': tripStartAt,
       'checkedAt': checkedAt,
-      'driverLocation': driverLocation.toJson(),
-      'distanceSource': distanceSource,
+      'driverLocation': driverLocation?.toJson(),
     };
   }
 }
@@ -183,7 +206,7 @@ class Fare {
   final bool requiresExtraPayment;
   final bool refundApplicable;
   final bool bufferApplied;
-  final dynamic adjustmentReasons;
+  final List<String>? adjustmentReasons;
 
   Fare({
     required this.estimatedFare,
@@ -207,7 +230,10 @@ class Fare {
       requiresExtraPayment: json['requiresExtraPayment'] ?? false,
       refundApplicable: json['refundApplicable'] ?? false,
       bufferApplied: json['bufferApplied'] ?? false,
-      adjustmentReasons: json['adjustmentReasons'],
+      adjustmentReasons:
+          json['adjustmentReasons'] != null
+              ? List<String>.from(json['adjustmentReasons'])
+              : null,
     );
   }
 
@@ -227,44 +253,89 @@ class Fare {
 }
 
 class FareBreakdown {
+  final RoundTripDetail? roundTripDetail;
+
   final double baseFare;
   final double distanceCharge;
   final double timeCharge;
   final double surgeCharge;
   final double subtotal;
-  final int gstPercent;
+
+  final int? gstPercent;
   final double gstAmount;
+
   final double tollCharge;
+  final double mcdTollCharge;
+
+  final double surchargeAmount;
+  final double waitingChargeAmount;
+  final int waitingMins;
+
+  final double extraKmCharge;
+  final double extraTimeCharge;
+
+  final double discountAmount;
+  final double walletUsed;
+
+  final double airportFare;
+  final double nightFare;
+
   final double totalFare;
 
   FareBreakdown({
+    this.roundTripDetail,
     required this.baseFare,
     required this.distanceCharge,
     required this.timeCharge,
     required this.surgeCharge,
     required this.subtotal,
-    required this.gstPercent,
+    this.gstPercent,
     required this.gstAmount,
     required this.tollCharge,
+    required this.mcdTollCharge,
+    required this.surchargeAmount,
+    required this.waitingChargeAmount,
+    required this.waitingMins,
+    required this.extraKmCharge,
+    required this.extraTimeCharge,
+    required this.discountAmount,
+    required this.walletUsed,
+    required this.airportFare,
+    required this.nightFare,
     required this.totalFare,
   });
 
   factory FareBreakdown.fromJson(Map<String, dynamic> json) {
     return FareBreakdown(
+      roundTripDetail:
+          json['roundTripDetail'] != null
+              ? RoundTripDetail.fromJson(json['roundTripDetail'])
+              : null,
       baseFare: (json['baseFare'] ?? 0).toDouble(),
       distanceCharge: (json['distanceCharge'] ?? 0).toDouble(),
       timeCharge: (json['timeCharge'] ?? 0).toDouble(),
       surgeCharge: (json['surgeCharge'] ?? 0).toDouble(),
       subtotal: (json['subtotal'] ?? 0).toDouble(),
-      gstPercent: json['gstPercent'] ?? 0,
+      gstPercent: json['gstPercent'],
       gstAmount: (json['gstAmount'] ?? 0).toDouble(),
       tollCharge: (json['tollCharge'] ?? 0).toDouble(),
+      mcdTollCharge: (json['mcdTollCharge'] ?? 0).toDouble(),
+      surchargeAmount: (json['surchargeAmount'] ?? 0).toDouble(),
+      waitingChargeAmount: (json['waitingChargeAmount'] ?? 0).toDouble(),
+      waitingMins: json['waitingMins'] ?? 0,
+      extraKmCharge: (json['extraKmCharge'] ?? 0).toDouble(),
+      extraTimeCharge: (json['extraTimeCharge'] ?? 0).toDouble(),
+      discountAmount: (json['discountAmount'] ?? 0).toDouble(),
+      walletUsed: (json['walletUsed'] ?? 0).toDouble(),
+      airportFare: (json['airportFare'] ?? 0).toDouble(),
+      nightFare: (json['nightFare'] ?? 0).toDouble(),
       totalFare: (json['totalFare'] ?? 0).toDouble(),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
+      'roundTripDetail': roundTripDetail?.toJson(),
       'baseFare': baseFare,
       'distanceCharge': distanceCharge,
       'timeCharge': timeCharge,
@@ -273,7 +344,57 @@ class FareBreakdown {
       'gstPercent': gstPercent,
       'gstAmount': gstAmount,
       'tollCharge': tollCharge,
+      'mcdTollCharge': mcdTollCharge,
+      'surchargeAmount': surchargeAmount,
+      'waitingChargeAmount': waitingChargeAmount,
+      'waitingMins': waitingMins,
+      'extraKmCharge': extraKmCharge,
+      'extraTimeCharge': extraTimeCharge,
+      'discountAmount': discountAmount,
+      'walletUsed': walletUsed,
+      'airportFare': airportFare,
+      'nightFare': nightFare,
       'totalFare': totalFare,
+    };
+  }
+}
+
+class RoundTripDetail {
+  final double? oneWayDistanceKm;
+  final double? effectiveDistanceKm;
+  final int? oneWayTravelMins;
+  final int? idleMinsBetweenLegs;
+  final int? returnTravelMins;
+  final int? effectiveTotalMins;
+
+  RoundTripDetail({
+    this.oneWayDistanceKm,
+    this.effectiveDistanceKm,
+    this.oneWayTravelMins,
+    this.idleMinsBetweenLegs,
+    this.returnTravelMins,
+    this.effectiveTotalMins,
+  });
+
+  factory RoundTripDetail.fromJson(Map<String, dynamic> json) {
+    return RoundTripDetail(
+      oneWayDistanceKm: (json['oneWayDistanceKm'] as num?)?.toDouble(),
+      effectiveDistanceKm: (json['effectiveDistanceKm'] as num?)?.toDouble(),
+      oneWayTravelMins: json['oneWayTravelMins'],
+      idleMinsBetweenLegs: json['idleMinsBetweenLegs'],
+      returnTravelMins: json['returnTravelMins'],
+      effectiveTotalMins: json['effectiveTotalMins'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'oneWayDistanceKm': oneWayDistanceKm,
+      'effectiveDistanceKm': effectiveDistanceKm,
+      'oneWayTravelMins': oneWayTravelMins,
+      'idleMinsBetweenLegs': idleMinsBetweenLegs,
+      'returnTravelMins': returnTravelMins,
+      'effectiveTotalMins': effectiveTotalMins,
     };
   }
 }

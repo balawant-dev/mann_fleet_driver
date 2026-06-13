@@ -12,6 +12,7 @@ import '../../penalty/ui/penaltyScreen.dart';
 import '../../profileManagement/provider/profileDetailProvider.dart';
 import '../../profileManagement/screen/personal_profile_screen.dart';
 import '../../punch/ui/punchScreen.dart';
+import '../../shuttle/shuttleShift/ui/shuttleShiftListScreen.dart';
 import '../../splash_screen/ui/splash_screen.dart';
 
 class CustomDrawer extends StatefulWidget {
@@ -164,14 +165,14 @@ class _CustomDrawerState extends State<CustomDrawer> {
                           ),
                         ),
                       ),
-                      // drawerItem(
-                      //   icon: Icons.gavel_outlined,
-                      //   title: "Deduction",
-                      //   onTap: () {
-                      //     navPush(context: context, action: PenaltyScreen());
-                      //     // TODO: Navigate to penalty screen
-                      //   },
-                      // ),
+                      drawerItem(
+                        icon: Icons.gavel_outlined,
+                        title: "Shuttle Shift",
+                        onTap: () {
+                          navPush(context: context, action: ShuttleShiftListScreen());
+                          // TODO: Navigate to penalty screen
+                        },
+                      ),
                       // drawerItem(
                       //   icon: Icons.payment_outlined,
                       //   title: "Payment Method",

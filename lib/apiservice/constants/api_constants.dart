@@ -37,6 +37,8 @@ class ApiConstants {
   static const String extraPaymentStatus = '/api/driver/extraPaymentStatus';
   static const String notifications = '/api/driver/notifications';
   static const String scanQr = '/api/driver/scanQr';
+  static const String shuttleShift = '/api/driver/shuttleShift';
+  static const String shuttleBookings = '/api/driver/shuttleBookings';
   static const String pickupVerification = '/api/driver/pickupVerification';
   static const String vehicle = '/api/driver/vehicle';
   static const String segment = '/api/driver/segment';

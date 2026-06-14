@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart' hide FirebaseService;
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:mann_fleet_driver/screen/auth/login_screen/provider/loginProvider.dart';
@@ -55,6 +56,7 @@ void main() async {
       allowAutoRestart: true,
     ),
   );
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   runApp(const MyApp());
 }
 

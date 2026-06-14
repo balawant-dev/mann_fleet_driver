@@ -1,8 +1,34 @@
 import 'dart:io';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+@pragma('vm:entry-point')
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  print('BACKGROUND HANDLER HIT');
+  await AwesomeNotifications().initialize(null, [
+    NotificationChannel(
+      channelKey: 'basic_channel',
+      channelName: 'Basic Notifications',
+      channelDescription: 'Basic Notifications',
+      playSound: true,
+      soundSource: 'resource://raw/sound',
+      importance: NotificationImportance.High,
+    ),
+  ]);
+
+  await AwesomeNotifications().createNotification(
+    content: NotificationContent(
+      id: DateTime.now().millisecondsSinceEpoch.remainder(100000),
+      channelKey: 'basic_channel',
+      title: message.data['title'],
+      body: message.data['body'],
+    ),
+  );
+}
 
 class FirebaseService {
   static final FirebaseMessaging _messaging = FirebaseMessaging.instance;

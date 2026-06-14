@@ -7,15 +7,13 @@ import '../provider/shuttleShiftPro.dart';
 class ShuttleBookingListScreen extends StatefulWidget {
   final String shiftId;
 
-  const ShuttleBookingListScreen({
-    super.key,
-    required this.shiftId,
-  });
+  const ShuttleBookingListScreen({super.key, required this.shiftId});
 
   static const primaryColor = Color(0xff0A2472);
 
   @override
-  State<ShuttleBookingListScreen> createState() => _ShuttleBookingListScreenState();
+  State<ShuttleBookingListScreen> createState() =>
+      _ShuttleBookingListScreenState();
 }
 
 class _ShuttleBookingListScreenState extends State<ShuttleBookingListScreen> {
@@ -26,85 +24,74 @@ class _ShuttleBookingListScreenState extends State<ShuttleBookingListScreen> {
       Provider.of<ShuttleShiftProvider>(
         context,
         listen: false,
-      ).fetchedShiftBookingsApi(context:context,shiftID: widget.shiftId);
+      ).fetchedShiftBookingsApi(context: context, shiftID: widget.shiftId);
     });
   }
+
   @override
   Widget build(BuildContext context) {
-    final provider =
-    context.watch<ShuttleShiftProvider>();
+    final provider = context.watch<ShuttleShiftProvider>();
 
-    final bookings =
-        provider.fetchedShiftBookingsModel?.data??[];
+    final bookings = provider.fetchedShiftBookingsModel?.data ?? [];
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: CommonAppBar(title:  "Passenger Bookings",),
-
-
+      appBar: CommonAppBar(title: "Passenger Bookings"),
 
       body: Consumer<ShuttleShiftProvider>(
-          builder: (context, provider, child) {
+        builder: (context, provider, child) {
+          /// Loading
+          if (provider.isLoading) {
+            return const Center(
+              child: CircularProgressIndicator(
+                color: ShuttleBookingListScreen.primaryColor,
+              ),
+            );
+          }
 
-            /// Loading
-            if (provider.isLoading) {
-              return const Center(
-                child: CircularProgressIndicator(
-                  color: ShuttleBookingListScreen.primaryColor,
-                ),
+          final bookings = provider.fetchedShiftBookingsModel?.data ?? [];
+
+          /// Empty State
+          if (bookings.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.directions_bus_outlined,
+                    size: 80,
+                    color: Colors.grey.shade400,
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  const Text(
+                    "No Bookings Found",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  Text(
+                    provider.fetchedShiftBookingsModel?.message ??
+                        "No passengers available for this shift.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.grey.shade600),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          /// Data Found
+          return RefreshIndicator(
+            color: ShuttleBookingListScreen.primaryColor,
+            onRefresh: () async {
+              await provider.fetchedShiftBookingsApi(
+                context: context,
+                shiftID: widget.shiftId,
               );
-            }
-
-            final bookings =
-                provider.fetchedShiftBookingsModel?.data ?? [];
-
-            /// Empty State
-            if (bookings.isEmpty) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-
-                    Icon(
-                      Icons.directions_bus_outlined,
-                      size: 80,
-                      color: Colors.grey.shade400,
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    const Text(
-                      "No Bookings Found",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-
-                    const SizedBox(height: 8),
-
-                    Text(
-                      provider.fetchedShiftBookingsModel?.message ??
-                          "No passengers available for this shift.",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }
-
-            /// Data Found
-            return RefreshIndicator(
-              color: ShuttleBookingListScreen.primaryColor,
-              onRefresh: () async {
-                await provider.fetchedShiftBookingsApi(
-                  context: context,
-                  shiftID: widget.shiftId,
-                );
-              },
-              child: ListView.builder(
+            },
+            child: ListView.builder(
               padding: const EdgeInsets.all(16),
               itemCount: bookings.length,
               itemBuilder: (context, index) {
@@ -115,70 +102,63 @@ class _ShuttleBookingListScreenState extends State<ShuttleBookingListScreen> {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(18),
-                    border: Border.all(
-                      color: Colors.grey.shade200,
-                    ),
+                    border: Border.all(color: Colors.grey.shade200),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(.05),
                         blurRadius: 10,
                         offset: const Offset(0, 3),
-                      )
+                      ),
                     ],
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(15),
                     child: Column(
                       children: [
-
                         /// User Info
                         Row(
                           children: [
                             CircleAvatar(
                               radius: 25,
-                              backgroundColor:
-                              ShuttleBookingListScreen.primaryColor.withOpacity(.1),
+                              backgroundColor: ShuttleBookingListScreen
+                                  .primaryColor
+                                  .withOpacity(.1),
                               backgroundImage:
-                              booking.user?.profilePic != null &&
-                                  booking.user!.profilePic!
-                                      .isNotEmpty
-                                  ? NetworkImage(
-                                booking.user!.profilePic!,
-                              )
-                                  : null,
-                              child: booking.user?.profilePic == null
-                                  ? const Icon(
-                                Icons.person,
-                                color: ShuttleBookingListScreen.primaryColor,
-                              )
-                                  : null,
+                                  booking.user?.profilePic != null &&
+                                          booking.user!.profilePic!.isNotEmpty
+                                      ? NetworkImage(booking.user!.profilePic!)
+                                      : null,
+                              child:
+                                  booking.user?.profilePic == null
+                                      ? const Icon(
+                                        Icons.person,
+                                        color:
+                                            ShuttleBookingListScreen
+                                                .primaryColor,
+                                      )
+                                      : null,
                             ),
 
                             const SizedBox(width: 12),
 
                             Expanded(
                               child: Column(
-                                crossAxisAlignment:
-                                CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    booking.user?.name ??
-                                        "Unknown User",
+                                    booking.user?.name ?? "Unknown User",
                                     style: const TextStyle(
                                       fontSize: 16,
-                                      fontWeight:
-                                      FontWeight.w700,
+                                      fontWeight: FontWeight.w700,
                                     ),
                                   ),
 
                                   const SizedBox(height: 4),
 
                                   Text(
-                                    booking.shuttlePass?.name ??
-                                        "",
+                                    booking.shuttlePass?.name ?? "",
                                     style: TextStyle(
-                                      color:
-                                      Colors.grey.shade600,
+                                      color: Colors.grey.shade600,
                                     ),
                                   ),
                                 ],
@@ -186,34 +166,25 @@ class _ShuttleBookingListScreenState extends State<ShuttleBookingListScreen> {
                             ),
 
                             Container(
-                              padding:
-                              const EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                 horizontal: 10,
                                 vertical: 5,
                               ),
                               decoration: BoxDecoration(
                                 color:
-                                booking.tripStatus ==
-                                    "Completed"
-                                    ? Colors.green
-                                    .withOpacity(.1)
-                                    : Colors.orange
-                                    .withOpacity(.1),
-                                borderRadius:
-                                BorderRadius.circular(
-                                  20,
-                                ),
+                                    booking.tripStatus == "Completed"
+                                        ? Colors.green.withOpacity(.1)
+                                        : Colors.orange.withOpacity(.1),
+                                borderRadius: BorderRadius.circular(20),
                               ),
                               child: Text(
                                 booking.tripStatus ?? "Pending",
                                 style: TextStyle(
-                                  fontWeight:
-                                  FontWeight.w600,
+                                  fontWeight: FontWeight.w600,
                                   color:
-                                  booking.tripStatus ==
-                                      "Completed"
-                                      ? Colors.green
-                                      : Colors.orange,
+                                      booking.tripStatus == "Completed"
+                                          ? Colors.green
+                                          : Colors.orange,
                                 ),
                               ),
                             ),
@@ -222,9 +193,7 @@ class _ShuttleBookingListScreenState extends State<ShuttleBookingListScreen> {
 
                         const SizedBox(height: 15),
 
-                        Divider(
-                          color: Colors.grey.shade200,
-                        ),
+                        Divider(color: Colors.grey.shade200),
 
                         const SizedBox(height: 10),
 
@@ -242,8 +211,7 @@ class _ShuttleBookingListScreenState extends State<ShuttleBookingListScreen> {
                               child: Text(
                                 "${booking.source ?? ""} ➜ ${booking.destination ?? ""}",
                                 style: const TextStyle(
-                                  fontWeight:
-                                  FontWeight.w600,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ),
@@ -254,12 +222,10 @@ class _ShuttleBookingListScreenState extends State<ShuttleBookingListScreen> {
 
                         Row(
                           children: [
-
                             Expanded(
                               child: _infoCard(
                                 title: "Rides Left",
-                                value:
-                                "${booking.remainingRides ?? 0}",
+                                value: "${booking.remainingRides ?? 0}",
                               ),
                             ),
 
@@ -268,8 +234,7 @@ class _ShuttleBookingListScreenState extends State<ShuttleBookingListScreen> {
                             Expanded(
                               child: _infoCard(
                                 title: "Total Rides",
-                                value:
-                                "${booking.totalRides ?? 0}",
+                                value: "${booking.totalRides ?? 0}",
                               ),
                             ),
                           ],
@@ -282,8 +247,7 @@ class _ShuttleBookingListScreenState extends State<ShuttleBookingListScreen> {
                             Expanded(
                               child: _infoCard(
                                 title: "Amount",
-                                value:
-                                "₹${booking.totalAmount ?? 0}",
+                                value: "₹${booking.totalAmount ?? 0}",
                               ),
                             ),
 
@@ -292,8 +256,7 @@ class _ShuttleBookingListScreenState extends State<ShuttleBookingListScreen> {
                             Expanded(
                               child: _infoCard(
                                 title: "Scans",
-                                value:
-                                "${booking.scanCount ?? 0}",
+                                value: "${booking.scanCount ?? 0}",
                               ),
                             ),
                           ],
@@ -303,17 +266,12 @@ class _ShuttleBookingListScreenState extends State<ShuttleBookingListScreen> {
 
                         Row(
                           children: [
-
                             Expanded(
                               child: Container(
-                                padding:
-                                const EdgeInsets.all(10),
+                                padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
                                   color: Colors.grey.shade50,
-                                  borderRadius:
-                                  BorderRadius.circular(
-                                    12,
-                                  ),
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Column(
                                   children: [
@@ -321,19 +279,15 @@ class _ShuttleBookingListScreenState extends State<ShuttleBookingListScreen> {
                                       "Payment",
                                       style: TextStyle(
                                         fontSize: 12,
-                                        color: Colors
-                                            .grey.shade600,
+                                        color: Colors.grey.shade600,
                                       ),
                                     ),
                                     const SizedBox(height: 5),
                                     Text(
-                                      booking.paymentStatus ??
-                                          "",
-                                      style:
-                                      const TextStyle(
+                                      booking.paymentStatus ?? "",
+                                      style: const TextStyle(
                                         color: Colors.green,
-                                        fontWeight:
-                                        FontWeight.bold,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   ],
@@ -345,14 +299,10 @@ class _ShuttleBookingListScreenState extends State<ShuttleBookingListScreen> {
 
                             Expanded(
                               child: Container(
-                                padding:
-                                const EdgeInsets.all(10),
+                                padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
                                   color: Colors.grey.shade50,
-                                  borderRadius:
-                                  BorderRadius.circular(
-                                    12,
-                                  ),
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Column(
                                   children: [
@@ -360,20 +310,15 @@ class _ShuttleBookingListScreenState extends State<ShuttleBookingListScreen> {
                                       "Booking Date",
                                       style: TextStyle(
                                         fontSize: 12,
-                                        color: Colors
-                                            .grey.shade600,
+                                        color: Colors.grey.shade600,
                                       ),
                                     ),
                                     const SizedBox(height: 5),
                                     Text(
-                                      booking.bookingDate ??
-                                          "",
-                                      textAlign:
-                                      TextAlign.center,
-                                      style:
-                                      const TextStyle(
-                                        fontWeight:
-                                        FontWeight.w600,
+                                      booking.bookingDate ?? "",
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w600,
                                       ),
                                     ),
                                   ],
@@ -385,56 +330,44 @@ class _ShuttleBookingListScreenState extends State<ShuttleBookingListScreen> {
 
                         const SizedBox(height: 15),
 
-                        SizedBox(
-                          width: double.infinity,
-                          height: 45,
-                          child: ElevatedButton(
-                            style:
-                            ElevatedButton.styleFrom(
-                              backgroundColor:
-                              ShuttleBookingListScreen.primaryColor,
-                              shape:
-                              RoundedRectangleBorder(
-                                borderRadius:
-                                BorderRadius.circular(
-                                  12,
-                                ),
-                              ),
-                            ),
-                            onPressed: () {
-
-                              /// Booking Detail Screen
-                            },
-                            child: const Text(
-                              "View Details",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight:
-                                FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        )
+                        // SizedBox(
+                        //   width: double.infinity,
+                        //   height: 45,
+                        //   child: ElevatedButton(
+                        //     style: ElevatedButton.styleFrom(
+                        //       backgroundColor:
+                        //           ShuttleBookingListScreen.primaryColor,
+                        //       shape: RoundedRectangleBorder(
+                        //         borderRadius: BorderRadius.circular(12),
+                        //       ),
+                        //     ),
+                        //     onPressed: () {
+                        //       /// Booking Detail Screen
+                        //     },
+                        //     child: const Text(
+                        //       "View Details",
+                        //       style: TextStyle(
+                        //         color: Colors.white,
+                        //         fontWeight: FontWeight.w600,
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
                       ],
                     ),
                   ),
                 );
               },
-                        ),
-            );
-        }
+            ),
+          );
+        },
       ),
     );
   }
 
-  Widget _infoCard({
-    required String title,
-    required String value,
-  }) {
+  Widget _infoCard({required String title, required String value}) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        vertical: 12,
-      ),
+      padding: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
         color: ShuttleBookingListScreen.primaryColor.withOpacity(.05),
         borderRadius: BorderRadius.circular(12),
@@ -443,10 +376,7 @@ class _ShuttleBookingListScreenState extends State<ShuttleBookingListScreen> {
         children: [
           Text(
             title,
-            style: const TextStyle(
-              fontSize: 12,
-              color: Colors.black54,
-            ),
+            style: const TextStyle(fontSize: 12, color: Colors.black54),
           ),
           const SizedBox(height: 5),
           Text(

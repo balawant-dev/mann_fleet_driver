@@ -215,7 +215,7 @@ class _SplashScreenState extends State<SplashScreen> {
         width: double.infinity,
         decoration: const BoxDecoration(
           image: DecorationImage(
-            image: AssetImage("assets/icon/newss.jpeg"),
+            image: AssetImage("assets/images/splash.jpeg"),
             // image: AssetImage("assets/images/spalshBackround.jpeg"),
             fit: BoxFit.fill,
           ),

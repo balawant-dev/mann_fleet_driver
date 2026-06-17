@@ -114,6 +114,8 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
       id: bookingId,
       currentLat: currentLat.toString(),
       currentLng: currentLng.toString(),
+      // currentLat: "28.5292049",
+      // currentLng: "77.2747464",
       durationMins: "",
     );
     if (status != null && status.fare.adjustmentType.toLowerCase() == "none") {
@@ -1136,16 +1138,17 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
   }
 
   void showBookingCompletionDialog(
-    BuildContext context,
+    BuildContext ctx,
     bool isAdjust,
     FarePreviewData status,
   ) {
     String? selectedPaymentMode = 'select_method';
     final controller = TextEditingController();
-    final provider = context.read<NewBookingProvider>();
+    final provider = ctx.read<NewBookingProvider>();
     showDialog(
-      context: context,
+      context: ctx,
       builder: (BuildContext context) {
+        final parentCtx = ctx;
         return AlertDialog(
           title: const Text(
             'Booking Information',
@@ -1286,17 +1289,36 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                       if (controller.text.length > 10) {
                         final success = await provider.waiveExtraPayment(
                           context: context,
+                          currentLat: currentLat.toString(),
+                          currentLng: currentLng.toString(),
                           id: widget.id,
                           reason: controller.text,
                         );
                         if (success) {
                           Navigator.pop(context);
-                          Future.delayed(const Duration(seconds: 1), () {
-                            navPushReplace(
+                          final status = await Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => UploadSpeedoMeterImageScreen(
+                                    id: widget.id,
+                                  ),
+                            ),
+                          );
+
+                          if (status == true) {
+                            await provider.forcedCompleteBooking(
                               context: context,
-                              action: const MainScreen(),
+                              id: widget.id,
                             );
-                          });
+                            Navigator.pop(parentCtx);
+
+                            Future.delayed(const Duration(seconds: 1), () {
+                              navPushReplace(
+                                context: parentCtx,
+                                action: const MainScreen(),
+                              );
+                            });
+                          }
                         }
                       } else {
                         ToastHelper.show(
@@ -1311,6 +1333,8 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                         id: widget.id,
                         currentLat: currentLat.toString(),
                         currentLng: currentLng.toString(),
+                        // currentLat: "28.6659174",
+                        // currentLng: "77.3372858",
                       );
                       if (success) {
                         Navigator.pop(context);

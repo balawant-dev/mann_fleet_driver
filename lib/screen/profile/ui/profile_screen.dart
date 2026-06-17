@@ -14,14 +14,10 @@ class _ProfileReviewScreenState extends State<ProfileReviewScreen> {
       backgroundColor: Colors.grey[200],
       body: Column(
         children: [
-          // 🔥 Top Profile Section
           Container(
             width: double.infinity,
             padding: const EdgeInsets.only(top: 60, bottom: 30),
-            decoration: const BoxDecoration(
-              color: Colors.black,
-
-            ),
+            decoration: const BoxDecoration(color: Colors.black),
             child: Column(
               children: const [
                 CircleAvatar(
@@ -32,9 +28,10 @@ class _ProfileReviewScreenState extends State<ProfileReviewScreen> {
                 Text(
                   "Rohit Kumar",
                   style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold),
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 SizedBox(height: 5),
                 Text(
@@ -42,10 +39,7 @@ class _ProfileReviewScreenState extends State<ProfileReviewScreen> {
                   style: TextStyle(color: Colors.white70),
                 ),
                 SizedBox(height: 5),
-                Text(
-                  "+91 9876543210",
-                  style: TextStyle(color: Colors.white70),
-                ),
+                Text("+91 9876543210", style: TextStyle(color: Colors.white70)),
               ],
             ),
           ),
@@ -84,7 +78,7 @@ class ReviewCard extends StatelessWidget {
             color: Colors.black.withOpacity(0.08),
             blurRadius: 10,
             offset: const Offset(0, 4),
-          )
+          ),
         ],
       ),
       child: Column(
@@ -109,12 +103,13 @@ class ReviewCard extends StatelessWidget {
                         Text(
                           "Raju Kumar",
                           style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
                         ),
                         Text(
                           "2024-01-23 12:41:02",
-                          style: TextStyle(
-                              color: Colors.grey, fontSize: 12),
+                          style: TextStyle(color: Colors.grey, fontSize: 12),
                         ),
                       ],
                     ),
@@ -124,8 +119,11 @@ class ReviewCard extends StatelessWidget {
                     Row(
                       children: List.generate(
                         5,
-                            (index) => const Icon(Icons.star,
-                            color: Colors.indigo, size: 18),
+                        (index) => const Icon(
+                          Icons.star,
+                          color: Colors.indigo,
+                          size: 18,
+                        ),
                       ),
                     ),
 
@@ -155,11 +153,10 @@ class ReviewCard extends StatelessWidget {
               decoration: InputDecoration(
                 hintText: "Reply Comment",
                 border: InputBorder.none,
-                disabledBorder:InputBorder.none ,
+                disabledBorder: InputBorder.none,
                 enabledBorder: InputBorder.none,
                 focusedBorder: InputBorder.none,
                 focusedErrorBorder: InputBorder.none,
-
 
                 // ✅ Correct property
                 suffixIcon: GestureDetector(
@@ -170,7 +167,7 @@ class ReviewCard extends StatelessWidget {
                 contentPadding: const EdgeInsets.symmetric(vertical: 10),
               ),
             ),
-          )
+          ),
         ],
       ),
     );

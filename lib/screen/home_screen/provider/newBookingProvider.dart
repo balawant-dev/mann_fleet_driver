@@ -405,6 +405,8 @@ class NewBookingProvider extends ChangeNotifier {
 
   Future<bool> waiveExtraPayment({
     required BuildContext context,
+    required String currentLat,
+    required String currentLng,
     required String id,
     required String reason,
   }) async {
@@ -414,9 +416,40 @@ class NewBookingProvider extends ChangeNotifier {
 
       final res = await api.waiveExtraPayment(
         context: context,
+        currentLat: currentLat,
+        currentLng: currentLng,
         id: id,
         reason: reason,
       );
+
+      if (res != null && res == true) {
+        await getNewBookingDetail(context: context, id: id);
+        await getNewBooking(context: context);
+
+        debugPrint("Complete trip 🎈🎈🎈🎈🎈🎈🎈🎈 for booking $id");
+        return true;
+      } else {
+        debugPrint("Failed to start trip for booking $id");
+        return false;
+      }
+    } catch (e) {
+      debugPrint("Error starting trip $id: $e");
+      return false;
+    } finally {
+      // isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> forcedCompleteBooking({
+    required BuildContext context,
+    required String id,
+  }) async {
+    try {
+      // isLoading = true;
+      notifyListeners();
+
+      final res = await api.forcedCompleteBooking(context: context, id: id);
 
       if (res != null && res == true) {
         await getNewBookingDetail(context: context, id: id);

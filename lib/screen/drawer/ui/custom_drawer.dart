@@ -23,265 +23,296 @@ class CustomDrawer extends StatefulWidget {
 }
 
 class _CustomDrawerState extends State<CustomDrawer> {
-
-
   @override
   Widget build(BuildContext context) {
-    return Consumer<ProfileDetailProvider>(builder: (context, profilePro, child) {
-      // if (profilePro.getProfileModel==null||profilePro.getProfileModel!.data==null) {
-      //   return const Center(child: CircularProgressIndicator());
-      // }
-      return Drawer(
-        width: MediaQuery.of(context).size.width * 0.80,
-        child: Column(
-          children: [
-            // ── Profile Header ────────────────────────────────────────
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.only(top: 50, bottom: 24),
-              color: ColorResource.primaryColor,
-              child: GestureDetector(
-                onTap: (){
-                  navPush(context: context, action: PersonalProfileScreen());
-                },
-                child: Column(
-                  children:  [
-                    ClipOval(
-                      child: Image.network(
-                        profilePro.getProfileModel?.data?.driver?.profilePic ?? "Profile Me image nhi aa rha hai",
-                        width: 80, // Radius 40 hai toh width/height 80 hogi
-                        height: 80,
-                        fit: BoxFit.cover,
-
-                        // Jab image load ho rahi ho
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return Container(
-                            width: 80,
-                            height: 80,
-                            color: Colors.grey[200],
-                            child: const Center(
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            ),
-                          );
-                        },
-
-                        // Jab image load hone mein error aaye ya URL invalid ho
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            width: 80,
-                            height: 80,
-                            color: Colors.grey[300],
-                            child: const Icon(
-                              Icons.person,
-                              size: 40,
-                              color: Colors.grey,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    // CircleAvatar(
-                    //   radius: 40,
-                    //   backgroundImage: NetworkImage(profilePro.getProfileModel?.data?.driver?.profilePic??"No Image"),
-                    // ),
-                    SizedBox(height: 12),
-                    Text(
-                      profilePro.getProfileModel?.data?.driver?.name??"Update Profile",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    SizedBox(height: 6),
-
-                    // SizedBox(height: 6),
-                    Text(
-                      profilePro.getProfileModel?.data?.driver?.email??"Update Profile",
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 14,
-                      ),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      "+91 ${profilePro.getProfileModel?.data?.driver?.phone??"Update Profile"}",
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            // ── Menu Items ─────────────────────────────────────────────
-            Expanded(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+    return Consumer<ProfileDetailProvider>(
+      builder: (context, profilePro, child) {
+        // if (profilePro.getProfileModel==null||profilePro.getProfileModel!.data==null) {
+        //   return const Center(child: CircularProgressIndicator());
+        // }
+        return Drawer(
+          width: MediaQuery.of(context).size.width * 0.80,
+          child: Column(
+            children: [
+              // ── Profile Header ────────────────────────────────────────
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.only(top: 50, bottom: 24),
+                color: ColorResource.primaryColor,
+                child: GestureDetector(
+                  onTap: () {
+                    navPush(context: context, action: PersonalProfileScreen());
+                  },
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      drawerItem(
-                        icon: Icons.person_outline,
-                        title: "Profile Management",
-                        onTap: () {
-                          navPush(context: context, action: ProfileManagementScreen());
-                          // TODO: Navigate to profile
-                        },
-                      ),
-                      drawerItem(
-                        icon: Icons.star_border,
-                        title: "Driver Rating",
-                        onTap: () {}, // optional
-                        trailing: Container(
-                          margin: const EdgeInsets.only(top: 12),
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                          decoration: BoxDecoration(
-                            color: Colors.amber.shade100,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: Colors.amber.shade300),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.star, size: 18, color: Colors.orange),
-                              const SizedBox(width: 4),
-                              Text(
-                                (double.tryParse(
-                                  profilePro.getProfileModel?.data?.driver?.rating?.toString() ?? "0",
-                                ) ??
-                                    0.0)
-                                    .toStringAsFixed(1),
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 14,
+                      ClipOval(
+                        child: Image.network(
+                          profilePro
+                                  .getProfileModel
+                                  ?.data
+                                  ?.driver
+                                  ?.profilePic ??
+                              "Profile Me image nhi aa rha hai",
+                          width: 80, // Radius 40 hai toh width/height 80 hogi
+                          height: 80,
+                          fit: BoxFit.cover,
+
+                          // Jab image load ho rahi ho
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Container(
+                              width: 80,
+                              height: 80,
+                              color: Colors.grey[200],
+                              child: const Center(
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
                                 ),
                               ),
-                            ],
-                          ),
+                            );
+                          },
+
+                          // Jab image load hone mein error aaye ya URL invalid ho
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              width: 80,
+                              height: 80,
+                              color: Colors.grey[300],
+                              child: const Icon(
+                                Icons.person,
+                                size: 40,
+                                color: Colors.grey,
+                              ),
+                            );
+                          },
                         ),
                       ),
-                      drawerItem(
-                        icon: Icons.gavel_outlined,
-                        title: "Shuttle Shift",
-                        onTap: () {
-                          navPush(context: context, action: ShuttleShiftListScreen());
-                          // TODO: Navigate to penalty screen
-                        },
-                      ),
-                      // drawerItem(
-                      //   icon: Icons.payment_outlined,
-                      //   title: "Payment Method",
-                      //   onTap: () {},
+                      // CircleAvatar(
+                      //   radius: 40,
+                      //   backgroundImage: NetworkImage(profilePro.getProfileModel?.data?.driver?.profilePic??"No Image"),
                       // ),
-                      // drawerItem(
-                      //   icon: Icons.currency_rupee,
-                      //   title: "Refund Policy",
-                      //   onTap: () {
-                      //     navPush(
-                      //       context: context,
-                      //       action: const CMSContentScreen(
-                      //         title: "Refund Policy",
-                      //         type: CMSContentType.refund,
-                      //       ),
-                      //     );
-                      //   },
-                      // ),
-                      drawerItem(
-                        icon: Icons.support_agent,
-                        title: "Help & Support",
-                        onTap: () {},
+                      SizedBox(height: 12),
+                      Text(
+                        profilePro.getProfileModel?.data?.driver?.name ??
+                            "Update Profile",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                      drawerItem(
-                        icon: Icons.info_outline,
-                        title: "About us",
-                        onTap: () {
-                          navPush(
-                            context: context,
-                            action: const CMSContentScreen(
-                              title: "About us",
-                              type: CMSContentType.terms,
-                            ),
-                          );
-                        },
-                      ),
-                      drawerItem(
-                        icon: Icons.privacy_tip_outlined,
-                        title: "Privacy Policy",
-                        onTap: () {
-                          navPush(
-                            context: context,
-                            action: const CMSContentScreen(
-                              title: "Privacy Policy",
-                              type: CMSContentType.privacy,
-                            ),
-                          );
-                        },
-                      ),
-                      drawerItem(
-                        icon: Icons.description_outlined,
-                        title: "Terms & Conditions",
-                        onTap: () {
-                          navPush(
-                            context: context,
-                            action: const CMSContentScreen(
-                              title: "Terms & Conditions",
-                              type: CMSContentType.terms,
-                            ),
-                          );
-                        },
-                      ),
-                      //driver rating
+                      SizedBox(height: 6),
 
-                      // drawerItem(
-                      //   icon: Icons.fact_check_outlined,
-                      //   title: "Attendance Punch",
-                      //   onTap: () {
-                      //     navPush(
-                      //       context: context,
-                      //       action: const PunchScreen(
-                      //
-                      //       ),
-                      //     );
-                      //   },
-                      //  ),
-                // drawerItem(
-                //         icon: Icons.fact_check_outlined,
-                //         title: "Fuel Entry",
-                //         onTap: () {
-                //           navPush(
-                //             context: context,
-                //             action:  FuelEntryScreen(
-                //
-                //             ),
-                //           );
-                //         },
-                //       ),
-
-                      const Divider(height: 32, thickness: 1),
-
-                      drawerItem(
-                        icon: Icons.logout,
-                        title: "Log Out",
-                        onTap: () => showLogoutDialog(context),
-                        color: Colors.red,
+                      // SizedBox(height: 6),
+                      Text(
+                        profilePro.getProfileModel?.data?.driver?.email ??
+                            "Update Profile",
+                        style: TextStyle(color: Colors.white70, fontSize: 14),
                       ),
-                      // Spacer(),
-
+                      SizedBox(height: 4),
+                      Text(
+                        "+91 ${profilePro.getProfileModel?.data?.driver?.phone ?? "Update Profile"}",
+                        style: TextStyle(color: Colors.white70, fontSize: 14),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        "${profilePro.getProfileModel?.data?.driver?.vehicles?.first.brand ?? "Car"} - ${profilePro.getProfileModel?.data?.driver?.vehicles?.first.model ?? "Model"} - ${profilePro.getProfileModel?.data?.driver?.vehicles?.first.carNumber ?? "Car Number"}",
+                        style: TextStyle(color: Colors.white70, fontSize: 12),
+                      ),
                     ],
                   ),
                 ),
               ),
-            ),
-            Text("Version 1.0.0",style: TextStyle(color: Colors.grey),),SizedBox(height: 5,)
-          ],
-        ),
-      );
-    },);
+
+              // ── Menu Items ─────────────────────────────────────────────
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 16,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        drawerItem(
+                          icon: Icons.person_outline,
+                          title: "Profile Management",
+                          onTap: () {
+                            navPush(
+                              context: context,
+                              action: ProfileManagementScreen(),
+                            );
+                            // TODO: Navigate to profile
+                          },
+                        ),
+                        drawerItem(
+                          icon: Icons.star_border,
+                          title: "Driver Rating",
+                          onTap: () {}, // optional
+                          trailing: Container(
+                            margin: const EdgeInsets.only(top: 12),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.amber.shade100,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: Colors.amber.shade300),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.star,
+                                  size: 18,
+                                  color: Colors.orange,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  (double.tryParse(
+                                            profilePro
+                                                    .getProfileModel
+                                                    ?.data
+                                                    ?.driver
+                                                    ?.rating
+                                                    ?.toString() ??
+                                                "0",
+                                          ) ??
+                                          0.0)
+                                      .toStringAsFixed(1),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        drawerItem(
+                          icon: Icons.gavel_outlined,
+                          title: "Shuttle Shift",
+                          onTap: () {
+                            navPush(
+                              context: context,
+                              action: ShuttleShiftListScreen(),
+                            );
+                            // TODO: Navigate to penalty screen
+                          },
+                        ),
+                        // drawerItem(
+                        //   icon: Icons.payment_outlined,
+                        //   title: "Payment Method",
+                        //   onTap: () {},
+                        // ),
+                        // drawerItem(
+                        //   icon: Icons.currency_rupee,
+                        //   title: "Refund Policy",
+                        //   onTap: () {
+                        //     navPush(
+                        //       context: context,
+                        //       action: const CMSContentScreen(
+                        //         title: "Refund Policy",
+                        //         type: CMSContentType.refund,
+                        //       ),
+                        //     );
+                        //   },
+                        // ),
+                        drawerItem(
+                          icon: Icons.support_agent,
+                          title: "Help & Support",
+                          onTap: () {},
+                        ),
+                        drawerItem(
+                          icon: Icons.info_outline,
+                          title: "About us",
+                          onTap: () {
+                            navPush(
+                              context: context,
+                              action: const CMSContentScreen(
+                                title: "About us",
+                                type: CMSContentType.terms,
+                              ),
+                            );
+                          },
+                        ),
+                        drawerItem(
+                          icon: Icons.privacy_tip_outlined,
+                          title: "Privacy Policy",
+                          onTap: () {
+                            navPush(
+                              context: context,
+                              action: const CMSContentScreen(
+                                title: "Privacy Policy",
+                                type: CMSContentType.privacy,
+                              ),
+                            );
+                          },
+                        ),
+                        drawerItem(
+                          icon: Icons.description_outlined,
+                          title: "Terms & Conditions",
+                          onTap: () {
+                            navPush(
+                              context: context,
+                              action: const CMSContentScreen(
+                                title: "Terms & Conditions",
+                                type: CMSContentType.terms,
+                              ),
+                            );
+                          },
+                        ),
+
+                        //driver rating
+
+                        // drawerItem(
+                        //   icon: Icons.fact_check_outlined,
+                        //   title: "Attendance Punch",
+                        //   onTap: () {
+                        //     navPush(
+                        //       context: context,
+                        //       action: const PunchScreen(
+                        //
+                        //       ),
+                        //     );
+                        //   },
+                        //  ),
+                        // drawerItem(
+                        //         icon: Icons.fact_check_outlined,
+                        //         title: "Fuel Entry",
+                        //         onTap: () {
+                        //           navPush(
+                        //             context: context,
+                        //             action:  FuelEntryScreen(
+                        //
+                        //             ),
+                        //           );
+                        //         },
+                        //       ),
+                        const Divider(height: 32, thickness: 1),
+
+                        drawerItem(
+                          icon: Icons.logout,
+                          title: "Log Out",
+                          onTap: () => showLogoutDialog(context),
+                          color: Colors.red,
+                        ),
+
+                        // Spacer(),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Text("Version 1.0.0", style: TextStyle(color: Colors.grey)),
+              SizedBox(height: 5),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   Widget drawerItem({
@@ -320,72 +351,79 @@ class _CustomDrawerState extends State<CustomDrawer> {
       ),
     );
   }
+
   void showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
       barrierDismissible: true,
-      builder: (_) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        elevation: 16,
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            color: Colors.white,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.logout, size: 50, color: Colors.redAccent),
-              const SizedBox(height: 16),
-              const Text(
-                "Logout",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+      builder:
+          (_) => Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            elevation: 16,
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                color: Colors.white,
               ),
-              const SizedBox(height: 10),
-              const Text(
-                "Are you sure you want to logout?",
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16, color: Colors.black54),
-              ),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey[300],
-                      foregroundColor: Colors.black87,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8)),
-                    ),
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text("Cancel"),
+                  Icon(Icons.logout, size: 50, color: Colors.redAccent),
+                  const SizedBox(height: 16),
+                  const Text(
+                    "Logout",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.redAccent,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8)),
-                    ),
-                    onPressed: () async {
-                      Navigator.pop(context);
-                      // AppSettings.clearUserType();
-                      SecureStorageService.logout(context);
-                      // Navigator.pop(context, true);
-                      navPushBottomRemove(context: context, action: SplashScreen(),duration: 1);
-                    },
-                    child: const Text("Logout"),
+                  const SizedBox(height: 10),
+                  const Text(
+                    "Are you sure you want to logout?",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16, color: Colors.black54),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.grey[300],
+                          foregroundColor: Colors.black87,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text("Cancel"),
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.redAccent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        onPressed: () async {
+                          Navigator.pop(context);
+                          // AppSettings.clearUserType();
+                          SecureStorageService.logout(context);
+                          // Navigator.pop(context, true);
+                          navPushBottomRemove(
+                            context: context,
+                            action: SplashScreen(),
+                            duration: 1,
+                          );
+                        },
+                        child: const Text("Logout"),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
     );
   }
 }

@@ -71,6 +71,7 @@ class ProfileDetailProvider extends ChangeNotifier {
         await SecureStorageService.saveGeminiVersion(
           res.data!.first.name!.rGEMNI_API_VERSION!,
         );
+        getProfileApi(context: context);
       }
       errorMessage = null;
     } catch (e) {

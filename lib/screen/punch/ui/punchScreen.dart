@@ -28,7 +28,10 @@ class _PunchScreenState extends State<PunchScreen> {
   }
 
   Future<void> _handlePunchAction(PunchProvider provider) async {
+    print("DFGHJKLKJHGFDS");
+    showLoader(context);
     final hasPermission = await _checkLocationPermission();
+    Navigator.pop(context);
     if (!hasPermission) return;
 
     try {
@@ -72,13 +75,13 @@ class _PunchScreenState extends State<PunchScreen> {
           },
         );
       } else {
-        showLoader(context); // ✅ SHOW LOADER
+        showLoader(context);
         await provider.postPunchInApi(
           context: context,
           lat: position.latitude.toString(),
           lng: position.longitude.toString(),
         );
-        Navigator.pop(context); // ✅ CLOSE LOADER
+        Navigator.pop(context);
       }
 
       await provider.loadAllData(context: context);
@@ -134,19 +137,15 @@ class _PunchScreenState extends State<PunchScreen> {
                   Container(
                     width: MediaQuery.of(context).size.width,
                     decoration: BoxDecoration(
-                      color: const Color(
-                        0xFFF8FAFC,
-                      ), // ← Changed: Soft elegant background
+                      color: const Color(0xFFF8FAFC),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: const Color(
-                          0xFFE2E8F0,
-                        ), // ← Changed: Cleaner border
+                        color: const Color(0xFFE2E8F0),
                         width: 1.2,
                       ),
                       boxShadow: const [
                         BoxShadow(
-                          color: Color(0x0A000000), // ← Softer shadow
+                          color: Color(0x0A000000),
                           blurRadius: 8,
                           offset: Offset(0, 3),
                         ),

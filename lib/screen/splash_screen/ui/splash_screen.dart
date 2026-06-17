@@ -55,9 +55,8 @@ class _SplashScreenState extends State<SplashScreen> {
       listen: false,
     );
     await vmProfile.getPlatformDependenciesApi(context: context);
-    vmProfile.getProfileApi(context: context);
-
     final data = vmProfile.platformDependenciesModel?.data;
+    vmProfile.getProfileApi(context: context);
 
     final info = await PackageInfo.fromPlatform();
     final currentVersion = info.version;

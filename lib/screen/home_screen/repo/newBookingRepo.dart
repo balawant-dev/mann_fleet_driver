@@ -315,12 +315,40 @@ class NewBookingRepo {
     required BuildContext context,
     required String id,
     required String reason,
+    required String currentLat,
+    required String currentLng,
   }) async {
     try {
       final response = await _api.post(
         "${ApiConstants.waiveExtraPayment}/$id",
         requiresAuth: true,
-        data: {"reason": reason},
+        data: {
+          "reason": reason,
+          "currentLat": currentLat,
+          "currentLng": currentLng,
+        },
+      );
+      return response['status'];
+    } on DioException catch (e) {
+      if (e.error is UnauthorizedException) {
+        await SecureStorageService.logout(context);
+        throw UnauthorizedException();
+      } else {
+        rethrow;
+      }
+    } catch (e) {
+      throw ApiException(0, e.toString());
+    }
+  }
+
+  Future<bool> forcedCompleteBooking({
+    required BuildContext context,
+    required String id,
+  }) async {
+    try {
+      final response = await _api.get(
+        "${ApiConstants.forcedCompleteBooking}/$id",
+        requiresAuth: true,
       );
       return response['status'];
     } on DioException catch (e) {
@@ -664,7 +692,6 @@ class NewBookingRepo {
     }
   }
 
-
   Future<UpdateLocationModel> updateDriverLocationBackgroundApi({
     required String id,
     required double lat,
@@ -674,10 +701,7 @@ class NewBookingRepo {
     final response = await _api.patch(
       "${ApiConstants.updateDriverLocation}/$id",
       requiresAuth: true,
-      data: {
-        "lat": lat,
-        "lng": lng,
-      },
+      data: {"lat": lat, "lng": lng},
     );
 
     return UpdateLocationModel.fromJson(response);

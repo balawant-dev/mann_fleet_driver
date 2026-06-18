@@ -11,6 +11,7 @@ import '../../../../../apiservice/services/secure_storage_service.dart';
 import '../../auth/register/model/registerModel.dart';
 
 import '../../bookingDetail/model/bookingDetailModel.dart';
+import '../../sqlite_local_location/local_db_service.dart';
 import '../model/bookingAcceptedModel.dart';
 import '../model/bookingCancelModel.dart';
 import '../model/extra_charges_payment_model.dart';
@@ -181,6 +182,31 @@ class NewBookingRepo {
     }
   }
 
+  Future<void> syncLocations(String bookingId) async {
+    final locations = await LocalDbService.instance.getLocationsByBookingId(
+      bookingId,
+    );
+
+    if (locations.isEmpty) return;
+
+    final payload = {
+      'booking_id': bookingId,
+      'locations': locations.map((e) => e.toApiMap()).toList(),
+    };
+
+    try {
+      final response = await _api.post(
+        ApiConstants.applog,
+        requiresAuth: true,
+        data: payload,
+      );
+
+      if (response.statusCode == 200) {
+        await LocalDbService.instance.clearLocations();
+      }
+    } catch (_) {}
+  }
+
   Future<TripCompleteModel> completeTripApi({
     required BuildContext context,
     required String id,
@@ -193,6 +219,7 @@ class NewBookingRepo {
         requiresAuth: true,
         data: {"currentLat": currentLat, "currentLng": currentLng},
       );
+      syncLocations(id);
       //   await SecureStorageService.saveToken(response['token']);
       return TripCompleteModel.fromJson(response);
       //  return LoginModel.fromJson(response['user']);

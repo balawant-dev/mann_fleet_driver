@@ -29,6 +29,7 @@ class ApiConstants {
   static const String updateDriverLocation = '/api/driver/updateDriverLocation';
   static const String bookingHistory = '/api/driver/bookingHistory';
   static const String completeTrip = '/api/driver/completeTrip';
+  static const String applog = '/api/driver/applog';
   static const String finalFare = '/api/driver/finalFare';
   static const String waiveExtraPayment = '/api/driver/waiveExtraPayment';
   static const String extraPaymentCash = '/api/driver/extraPaymentCash';

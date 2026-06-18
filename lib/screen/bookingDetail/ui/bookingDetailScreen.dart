@@ -18,6 +18,7 @@ import '../../home_screen/model/final_fare_preview_model.dart';
 import '../../home_screen/provider/newBookingProvider.dart';
 import '../../pickup/ui/pickUpScreen.dart';
 import 'package:provider/provider.dart';
+import '../../sqlite_local_location/local_db_service.dart';
 import 'endSpeedoMeterScreen.dart';
 import 'mapRedirection.dart';
 
@@ -210,7 +211,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
   }) {
     const LocationSettings locationSettings = LocationSettings(
       accuracy: LocationAccuracy.high,
-      distanceFilter: 100, // 100 meter move
+      distanceFilter: 100,
     );
 
     _positionStream = Geolocator.getPositionStream(
@@ -969,8 +970,15 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
         !isEndOtpVerified) {
       return CommonAppButton(
         text: "End Trip",
-        onPressed: () {
-          _checkFinalFareAfterEndOtp(widget.id);
+        onPressed: () async {
+          final status = await Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => UploadSpeedoMeterImageScreen(id: widget.id),
+            ),
+          );
+          if (status == true) {
+            _checkFinalFareAfterEndOtp(widget.id);
+          }
         },
       );
     }
@@ -996,10 +1004,11 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
             await _completeTripAfterEndOtp(widget.id);
             navPop(context: context);
           } else {
-            navPush(
-              context: context,
-              action: UploadSpeedoMeterImageScreen(id: widget.id),
-            );
+            await _completeTripAfterEndOtp(widget.id);
+            // navPush(
+            //   context: context,
+            //   action: UploadSpeedoMeterImageScreen(id: widget.id),
+            // );
           }
         },
         // onPressed: () => showOtpDialog(widget.id, "end"),
@@ -1115,17 +1124,17 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                     }
                   }
                   if (type == "end") {
-                    final status = await Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder:
-                            (context) =>
-                                UploadSpeedoMeterImageScreen(id: widget.id),
-                      ),
-                    );
+                    // final status = await Navigator.of(context).push(
+                    //   MaterialPageRoute(
+                    //     builder:
+                    //         (context) =>
+                    //             UploadSpeedoMeterImageScreen(id: widget.id),
+                    //   ),
+                    // );
 
-                    if (status == true) {
-                      await _completeTripAfterEndOtp(widget.id);
-                    }
+                    // if (status == true) {
+                    await _completeTripAfterEndOtp(widget.id);
+                    // }
                   }
                 }
               },
@@ -1296,29 +1305,29 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                         );
                         if (success) {
                           Navigator.pop(context);
-                          final status = await Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder:
-                                  (context) => UploadSpeedoMeterImageScreen(
-                                    id: widget.id,
-                                  ),
-                            ),
+                          // final status = await Navigator.of(context).push(
+                          //   MaterialPageRoute(
+                          //     builder:
+                          //         (context) => UploadSpeedoMeterImageScreen(
+                          //           id: widget.id,
+                          //         ),
+                          //   ),
+                          // );
+                          //
+                          // if (status == true) {
+                          await provider.forcedCompleteBooking(
+                            context: context,
+                            id: widget.id,
                           );
+                          Navigator.pop(parentCtx);
 
-                          if (status == true) {
-                            await provider.forcedCompleteBooking(
-                              context: context,
-                              id: widget.id,
+                          Future.delayed(const Duration(seconds: 1), () {
+                            navPushReplace(
+                              context: parentCtx,
+                              action: const MainScreen(),
                             );
-                            Navigator.pop(parentCtx);
-
-                            Future.delayed(const Duration(seconds: 1), () {
-                              navPushReplace(
-                                context: parentCtx,
-                                action: const MainScreen(),
-                              );
-                            });
-                          }
+                          });
+                          // }
                         }
                       } else {
                         ToastHelper.show(

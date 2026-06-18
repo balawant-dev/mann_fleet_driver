@@ -1,5 +1,3 @@
-
-
 class TripCompleteModel {
   bool? status;
   String? message;
@@ -33,38 +31,39 @@ class Data {
   String? overallStatus;
   String? tripStartAt;
   String? tripEndAt;
-  int? actualMins;
-  double? estimatedKm;
-  double? actualKm;
-  int? extraKm;
+  var actualMins;
+  var estimatedKm;
+  var actualKm;
+  var extraKm;
   String? distanceSource;
-  double? estimatedFare;
-  double? prepaidAmount;
-  double? finalFare;
-  int? extraCharge;
+  var estimatedFare;
+  var prepaidAmount;
+  var finalFare;
+  var extraCharge;
   bool? requiresExtraPayment;
   FareBreakup? fareBreakup;
 
-  Data(
-      {this.bookingId,
-        this.bookingNumber,
-        this.paymentStatus,
-        this.assignmentStatus,
-        this.tripStatus,
-        this.overallStatus,
-        this.tripStartAt,
-        this.tripEndAt,
-        this.actualMins,
-        this.estimatedKm,
-        this.actualKm,
-        this.extraKm,
-        this.distanceSource,
-        this.estimatedFare,
-        this.prepaidAmount,
-        this.finalFare,
-        this.extraCharge,
-        this.requiresExtraPayment,
-        this.fareBreakup});
+  Data({
+    this.bookingId,
+    this.bookingNumber,
+    this.paymentStatus,
+    this.assignmentStatus,
+    this.tripStatus,
+    this.overallStatus,
+    this.tripStartAt,
+    this.tripEndAt,
+    this.actualMins,
+    this.estimatedKm,
+    this.actualKm,
+    this.extraKm,
+    this.distanceSource,
+    this.estimatedFare,
+    this.prepaidAmount,
+    this.finalFare,
+    this.extraCharge,
+    this.requiresExtraPayment,
+    this.fareBreakup,
+  });
 
   Data.fromJson(Map<String, dynamic> json) {
     bookingId = json['bookingId'];
@@ -85,9 +84,10 @@ class Data {
     finalFare = json['finalFare'];
     extraCharge = json['extraCharge'];
     requiresExtraPayment = json['requiresExtraPayment'];
-    fareBreakup = json['fareBreakup'] != null
-        ? new FareBreakup.fromJson(json['fareBreakup'])
-        : null;
+    fareBreakup =
+        json['fareBreakup'] != null
+            ? new FareBreakup.fromJson(json['fareBreakup'])
+            : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -118,42 +118,43 @@ class Data {
 }
 
 class FareBreakup {
-  int? baseFare;
-  double? distanceCharge;
-  int? timeCharge;
-  int? surgeCharge;
-  double? subtotal;
-  double? gstAmount;
-  int? tollCharge;
-  int? surchargeAmount;
-  int? waitingChargeAmount;
-  int? waitingMins;
-  int? extraKmCharge;
-  int? extraTimeCharge;
-  int? discountAmount;
-  int? walletUsed;
-  int? airportFare;
-  int? nightFare;
-  double? totalFare;
+  var baseFare;
+  var distanceCharge;
+  var timeCharge;
+  var surgeCharge;
+  var subtotal;
+  var gstAmount;
+  var tollCharge;
+  var surchargeAmount;
+  var waitingChargeAmount;
+  var waitingMins;
+  var extraKmCharge;
+  var extraTimeCharge;
+  var discountAmount;
+  var walletUsed;
+  var airportFare;
+  var nightFare;
+  var totalFare;
 
-  FareBreakup(
-      {this.baseFare,
-        this.distanceCharge,
-        this.timeCharge,
-        this.surgeCharge,
-        this.subtotal,
-        this.gstAmount,
-        this.tollCharge,
-        this.surchargeAmount,
-        this.waitingChargeAmount,
-        this.waitingMins,
-        this.extraKmCharge,
-        this.extraTimeCharge,
-        this.discountAmount,
-        this.walletUsed,
-        this.airportFare,
-        this.nightFare,
-        this.totalFare});
+  FareBreakup({
+    this.baseFare,
+    this.distanceCharge,
+    this.timeCharge,
+    this.surgeCharge,
+    this.subtotal,
+    this.gstAmount,
+    this.tollCharge,
+    this.surchargeAmount,
+    this.waitingChargeAmount,
+    this.waitingMins,
+    this.extraKmCharge,
+    this.extraTimeCharge,
+    this.discountAmount,
+    this.walletUsed,
+    this.airportFare,
+    this.nightFare,
+    this.totalFare,
+  });
 
   FareBreakup.fromJson(Map<String, dynamic> json) {
     baseFare = json['baseFare'];

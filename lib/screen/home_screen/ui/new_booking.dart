@@ -19,6 +19,7 @@ import '../../../widget/empty/noAssignedBookingScreen.dart';
 import '../../../widget/motionToastHelper.dart';
 import '../../bookingDetail/ui/bookingDetailScreen.dart';
 
+import '../../sqlite_local_location/showdata.dart';
 import '../../trip_cancellation/ui/trip_cancellation.dart';
 import '../component/bookingCard.dart';
 import '../provider/newBookingProvider.dart';
@@ -179,30 +180,41 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
                         provider.getBannerModel!.data!.isNotEmpty)
                       Column(
                         children: [
-                          CarouselSlider(
-                            options: CarouselOptions(
-                              height: 150,
-                              autoPlay: true,
-                              enlargeCenterPage: true,
-                              viewportFraction: 0.95,
-                              onPageChanged: (index, reason) {
-                                setState(() {
-                                  currentIndex = index;
-                                });
-                              },
+                          GestureDetector(
+                            onDoubleTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const LocationLogsPage(),
+                                ),
+                              );
+                            },
+                            child: CarouselSlider(
+                              options: CarouselOptions(
+                                height: 150,
+                                autoPlay: true,
+                                enlargeCenterPage: true,
+                                viewportFraction: 0.95,
+                                onPageChanged: (index, reason) {
+                                  setState(() {
+                                    currentIndex = index;
+                                  });
+                                },
+                              ),
+                              items:
+                                  provider.getBannerModel!.data!.map((item) {
+                                    return ClipRRect(
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: CustomImageView(
+                                        imagePath: item.image,
+                                        width:
+                                            MediaQuery.of(context).size.width,
+                                        fit: BoxFit.cover,
+                                        imageType: ImageType.network,
+                                      ),
+                                    );
+                                  }).toList(),
                             ),
-                            items:
-                                provider.getBannerModel!.data!.map((item) {
-                                  return ClipRRect(
-                                    borderRadius: BorderRadius.circular(12),
-                                    child: CustomImageView(
-                                      imagePath: item.image,
-                                      width: MediaQuery.of(context).size.width,
-                                      fit: BoxFit.cover,
-                                      imageType: ImageType.network,
-                                    ),
-                                  );
-                                }).toList(),
                           ),
                           const SizedBox(height: 10),
                           Row(
@@ -435,10 +447,7 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
             onTap: () async {
               final prefs = await SharedPreferences.getInstance();
 
-              await prefs.setString(
-                "tracking_booking_id",
-                bookingId,
-              );
+              await prefs.setString("tracking_booking_id", bookingId);
               bool success = await provider.acceptBookingApi(
                 context: context,
                 id: bookingId,
@@ -475,13 +484,10 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
         child: button(
           title: "Go to Detail",
           color: Colors.blue,
-          onTap: () async{
+          onTap: () async {
             final prefs = await SharedPreferences.getInstance();
 
-            await prefs.setString(
-              "tracking_booking_id",
-              bookingId,
-            );
+            await prefs.setString("tracking_booking_id", bookingId);
             navPush(
               context: context,
               action: BookingDetailScreen(id: bookingId),
@@ -524,9 +530,6 @@ class _NewBookingScreenState extends State<NewBookingScreen> {
                 message: "Trip Started 🚗",
                 type: ToastType.success,
               );
-              // ScaffoldMessenger.of(context).showSnackBar(
-              //   const SnackBar(content: Text("Trip Started 🚗")),
-              // );
             }
           },
         ),

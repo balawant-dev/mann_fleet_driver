@@ -35,26 +35,27 @@ class Data {
   Pickup? pickup;
   Pickup? dropoff;
   String? bookingType;
-  double? estimatedKm;
-  int? estimatedMins;
-  double? estimatedFare;
+  var estimatedKm;
+  var estimatedMins;
+  var estimatedFare;
 
-  Data(
-      {this.bookingId,
-        this.bookingNumber,
-        this.paymentStatus,
-        this.assignmentStatus,
-        this.tripStatus,
-        this.overallStatus,
-        this.tripStartAt,
-        this.user,
-        this.segment,
-        this.pickup,
-        this.dropoff,
-        this.bookingType,
-        this.estimatedKm,
-        this.estimatedMins,
-        this.estimatedFare});
+  Data({
+    this.bookingId,
+    this.bookingNumber,
+    this.paymentStatus,
+    this.assignmentStatus,
+    this.tripStatus,
+    this.overallStatus,
+    this.tripStartAt,
+    this.user,
+    this.segment,
+    this.pickup,
+    this.dropoff,
+    this.bookingType,
+    this.estimatedKm,
+    this.estimatedMins,
+    this.estimatedFare,
+  });
 
   Data.fromJson(Map<String, dynamic> json) {
     bookingId = json['bookingId'];
@@ -66,11 +67,11 @@ class Data {
     tripStartAt = json['tripStartAt'];
     user = json['user'] != null ? new User.fromJson(json['user']) : null;
     segment =
-    json['segment'] != null ? new Segment.fromJson(json['segment']) : null;
+        json['segment'] != null ? new Segment.fromJson(json['segment']) : null;
     pickup =
-    json['pickup'] != null ? new Pickup.fromJson(json['pickup']) : null;
+        json['pickup'] != null ? new Pickup.fromJson(json['pickup']) : null;
     dropoff =
-    json['dropoff'] != null ? new Pickup.fromJson(json['dropoff']) : null;
+        json['dropoff'] != null ? new Pickup.fromJson(json['dropoff']) : null;
     bookingType = json['bookingType'];
     estimatedKm = json['estimatedKm'];
     estimatedMins = json['estimatedMins'];
@@ -142,8 +143,8 @@ class Segment {
 }
 
 class Pickup {
-  double? lat;
-  double? lng;
+  var lat;
+  var lng;
   String? address;
 
   Pickup({this.lat, this.lng, this.address});

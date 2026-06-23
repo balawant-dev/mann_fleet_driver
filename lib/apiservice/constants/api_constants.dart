@@ -1,7 +1,7 @@
 class ApiConstants {
   //Live Url
-  static const String baseUrl = 'https://admin.mannfleetpartners.com';
-  // static const String baseUrl = 'http://167.71.226.189:9020';
+  // static const String baseUrl = 'https://admin.mannfleetpartners.com';
+  static const String baseUrl = 'http://167.71.226.189:9020';
 
   static const String verifyOtp = '/api/driver/verifyOtp';
 
@@ -66,6 +66,8 @@ class ApiConstants {
   static const String saveUserType = 'saveUserType';
   static const String geminiKey = 'geminiKey';
   static const String geminiVersion = 'geminiVersion';
+  static const String OpenAiKey = 'OpenAiKey';
+  static const String OpenAiVersion = 'OpenAiVersion';
   static const String forcedCompleteBooking =
       '/api/driver/forcedCompleteBooking';
 }

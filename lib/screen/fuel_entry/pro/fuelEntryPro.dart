@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:mann_fleet_driver/apiservice/services/secure_storage_service.dart';
+import 'package:mann_fleet_driver/screen/fuel_entry/service/open_ai_service.dart';
 import '../../../widget/motionToastHelper.dart';
 import '../../../widget/navigator_method.dart';
 import '../../../widget/showLoaderFunction.dart';
@@ -121,7 +122,7 @@ class FuelEntryProvider extends ChangeNotifier {
       switch (type) {
         case "bill":
           billImage = image;
-
+          await scanInvoiceBillDisplayWithGemini(image, context);
           break;
 
         case "odometer":
@@ -600,7 +601,9 @@ class FuelEntryProvider extends ChangeNotifier {
     showLoader(context);
 
     try {
-      final FuelScanResult results = await getFuelDetailsFromImage(imageFile);
+      final FuelScanResult results = await getFuelDetailsFromImageOpenAi(
+        imageFile,
+      );
 
       fuelQtyController.text = results.liters.toStringAsFixed(2);
       fuelPriceController.text = results.pricePerLiter.toStringAsFixed(2);
@@ -631,202 +634,6 @@ class FuelEntryProvider extends ChangeNotifier {
     fuelAmountController.clear();
   }
 
-  //   Future<void> scanFuelDisplayWithGemini(
-  //     File imageFile,
-  //     BuildContext context,
-  //   ) async {
-  //     try {
-  //       final api = await SecureStorageService.getGeminiToken();
-  //       final apiVersion = await SecureStorageService.getGeminiVersion();
-  //       showLoader(context);
-  //       print("START FUEL OCR");
-  //       print("API => $api");
-  //       print("VERSION => $apiVersion");
-  //
-  //       final bytes = await imageFile.readAsBytes();
-  //       final base64Image = base64Encode(bytes);
-  //
-  //       final uri = Uri.parse(
-  //         "https://generativelanguage.googleapis.com/v1beta/models/$apiVersion:generateContent?key=$api",
-  //       );
-  //
-  //       int retry = 0;
-  //       http.Response? response;
-  //
-  //       /// RETRY FOR 503
-  //       while (retry < 3) {
-  //         response = await http.post(
-  //           uri,
-  //           headers: {"Content-Type": "application/json"},
-  //           body: jsonEncode({
-  //             "contents": [
-  //               {
-  //                 "parts": [
-  //                   {
-  //                     "text": """
-  // You are a fuel station display OCR validator.
-  //
-  // RULES:
-  // - Accept ONLY fuel machine display images.
-  // - Reject selfies, documents, random objects, or unrelated photos.
-  // - Reject if liters, amount, or fuel price are unreadable.
-  // - Return ONLY valid JSON.
-  // - No markdown.
-  // - No explanation.
-  //
-  // If valid fuel display:
-  // {
-  //   "success": true,
-  //   "liters": 10.5,
-  //   "price_per_liter": 96.72,
-  //   "total_amount": 1015.56
-  // }
-  //
-  // If invalid image:
-  // {
-  //   "success": false,
-  //   "error": "Invalid fuel display image"
-  // }
-  // """,
-  //                   },
-  //                   {
-  //                     "inline_data": {
-  //                       "mime_type": "image/jpeg",
-  //                       "data": base64Image,
-  //                     },
-  //                   },
-  //                 ],
-  //               },
-  //             ],
-  //             "generationConfig": {"temperature": 0},
-  //           }),
-  //         );
-  //
-  //         print("STATUS => ${response.statusCode}");
-  //
-  //         /// HANDLE 503
-  //         if (response.statusCode == 503) {
-  //           retry++;
-  //
-  //           print("503 HEAVY USAGE RETRY => $retry");
-  //
-  //           await Future.delayed(Duration(seconds: 2 * retry));
-  //
-  //           continue;
-  //         }
-  //
-  //         break;
-  //       }
-  //
-  //       if (response == null) {
-  //         print("NO RESPONSE");
-  //         return;
-  //       }
-  //
-  //       print(response.body);
-  //
-  //       if (response.statusCode == 200) {
-  //         final data = jsonDecode(response.body);
-  //
-  //         String rawText =
-  //             data["candidates"]?[0]?["content"]?["parts"]?[0]?["text"] ?? "";
-  //
-  //         print("RAW => $rawText");
-  //
-  //         /// CLEAN RESPONSE
-  //         String cleaned =
-  //             rawText
-  //                 .replaceAll("```json", "")
-  //                 .replaceAll("```", "")
-  //                 .replaceAll("\n", "")
-  //                 .trim();
-  //
-  //         Map<String, dynamic> jsonData = {};
-  //
-  //         try {
-  //           jsonData = jsonDecode(cleaned);
-  //         } catch (e) {
-  //           print("JSON PARSE ERROR => $e");
-  //
-  //           final regex = RegExp(r'\{.*\}');
-  //           final match = regex.firstMatch(rawText);
-  //
-  //           if (match != null) {
-  //             jsonData = jsonDecode(match.group(0)!);
-  //           }
-  //         }
-  //
-  //         /// STRICT VALIDATION
-  //         bool success = jsonData["success"] == true;
-  //
-  //         if (!success) {
-  //           fuelQtyController.clear();
-  //           fuelPriceController.clear();
-  //           fuelAmountController.clear();
-  //
-  //           ScaffoldMessenger.of(context).showSnackBar(
-  //             const SnackBar(
-  //               content: Text("Only fuel machine display images are allowed"),
-  //             ),
-  //           );
-  //
-  //           return;
-  //         }
-  //
-  //         double liters = double.tryParse(jsonData["liters"].toString()) ?? 0;
-  //
-  //         double price =
-  //             double.tryParse(jsonData["price_per_liter"].toString()) ?? 0;
-  //
-  //         double total =
-  //             double.tryParse(jsonData["total_amount"].toString()) ?? 0;
-  //
-  //         /// EXTRA SAFETY
-  //         if (liters <= 0 || price <= 0 || total <= 0) {
-  //           fuelQtyController.clear();
-  //           fuelPriceController.clear();
-  //           fuelAmountController.clear();
-  //
-  //           ScaffoldMessenger.of(context).showSnackBar(
-  //             const SnackBar(content: Text("Fuel data not detected properly")),
-  //           );
-  //
-  //           return;
-  //         }
-  //
-  //         fuelQtyController.text = liters.toStringAsFixed(2);
-  //
-  //         fuelPriceController.text = price.toStringAsFixed(2);
-  //
-  //         fuelAmountController.text = total.toStringAsFixed(2);
-  //
-  //         print("AUTO FILL DONE");
-  //
-  //         notifyListeners();
-  //       } else {
-  //         print("ERROR RESPONSE => ${response.body}");
-  //
-  //         ScaffoldMessenger.of(context).showSnackBar(
-  //           SnackBar(
-  //             content: Text(
-  //               response.statusCode == 503
-  //                   ? "Server busy. Try again."
-  //                   : "Failed to scan fuel display",
-  //             ),
-  //           ),
-  //         );
-  //       }
-  //     } catch (e) {
-  //       print("OCR ERROR => $e");
-  //
-  //       ScaffoldMessenger.of(
-  //         context,
-  //       ).showSnackBar(const SnackBar(content: Text("Something went wrong")));
-  //     } finally {
-  //       Navigator.pop(context);
-  //     }
-  //   }
-
   Future<void> scanOdometerDisplayWithGemini(
     File imageFile,
     BuildContext context,
@@ -834,7 +641,7 @@ class FuelEntryProvider extends ChangeNotifier {
     showLoader(context);
 
     try {
-      double reading = await getOdometerReadingFromImage(imageFile);
+      double reading = await getOdometerReadingFromImageOpenAi(imageFile);
 
       odometerController.text = reading.toStringAsFixed(0);
       notifyListeners();
@@ -843,6 +650,39 @@ class FuelEntryProvider extends ChangeNotifier {
     } catch (error) {
       if (context.mounted) {
         odometerController.clear();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(error.toString().replaceFirst("Exception: ", "")),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } finally {
+      if (context.mounted) {
+        navPop(context: context);
+      }
+    }
+  }
+
+  Future<void> scanInvoiceBillDisplayWithGemini(
+    File imageFile,
+    BuildContext context,
+  ) async {
+    showLoader(context);
+
+    try {
+      final FuelInvoiceResult reading = await getFuelInvoiceFromImageOpenAi(
+        imageFile,
+      );
+
+      invoiceNumberController.text = reading.invoiceNo;
+
+      notifyListeners();
+
+      print("Invoice Bill reading auto-filled successfully!");
+    } catch (error) {
+      if (context.mounted) {
+        invoiceNumberController.clear();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(error.toString().replaceFirst("Exception: ", "")),

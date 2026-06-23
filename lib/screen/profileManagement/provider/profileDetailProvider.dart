@@ -71,8 +71,18 @@ class ProfileDetailProvider extends ChangeNotifier {
         await SecureStorageService.saveGeminiVersion(
           res.data!.first.name!.rGEMNI_API_VERSION!,
         );
-        getProfileApi(context: context);
       }
+      if (res.data != null &&
+          res.data!.first.name!.rOpenAiKey != null &&
+          res.data!.first.name!.rOpenAiKey!.isNotEmpty) {
+        await SecureStorageService.saveOpenAiToken(
+          res.data!.first.name!.rOpenAiKey!,
+        );
+        await SecureStorageService.saveOpenAiVersion(
+          res.data!.first.name!.rOpenAiVersion!,
+        );
+      }
+      getProfileApi(context: context);
       errorMessage = null;
     } catch (e) {
       errorMessage = e.toString();

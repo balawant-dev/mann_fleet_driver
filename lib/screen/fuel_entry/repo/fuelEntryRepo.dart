@@ -1,4 +1,3 @@
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
@@ -9,7 +8,6 @@ import '../../../../../apiservice/network/network_utils.dart';
 import '../../../../../apiservice/services/secure_storage_service.dart';
 
 import '../model/fuelEntryModel.dart';
-
 
 class FuelEntryRepo {
   final ApiService _api = ApiService();
@@ -31,7 +29,6 @@ class FuelEntryRepo {
     required BuildContext context,
   }) async {
     try {
-
       FormData formData = FormData.fromMap({
         "carNumber": carNumber,
         "fuelType": fuelType,
@@ -62,15 +59,12 @@ class FuelEntryRepo {
           "endFuelMeterImage": await MultipartFile.fromFile(
             endFuelMeterImage,
             filename: endFuelMeterImage.split('/').last,
-          ),  if (billImage.isNotEmpty)
+          ),
+        if (billImage.isNotEmpty)
           "billImage": await MultipartFile.fromFile(
             billImage,
             filename: billImage.split('/').last,
           ),
-
-
-
-
       });
 
       final response = await _api.postMultipart(
@@ -81,50 +75,51 @@ class FuelEntryRepo {
       );
 
       return FuelEntryModel.fromJson(response);
-
     } on DioException catch (e) {
       if (e.error is NoInternetException) {
         showNoInternetScreen(
           context,
-          onRetry: () => fuelEntryAPi(
-
-            context: context,
-              invoiceNumber:invoiceNumber,
-            fuelType: fuelType,
-            carNumber: carNumber,
-            billImage: billImage,
-            endFuelMeterImage: endFuelMeterImage,
-            fuelAmount: fuelAmount,
-            fuelPrice: fuelPrice,
-            fuelQuantity: fuelQuantity,
-            locationAddress: locationAddress,
-            locationLat: locationLat,locationLng: locationLng,
-            odometerMeterImage: odometerReading,
-            odometerReading: odometerReading,
-            startFuelMeterImage: startFuelMeterImage
-
-          ),
+          onRetry:
+              () => fuelEntryAPi(
+                context: context,
+                invoiceNumber: invoiceNumber,
+                fuelType: fuelType,
+                carNumber: carNumber,
+                billImage: billImage,
+                endFuelMeterImage: endFuelMeterImage,
+                fuelAmount: fuelAmount,
+                fuelPrice: fuelPrice,
+                fuelQuantity: fuelQuantity,
+                locationAddress: locationAddress,
+                locationLat: locationLat,
+                locationLng: locationLng,
+                odometerMeterImage: odometerReading,
+                odometerReading: odometerReading,
+                startFuelMeterImage: startFuelMeterImage,
+              ),
         );
         throw NoInternetException();
       } else if (e.error is ServerException) {
         showServerErrorScreen(
           context,
-          onRetry: () => fuelEntryAPi(
-              context: context,
-              fuelType: fuelType,
-              carNumber: carNumber,
-              invoiceNumber:invoiceNumber,
-              billImage: billImage,
-              endFuelMeterImage: endFuelMeterImage,
-              fuelAmount: fuelAmount,
-              fuelPrice: fuelPrice,
-              fuelQuantity: fuelQuantity,
-              locationAddress: locationAddress,
-              locationLat: locationLat,locationLng: locationLng,
-              odometerMeterImage: odometerReading,
-              odometerReading: odometerReading,
-              startFuelMeterImage: startFuelMeterImage
-          ),
+          onRetry:
+              () => fuelEntryAPi(
+                context: context,
+                fuelType: fuelType,
+                carNumber: carNumber,
+                invoiceNumber: invoiceNumber,
+                billImage: billImage,
+                endFuelMeterImage: endFuelMeterImage,
+                fuelAmount: fuelAmount,
+                fuelPrice: fuelPrice,
+                fuelQuantity: fuelQuantity,
+                locationAddress: locationAddress,
+                locationLat: locationLat,
+                locationLng: locationLng,
+                odometerMeterImage: odometerReading,
+                odometerReading: odometerReading,
+                startFuelMeterImage: startFuelMeterImage,
+              ),
         );
         throw ServerException();
       } else if (e.error is UnauthorizedException) {
@@ -137,8 +132,6 @@ class FuelEntryRepo {
       throw ApiException(0, e.toString());
     }
   }
-
-
 
   // Future<GetProfileModel> getProfileApi({required BuildContext context}) async {
   //   try {

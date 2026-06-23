@@ -1,6 +1,3 @@
-
-
-
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -13,7 +10,6 @@ class BillScannerScreen extends StatefulWidget {
 }
 
 class _BillScannerScreenState extends State<BillScannerScreen> {
-
   final picker = ImagePicker();
 
   File? billImage;
@@ -29,19 +25,20 @@ class _BillScannerScreenState extends State<BillScannerScreen> {
   Future<void> pickImage(bool isBill) async {
     final source = await showModalBottomSheet<ImageSource>(
       context: context,
-      builder: (_) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ListTile(
-            title: Text("Camera"),
-            onTap: () => Navigator.pop(context, ImageSource.camera),
+      builder:
+          (_) => Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: Text("Camera"),
+                onTap: () => Navigator.pop(context, ImageSource.camera),
+              ),
+              ListTile(
+                title: Text("Gallery"),
+                onTap: () => Navigator.pop(context, ImageSource.gallery),
+              ),
+            ],
           ),
-          ListTile(
-            title: Text("Gallery"),
-            onTap: () => Navigator.pop(context, ImageSource.gallery),
-          ),
-        ],
-      ),
     );
 
     if (source == null) return;
@@ -69,10 +66,7 @@ class _BillScannerScreenState extends State<BillScannerScreen> {
     CroppedFile? cropped = await ImageCropper().cropImage(
       sourcePath: file.path,
       uiSettings: [
-        AndroidUiSettings(
-          toolbarTitle: "Crop Image",
-          lockAspectRatio: false,
-        ),
+        AndroidUiSettings(toolbarTitle: "Crop Image", lockAspectRatio: false),
         IOSUiSettings(title: "Crop Image"),
       ],
     );
@@ -85,8 +79,9 @@ class _BillScannerScreenState extends State<BillScannerScreen> {
     final inputImage = InputImage.fromFile(file);
     final textRecognizer = TextRecognizer();
 
-    final RecognizedText recognizedText =
-    await textRecognizer.processImage(inputImage);
+    final RecognizedText recognizedText = await textRecognizer.processImage(
+      inputImage,
+    );
 
     textRecognizer.close();
 
@@ -104,7 +99,6 @@ class _BillScannerScreenState extends State<BillScannerScreen> {
 
   /// 🧠 SMART DATA EXTRACTION
   void extractDataAdvanced(String text) {
-
     /// ✅ ONLY STRONG KEYS (ENGLISH ONLY)
     List<String> invoiceKeys = [
       "invoice no",
@@ -120,7 +114,7 @@ class _BillScannerScreenState extends State<BillScannerScreen> {
       "inv",
       "invoice#",
       "bill#",
-      "receipt#"
+      "receipt#",
     ];
 
     List<String> amountKeys = [
@@ -136,7 +130,7 @@ class _BillScannerScreenState extends State<BillScannerScreen> {
       "rs",
       "rs.",
       "inr",
-      "₹"
+      "₹",
     ];
 
     String foundInvoice = "Not Found";
@@ -156,7 +150,6 @@ class _BillScannerScreenState extends State<BillScannerScreen> {
 
       for (String key in invoiceKeys) {
         if (l.contains(key) && foundInvoice == "Not Found") {
-
           /// 🔥 KEY ke baad ka part nikaalo
           String afterKey = line.toLowerCase().split(key).last;
 
@@ -182,8 +175,7 @@ class _BillScannerScreenState extends State<BillScannerScreen> {
           if (i + 1 < lines.length) {
             String nextLine = lines[i + 1];
 
-            final nextMatch =
-            RegExp(r'([A-Z0-9\-]{4,})').firstMatch(nextLine);
+            final nextMatch = RegExp(r'([A-Z0-9\-]{4,})').firstMatch(nextLine);
 
             if (nextMatch != null) {
               String val = nextMatch.group(1)!;
@@ -209,7 +201,6 @@ class _BillScannerScreenState extends State<BillScannerScreen> {
 
       for (String key in amountKeys) {
         if (l.contains(key)) {
-
           /// Extract only number after keyword
           RegExp reg = RegExp(r'(\d+\.?\d{0,2})');
           Iterable<Match> matches = reg.allMatches(line);
@@ -279,7 +270,6 @@ class _BillScannerScreenState extends State<BillScannerScreen> {
         padding: EdgeInsets.all(16),
         child: Column(
           children: [
-
             /// 🧾 BILL SECTION
             sectionTitle("Petrol Bill Scanner"),
 
@@ -288,8 +278,7 @@ class _BillScannerScreenState extends State<BillScannerScreen> {
               child: Text("Scan Bill"),
             ),
 
-            if (billImage != null)
-              Image.file(billImage!, height: 150),
+            if (billImage != null) Image.file(billImage!, height: 150),
 
             buildRow("Invoice No:", invoiceNumber),
             buildRow("Amount:", amount),
@@ -304,8 +293,7 @@ class _BillScannerScreenState extends State<BillScannerScreen> {
               child: Text("Scan Speedometer"),
             ),
 
-            if (speedoImage != null)
-              Image.file(speedoImage!, height: 150),
+            if (speedoImage != null) Image.file(speedoImage!, height: 150),
 
             SizedBox(height: 10),
 

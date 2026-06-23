@@ -1,19 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-
 import 'package:mann_fleet_driver/util/color/app_colors.dart';
-
 import 'package:mann_fleet_driver/widget/commonAppBar.dart';
 import 'package:mann_fleet_driver/widget/commonAppButton.dart';
 import 'package:mann_fleet_driver/widget/commonTextFormField.dart';
-
 import 'package:mann_fleet_driver/widget/custom_text.dart';
 import 'package:dotted_border/dotted_border.dart';
-
 import 'package:provider/provider.dart';
-
 import 'dart:io';
-
 import '../../vehicle/provider/editVehicalDetailPro.dart';
 import '../pro/fuelEntryPro.dart';
 
@@ -27,7 +21,6 @@ class FuelEntryScreen extends StatefulWidget {
 class _FuelEntryScreenState extends State<FuelEntryScreen> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<EditVehicleDetailsPro>().getVehicleApi(context: context);
@@ -76,18 +69,28 @@ class _FuelEntryScreenState extends State<FuelEntryScreen> {
 
                 const SizedBox(height: 15),
                 _imageCard(
-                  title: "End Meter",
-                  file: provider.endImage,
-                  onTap: () => _pick(context, provider, "end"),
-                ),
-
-                /// IMAGE SECTION
-                _imageCard(
                   title: "Odometer Image",
                   file: provider.odometerImage,
                   onTap: () => _pick(context, provider, "odometer"),
                 ),
-                const SizedBox(height: 20),
+                _imageCard(
+                  title: "Start Meter",
+                  file: provider.startImage,
+                  onTap: () => _pick(context, provider, "start"),
+                ),
+
+                _imageCard(
+                  title: "End Meter",
+                  file: provider.endImage,
+                  onTap: () => _pick(context, provider, "end"),
+                ),
+                _imageCard(
+                  title: "Upload Bill",
+                  file: provider.billImage,
+                  onTap: () => _pick(context, provider, "bill"),
+                ),
+
+                const SizedBox(height: 15),
 
                 /// VEHICLE
                 // _label('Vehicle No.'),
@@ -181,20 +184,6 @@ class _FuelEntryScreenState extends State<FuelEntryScreen> {
                   hintText: 'Total Amount',
                   labelText: 'Total Amount',
                   isRequired: true,
-                ),
-
-                const SizedBox(height: 20),
-
-                _imageCard(
-                  title: "Start Meter",
-                  file: provider.startImage,
-                  onTap: () => _pick(context, provider, "start"),
-                ),
-
-                _imageCard(
-                  title: "Upload Bill",
-                  file: provider.billImage,
-                  onTap: () => _pick(context, provider, "bill"),
                 ),
 
                 const SizedBox(height: 100),

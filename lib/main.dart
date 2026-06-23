@@ -23,8 +23,6 @@ import 'package:mann_fleet_driver/screen/vehicle/provider/vehicle_details_provid
 import 'package:mann_fleet_driver/screen/splash_screen/ui/splash_screen.dart';
 import 'package:mann_fleet_driver/util/theame/app_theme.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 import 'apiservice/services/firebaseService.dart';
 import 'firebase_options.dart';
 

@@ -5,14 +5,11 @@ import 'package:mann_fleet_driver/util/image_resource/image_resource.dart';
 import 'package:mann_fleet_driver/widget/customImageView.dart';
 import 'package:mann_fleet_driver/widget/custom_text.dart';
 import 'package:provider/provider.dart';
-
 import '../../../widget/navigator_method.dart';
 import '../../drawer/ui/custom_drawer.dart';
-
 import '../../notification/ui/notificationScreen.dart';
 import '../../profileManagement/screen/personal_profile_screen.dart';
 import '../provider/newBookingProvider.dart';
-
 import 'new_booking.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -29,12 +26,15 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    loadInitialData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      loadInitialData();
+    });
   }
 
-  void loadInitialData() {
+  void loadInitialData() async {
     final vm = Provider.of<ProfileDetailProvider>(context, listen: false);
     vm.getProfileApi(context: context);
+    await vm.getPlatformDependenciesApi(context: context);
   }
 
   String _getGreeting() {

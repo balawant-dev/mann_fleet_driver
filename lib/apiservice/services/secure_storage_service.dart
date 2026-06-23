@@ -72,6 +72,23 @@ class SecureStorageService {
     return await _storage.read(key: ApiConstants.geminiVersion);
   }
 
+  /// OpenAi Token
+  static Future<void> saveOpenAiToken(String token) async {
+    await _storage.write(key: ApiConstants.OpenAiKey, value: token);
+  }
+
+  static Future<void> saveOpenAiVersion(String version) async {
+    await _storage.write(key: ApiConstants.OpenAiVersion, value: version);
+  }
+
+  static Future<String?> getOpenAiToken() async {
+    return await _storage.read(key: ApiConstants.OpenAiKey);
+  }
+
+  static Future<String?> getOpenAiVersion() async {
+    return await _storage.read(key: ApiConstants.OpenAiVersion);
+  }
+
   static Future<bool> getIsAgent() async {
     final value = await _storage.read(key: ApiConstants.isAgentKey);
     return value == 'true';

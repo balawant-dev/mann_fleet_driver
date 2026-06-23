@@ -189,8 +189,11 @@ class NewBookingRepo {
 
     if (locations.isEmpty) return;
 
+    final totalDistance = locations.last.cumulativeDistance;
+
     final payload = {
       'booking_id': bookingId,
+      'total_distance': totalDistance,
       'locations': locations.map((e) => e.toApiMap()).toList(),
     };
 
@@ -204,7 +207,9 @@ class NewBookingRepo {
       if (response.statusCode == 200) {
         await LocalDbService.instance.clearLocations();
       }
-    } catch (_) {}
+    } catch (e) {
+      print("Location sync failed: $e");
+    }
   }
 
   Future<TripCompleteModel> completeTripApi({

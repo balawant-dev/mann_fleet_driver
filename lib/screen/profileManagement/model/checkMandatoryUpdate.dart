@@ -74,6 +74,8 @@ class Name {
   String? rAZORKEYSECRET;
   String? rGEMNI_API_KEY;
   String? rGEMNI_API_VERSION;
+  String? rOpenAiVersion;
+  String? rOpenAiKey;
 
   Name({
     this.userAppVersion,
@@ -82,6 +84,8 @@ class Name {
     this.rAZORKEY,
     this.rGEMNI_API_KEY,
     this.rGEMNI_API_VERSION,
+    this.rOpenAiVersion,
+    this.rOpenAiKey,
     this.rAZORKEYSECRET,
   });
 
@@ -92,6 +96,8 @@ class Name {
     rAZORKEY = json['RAZOR_KEY'];
     rGEMNI_API_KEY = json['GEMNI_API_KEY'];
     rGEMNI_API_VERSION = json['GEMNI_API_VERSION'];
+    rOpenAiVersion = json['OpenAiVersion'];
+    rOpenAiKey = json['OpenAiKey'];
     rAZORKEYSECRET = json['RAZOR_KEY_SECRET'];
   }
 
@@ -104,6 +110,8 @@ class Name {
     data['RAZOR_KEY_SECRET'] = this.rAZORKEYSECRET;
     data['GEMNI_API_KEY'] = this.rGEMNI_API_KEY;
     data['GEMNI_API_VERSION'] = this.rGEMNI_API_VERSION;
+    data['OpenAiVersion'] = this.rOpenAiVersion;
+    data['OpenAiKey'] = this.rOpenAiKey;
     return data;
   }
 }

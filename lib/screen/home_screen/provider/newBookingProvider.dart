@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mann_fleet_driver/screen/fuel_entry/service/open_ai_service.dart';
 import 'package:mann_fleet_driver/widget/motionToastHelper.dart';
 import 'package:mann_fleet_driver/widget/navigator_method.dart';
 import '../../../apiservice/services/secure_storage_service.dart';
@@ -769,7 +770,7 @@ class NewBookingProvider extends ChangeNotifier {
     showLoader(context);
 
     try {
-      double reading = await getOdometerReadingFromImage(imageFile);
+      double reading = await getOdometerReadingFromImageOpenAi(imageFile);
 
       speedoMetervalue.text = reading.toStringAsFixed(0);
       notifyListeners();

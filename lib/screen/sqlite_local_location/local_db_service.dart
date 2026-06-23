@@ -1,3 +1,4 @@
+import 'package:geolocator/geolocator.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'model.dart';
@@ -21,17 +22,30 @@ class LocalDbService {
 
     return openDatabase(
       join(dbPath, 'app_database.db'),
-      version: 1,
+      version: 2,
       onCreate: (db, version) async {
         await db.execute('''
-          CREATE TABLE location_logs(
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            booking_id TEXT NOT NULL,
-            latitude REAL NOT NULL,
-            longitude REAL NOT NULL,
-            date_time TEXT NOT NULL
-          )
-        ''');
+      CREATE TABLE location_logs(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        booking_id TEXT NOT NULL,
+        latitude REAL NOT NULL,
+        longitude REAL NOT NULL,
+        date_time TEXT NOT NULL,
+        distance_from_prev REAL DEFAULT 0,
+        cumulative_distance REAL DEFAULT 0
+      )
+    ''');
+      },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) {
+          await db.execute(
+            'ALTER TABLE location_logs ADD COLUMN distance_from_prev REAL DEFAULT 0',
+          );
+
+          await db.execute(
+            'ALTER TABLE location_logs ADD COLUMN cumulative_distance REAL DEFAULT 0',
+          );
+        }
       },
     );
   }
@@ -45,11 +59,38 @@ class LocalDbService {
   }) async {
     final db = await database;
 
+    double distanceFromPrev = 0;
+    double cumulativeDistance = 0;
+
+    final lastLocation = await getLatestLocationByBookingId(bookingId);
+
+    if (lastLocation != null) {
+      distanceFromPrev = Geolocator.distanceBetween(
+        lastLocation.latitude,
+        lastLocation.longitude,
+        latitude,
+        longitude,
+      );
+
+      // Ignore GPS spikes
+      if (distanceFromPrev < 5) {
+        distanceFromPrev = 0;
+      }
+
+      if (distanceFromPrev > 1000) {
+        distanceFromPrev = 0;
+      }
+
+      cumulativeDistance = lastLocation.cumulativeDistance + distanceFromPrev;
+    }
+
     return db.insert('location_logs', {
       'booking_id': bookingId,
       'latitude': latitude,
       'longitude': longitude,
       'date_time': dateTime.toIso8601String(),
+      'distance_from_prev': distanceFromPrev,
+      'cumulative_distance': cumulativeDistance,
     });
   }
 
@@ -64,6 +105,27 @@ class LocalDbService {
     );
 
     return result.map(LocationLog.fromMap).toList();
+  }
+
+  Future<LocationLog?> getLatestLocationByBookingId(String bookingId) async {
+    final db = await database;
+
+    final result = await db.query(
+      'location_logs',
+      where: 'booking_id = ?',
+      whereArgs: [bookingId],
+      orderBy: 'id ASC',
+    );
+
+    if (result.isEmpty) return null;
+
+    return LocationLog.fromMap(result.first);
+  }
+
+  Future<double> getTotalDistance(String bookingId) async {
+    final last = await getLatestLocationByBookingId(bookingId);
+
+    return last?.cumulativeDistance ?? 0;
   }
 
   /// Get All Locations
@@ -119,37 +181,3 @@ class LocalDbService {
     _database = null;
   }
 }
-
-//
-// Future<void> syncLocations(
-//   String bookingId,
-// ) async {
-//   final locations =
-//       await LocalDbService.instance
-//           .getLocationsByBookingId(bookingId);
-//
-//   if (locations.isEmpty) return;
-//
-//   final payload = {
-//     'booking_id': bookingId,
-//     'locations': locations
-//         .map((e) => e.toApiMap())
-//         .toList(),
-//   };
-//
-//   try {
-//     final response = await dio.post(
-//       '/location-sync',
-//       data: payload,
-//     );
-//
-//     if (response.statusCode == 200) {
-//       await LocalDbService.instance.deleteLocationsByIds(
-//         locations
-//             .where((e) => e.id != null)
-//             .map((e) => e.id!)
-//             .toList(),
-//       );
-//     }
-//   } catch (_) {}
-// }

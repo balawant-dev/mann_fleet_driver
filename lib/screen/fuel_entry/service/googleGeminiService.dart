@@ -100,15 +100,23 @@ Future<double> getOdometerReadingFromImage(File imageFile) async {
 
     int retry = 0;
     GenerateContentResponse? response;
-
+    final stopwatch = Stopwatch()..start();
     while (retry < 3) {
       try {
         response = await model.generateContent(content);
+        stopwatch.stop();
+        print('GEMINI Response Time: ${stopwatch.elapsedMilliseconds} ms');
         break;
       } on GenerativeAIException catch (e) {
         retry++;
         print("Gemini API Retry Attempt => $retry due to: $e");
-        if (retry >= 3) rethrow;
+        if (retry >= 3) {
+          stopwatch.stop();
+          print(
+            "GEMINI ODOMETER FAILED AFTER => ${stopwatch.elapsedMilliseconds} ms",
+          );
+          rethrow;
+        }
         await Future.delayed(Duration(seconds: 2 * retry));
       }
     }
@@ -217,18 +225,24 @@ ERROR HANDLING:
     final content = [
       Content.multi([TextPart(prompt), DataPart('image/jpeg', bytes)]),
     ];
-
+    final stopwatch = Stopwatch()..start();
     int retry = 0;
     GenerateContentResponse? response;
 
     while (retry < 3) {
       try {
         response = await model.generateContent(content);
+        stopwatch.stop();
+        print('GEMINI Response Time: ${stopwatch.elapsedMilliseconds} ms');
         break;
       } on GenerativeAIException catch (e) {
         retry++;
         print("Gemini API Fuel Retry Attempt => $retry due to: $e");
-        if (retry >= 3) rethrow;
+        if (retry >= 3) {
+          stopwatch.stop();
+          print('GEMINI Response Time: ${stopwatch.elapsedMilliseconds} ms');
+          rethrow;
+        }
         await Future.delayed(Duration(seconds: 2 * retry));
       }
     }
@@ -280,5 +294,18 @@ class FuelScanResult {
     required this.liters,
     required this.pricePerLiter,
     required this.totalAmount,
+  });
+}
+class FuelInvoiceResult {
+  final String invoiceNo;
+  final double totalAmount;
+  final double fuelRate;
+  final double fuelQuantity;
+
+  FuelInvoiceResult({
+    required this.invoiceNo,
+    required this.totalAmount,
+    required this.fuelRate,
+    required this.fuelQuantity,
   });
 }

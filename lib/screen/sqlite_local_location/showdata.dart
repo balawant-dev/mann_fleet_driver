@@ -63,7 +63,7 @@ class _LocationLogsPageState extends State<LocationLogsPage> {
                 itemBuilder: (context, index) {
                   final item = _logs[index];
 
-                  return Card(
+                  Card(
                     margin: const EdgeInsets.all(8),
                     child: Padding(
                       padding: const EdgeInsets.all(12),
@@ -74,10 +74,32 @@ class _LocationLogsPageState extends State<LocationLogsPage> {
                             'Booking: ${item.bookingId}',
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
+
                           const SizedBox(height: 8),
+
                           Text('Latitude : ${item.latitude}'),
                           Text('Longitude: ${item.longitude}'),
-                          Text('Time     : ${item.dateTime}'),
+
+                          const SizedBox(height: 8),
+
+                          Text(
+                            'Distance From Prev: '
+                            '${item.distanceFromPrev.toStringAsFixed(2)} m',
+                          ),
+
+                          Text(
+                            'Total Distance: '
+                            '${item.cumulativeDistance.toStringAsFixed(2)} m',
+                          ),
+
+                          Text(
+                            'Total Distance: '
+                            '${(item.cumulativeDistance / 1000).toStringAsFixed(2)} km',
+                          ),
+
+                          const SizedBox(height: 8),
+
+                          Text('Time: ${item.dateTime}'),
                         ],
                       ),
                     ),

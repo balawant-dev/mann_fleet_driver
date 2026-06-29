@@ -16,7 +16,7 @@ import '../../auth/register/ui/registerScreen.dart';
 import '../../bottomBar/bottomBar.dart';
 import '../../profileManagement/provider/profileDetailProvider.dart';
 import '../../profileManagement/screen/profileManagementScreen.dart';
-
+import 'package:video_player/video_player.dart';
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -25,9 +25,18 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  late VideoPlayerController _videoController;
   @override
   void initState() {
     super.initState();
+    _videoController = VideoPlayerController.asset(
+      'assets/images/spalshVideo.mp4',
+    )
+      ..initialize().then((_) {
+        setState(() {});
+        _videoController.play();
+        _videoController.setLooping(true);
+      });
     loadInitialData();
   }
 
@@ -210,16 +219,53 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage("assets/images/splash.jpeg"),
-            // image: AssetImage("assets/images/spalshBackround.jpeg"),
-            fit: BoxFit.fill,
+      body: Stack(
+        children: [
+
+          /// Background Video
+          Positioned.fill(
+
+
+            child: _videoController.value.isInitialized
+                ? FittedBox(
+              fit: BoxFit.cover,
+              child: SizedBox(
+                width: _videoController.value.size.width,
+                height: _videoController.value.size.height,
+                child: VideoPlayer(_videoController),
+              ),
+            )
+                : Container(color: Colors.black),
           ),
-        ),
+
+          /// Optional Dark Overlay
+          // Positioned.fill(
+          //   child: Container(
+          //     color: Colors.black.withOpacity(0.2),
+          //   ),
+          // ),
+
+          /// Logo Center
+          // Center(
+          //   child: CustomImageView(
+          //     imagePath: AppImages.logo,
+          //     height: MediaQuery.of(context).size.height * 0.115,
+          //     width: MediaQuery.of(context).size.width * 0.786,
+          //     fit: BoxFit.contain,
+          //   ),
+          // ),
+        ],
       ),
+      // body: Container(
+      //   width: double.infinity,
+      //   decoration: const BoxDecoration(
+      //     image: DecorationImage(
+      //       image: AssetImage("assets/images/splash.jpeg"),
+      //       // image: AssetImage("assets/images/spalshBackround.jpeg"),
+      //       fit: BoxFit.fill,
+      //     ),
+      //   ),
+      // ),
     );
   }
 }

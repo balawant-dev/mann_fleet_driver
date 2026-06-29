@@ -190,7 +190,7 @@ class CommonAppButton extends StatelessWidget {
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: backgroundColor,
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(24),
           border: borderColor != null ? Border.all(color: borderColor!) : null,
           boxShadow: const [
             BoxShadow(

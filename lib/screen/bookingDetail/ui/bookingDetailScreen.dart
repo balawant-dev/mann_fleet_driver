@@ -1259,7 +1259,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                     if (isAdjust && selectedPaymentMode == 'force_complete')
                       TextField(
                         controller: controller,
-                        decoration: InputDecoration(hint: Text("Enter Reason")),
+                        decoration: InputDecoration(hintText: "Enter Reason"),
                       ),
                   ],
                 ),

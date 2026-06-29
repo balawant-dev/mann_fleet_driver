@@ -119,310 +119,322 @@ class _OtpScreenState extends State<OtpScreen> {
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      body: SizedBox.expand(
-        child: Container(
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage("assets/images/loginImage.png"),
-              fit: BoxFit.cover,
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              children: [
-                const SizedBox(height: 310),
-
-                const Text(
-                  "Verify your number",
-                  style: TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xff4A4F58),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Column(
+          children: [  const SizedBox(height: 200),
+            Container(
+              padding: const EdgeInsets.symmetric(
+                  horizontal:       14,vertical: 20
+              ),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.grey.shade300),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.08),
+                    blurRadius: 20,
+                    spreadRadius: 2,
+                    offset: const Offset(0, 8),
                   ),
-                ),
+                ],
+              ),
+              child: Column(
+                children: [
 
-                const SizedBox(height: 10),
 
-                Text(
-                  'We have sent a verification code to',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Color(0xFF3E4959),
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      '+91 ${widget.mobileNumber}',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Color(0xFF3E4959),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
+                  const Text(
+                    "Verify your number",
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xff4A4F58),
                     ),
-                    SizedBox(width: 10),
-                    CustomImageView(
-                      // imagePath: "assets/images/editImage.png",
-                      imagePath: AppImages.editImage,
-
-                      fit: BoxFit.cover,
-                      height: 14,
-                      width: 14,
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 15),
-                Pinput(
-                  controller: otpController,
-                  length: 4,
-                  defaultPinTheme: defaultPinTheme,
-                  onChanged: (value) {
-                    setState(() {});
-                  },
-
-                  /// 🔥 AUTO VERIFY HERE
-                  onCompleted: (value) async {
-                    final prefs = await SharedPreferences.getInstance();
-                    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-
-                    AndroidDeviceInfo androidInfo =
-                        await deviceInfo.androidInfo;
-
-                    String deviceId = androidInfo.id;
-                    String deviceType = androidInfo.type;
-
-                    print("DEVICE ID : $deviceId");
-                    print("DEVICE TYPE : $deviceType");
-
-                    showLoader(context);
-
-                    final otpProvider = context.read<OtpProvider>();
-                    final profileProvider =
-                        context.read<ProfileDetailProvider>();
-                    final deviceToken = prefs.getString('deviceToken') ?? '';
-
-                    /// 🔹 VERIFY OTP
-                    await otpProvider.verifyOtp(
-                      context: context,
-                      phone: widget.mobileNumber,
-                      otp: value,
-                      fcmToken: deviceToken,
-                      deviceID: deviceId,
-                    );
-                    Navigator.pop(context);
-
-                    if (otpProvider.verifyOtpModel != null &&
-                        otpProvider.verifyOtpModel!.status == true) {
-                      /// 🔹 GET PROFILE
-                      showLoader(context);
-
-                      await profileProvider.getProfileApi(context: context);
-
-                      Navigator.pop(context);
-
-                      final driver =
-                          profileProvider.getProfileModel?.data?.driver;
-
-                      await SecureStorageService.saveFirstUser(
-                        driver?.firstUser ?? false,
-                      );
-                      await SecureStorageService.saveProfileComplete(
-                        driver?.isProfileComplete ?? false,
-                      );
-                      await SecureStorageService.saveVerified(
-                        driver?.isVerified ?? false,
-                      );
-
-                      if (driver == null) {
-                        _showError("Something went wrong");
-                        return;
-                      }
-
-                      /// 🔥 NAVIGATION LOGIC
-                      if (driver.firstUser == true) {
-                        navPushReplace(
-                          context: context,
-                          action: RegisterScreen(
-                            mobileNumber: widget.mobileNumber,
-                          ),
-                        );
-                      } else if (driver.isProfileComplete == false) {
-                        navPushBottomRemove(
-                          duration: 1,
-                          context: context,
-                          action: const ProfileManagementScreen(),
-                        );
-                      } else {
-                        navPushBottomRemove(
-                          duration: 1,
-                          context: context,
-                          action: const MainScreen(),
-                        );
-                      }
-                    } else {
-                      _showError("Invalid OTP");
-                    }
-                  },
-                ),
-                const SizedBox(height: 25),
-
-                //
-
-                // CommonAppButton(
-                //   text: 'Verify Now',
-                //   backgroundColor: isOtpValid ? ColorResource.primaryColor : Colors.grey,
-                //   onPressed: isOtpValid
-                //       ? () async {
-                //
-                //     showLoader(context);
-                //
-                //     final otpProvider = context.read<OtpProvider>();
-                //     final profileProvider = context.read<ProfileDetailProvider>();
-                //
-                //     /// 🔹 VERIFY OTP
-                //     await otpProvider.verifyOtp(
-                //       context: context,
-                //       phone: widget.mobileNumber,
-                //       otp: otpController.text,
-                //       fcmToken: "temp_token",
-                //       deviceID: "temp_device",
-                //     );
-                //
-                //     /// ❌ CLOSE LOADER
-                //     Navigator.pop(context);
-                //
-                //     if (otpProvider.verifyOtpModel != null &&
-                //         otpProvider.verifyOtpModel!.status == true) {
-                //
-                //       /// 🔹 GET PROFILE (IMPORTANT 🔥)
-                //       showLoader(context);
-                //
-                //       await profileProvider.getProfileApi(context: context);
-                //
-                //       Navigator.pop(context);
-                //
-                //       final driver = profileProvider.getProfileModel?.data?.driver;
-                //
-                //       /// 🔥 SAVE ALL STATES LOCALLY
-                //       await SecureStorageService.saveFirstUser(driver?.firstUser ?? false);
-                //       await SecureStorageService.saveProfileComplete(driver?.isProfileComplete ?? false);
-                //       await SecureStorageService.saveVerified(driver?.isVerified ?? false);
-                //
-                //       if (driver == null) {
-                //         _showError("Something went wrong");
-                //         return;
-                //       }
-                //
-                //       /// 🔥 SAME LOGIC AS SPLASH
-                //       if (driver.firstUser == true) {
-                //
-                //         navPushReplace(
-                //           context: context,
-                //           action: RegisterScreen(
-                //             mobileNumber: widget.mobileNumber,
-                //           ),
-                //         );
-                //
-                //       } else if (driver.isProfileComplete == false) {
-                //
-                //         navPushBottomRemove(
-                //           duration: 1,
-                //           context: context,
-                //           action: const ProfileManagementScreen(),
-                //         );
-                //
-                //       } else if (driver.isVerified == false) {
-                //
-                //         navPushBottomRemove(
-                //           duration: 1,
-                //           context: context,
-                //           action: const MainScreen(),
-                //         );
-                //
-                //       } else {
-                //
-                //         navPushBottomRemove(
-                //           duration: 1,
-                //           context: context,
-                //           action: const MainScreen(),
-                //         );
-                //       }
-                //
-                //     } else {
-                //
-                //       _showError("Invalid OTP");
-                //
-                //     }
-                //
-                //   }
-                //       : null,
-                //
-                // ),
-                const SizedBox(height: 20),
-
-                Text(
-                  'Didn’t receive the OTP SMS?',
-                  style: TextStyle(
-                    color: Colors.black.withValues(alpha: 0.90),
-                    fontSize: 12,
                   ),
-                ),
-                const SizedBox(height: 5),
-                secondsRemaining > 0
-                    ? Text.rich(
-                      TextSpan(
-                        children: [
-                          TextSpan(
-                            text: 'Send OTP again in ',
-                            style: TextStyle(
-                              color: Colors.black.withValues(alpha: 0.90),
-                              fontSize: 12,
-                              fontFamily: 'Poppins',
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          TextSpan(
-                            text: '0:$secondsRemaining',
-                            style: const TextStyle(
-                              color: Color(0xFF00A642),
-                              fontSize: 12,
-                              fontFamily: 'Poppins',
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          TextSpan(
-                            text: ' sec',
-                            style: TextStyle(
-                              color: Colors.black.withValues(alpha: 0.90),
-                              fontSize: 12,
-                              fontFamily: 'Poppins',
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                    : GestureDetector(
-                      onTap: resendOtp,
-                      child: const Text(
-                        "Resend OTP",
-                        style: TextStyle(
-                          color: Color(0xFF00A642),
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
+
+                  const SizedBox(height: 10),
+
+                  Text(
+                    'We have sent a verification code to',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: Color(0xFF3E4959),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '+91 ${widget.mobileNumber}',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Color(0xFF3E4959),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
+                      SizedBox(width: 10),
+                      CustomImageView(
+                        // imagePath: "assets/images/editImage.png",
+                        imagePath: AppImages.editImage,
+
+                        fit: BoxFit.cover,
+                        height: 14,
+                        width: 14,
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 15),
+                  Pinput(
+                    controller: otpController,
+                    length: 4,
+                    defaultPinTheme: defaultPinTheme,
+                    onChanged: (value) {
+                      setState(() {});
+                    },
+
+                    /// 🔥 AUTO VERIFY HERE
+                    onCompleted: (value) async {
+                      final prefs = await SharedPreferences.getInstance();
+                      DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+
+                      AndroidDeviceInfo androidInfo =
+                          await deviceInfo.androidInfo;
+
+                      String deviceId = androidInfo.id;
+                      String deviceType = androidInfo.type;
+
+                      print("DEVICE ID : $deviceId");
+                      print("DEVICE TYPE : $deviceType");
+
+                      showLoader(context);
+
+                      final otpProvider = context.read<OtpProvider>();
+                      final profileProvider =
+                          context.read<ProfileDetailProvider>();
+                      final deviceToken = prefs.getString('deviceToken') ?? '';
+
+                      /// 🔹 VERIFY OTP
+                      await otpProvider.verifyOtp(
+                        context: context,
+                        phone: widget.mobileNumber,
+                        otp: value,
+                        fcmToken: deviceToken,
+                        deviceID: deviceId,
+                      );
+                      Navigator.pop(context);
+
+                      if (otpProvider.verifyOtpModel != null &&
+                          otpProvider.verifyOtpModel!.status == true) {
+                        /// 🔹 GET PROFILE
+                        showLoader(context);
+
+                        await profileProvider.getProfileApi(context: context);
+
+                        Navigator.pop(context);
+
+                        final driver =
+                            profileProvider.getProfileModel?.data?.driver;
+
+                        await SecureStorageService.saveFirstUser(
+                          driver?.firstUser ?? false,
+                        );
+                        await SecureStorageService.saveProfileComplete(
+                          driver?.isProfileComplete ?? false,
+                        );
+                        await SecureStorageService.saveVerified(
+                          driver?.isVerified ?? false,
+                        );
+
+                        if (driver == null) {
+                          _showError("Something went wrong");
+                          return;
+                        }
+
+                        /// 🔥 NAVIGATION LOGIC
+                        if (driver.firstUser == true) {
+                          navPushReplace(
+                            context: context,
+                            action: RegisterScreen(
+                              mobileNumber: widget.mobileNumber,
+                            ),
+                          );
+                        } else if (driver.isProfileComplete == false) {
+                          navPushBottomRemove(
+                            duration: 1,
+                            context: context,
+                            action: const ProfileManagementScreen(),
+                          );
+                        } else {
+                          navPushBottomRemove(
+                            duration: 1,
+                            context: context,
+                            action: const MainScreen(),
+                          );
+                        }
+                      } else {
+                        _showError("Invalid OTP");
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 20),
+
+                  //
+
+                  // CommonAppButton(
+                  //   text: 'Verify Now',
+                  //   backgroundColor: isOtpValid ? ColorResource.primaryColor : Colors.grey,
+                  //   onPressed: isOtpValid
+                  //       ? () async {
+                  //
+                  //     showLoader(context);
+                  //
+                  //     final otpProvider = context.read<OtpProvider>();
+                  //     final profileProvider = context.read<ProfileDetailProvider>();
+                  //
+                  //     /// 🔹 VERIFY OTP
+                  //     await otpProvider.verifyOtp(
+                  //       context: context,
+                  //       phone: widget.mobileNumber,
+                  //       otp: otpController.text,
+                  //       fcmToken: "temp_token",
+                  //       deviceID: "temp_device",
+                  //     );
+                  //
+                  //     /// ❌ CLOSE LOADER
+                  //     Navigator.pop(context);
+                  //
+                  //     if (otpProvider.verifyOtpModel != null &&
+                  //         otpProvider.verifyOtpModel!.status == true) {
+                  //
+                  //       /// 🔹 GET PROFILE (IMPORTANT 🔥)
+                  //       showLoader(context);
+                  //
+                  //       await profileProvider.getProfileApi(context: context);
+                  //
+                  //       Navigator.pop(context);
+                  //
+                  //       final driver = profileProvider.getProfileModel?.data?.driver;
+                  //
+                  //       /// 🔥 SAVE ALL STATES LOCALLY
+                  //       await SecureStorageService.saveFirstUser(driver?.firstUser ?? false);
+                  //       await SecureStorageService.saveProfileComplete(driver?.isProfileComplete ?? false);
+                  //       await SecureStorageService.saveVerified(driver?.isVerified ?? false);
+                  //
+                  //       if (driver == null) {
+                  //         _showError("Something went wrong");
+                  //         return;
+                  //       }
+                  //
+                  //       /// 🔥 SAME LOGIC AS SPLASH
+                  //       if (driver.firstUser == true) {
+                  //
+                  //         navPushReplace(
+                  //           context: context,
+                  //           action: RegisterScreen(
+                  //             mobileNumber: widget.mobileNumber,
+                  //           ),
+                  //         );
+                  //
+                  //       } else if (driver.isProfileComplete == false) {
+                  //
+                  //         navPushBottomRemove(
+                  //           duration: 1,
+                  //           context: context,
+                  //           action: const ProfileManagementScreen(),
+                  //         );
+                  //
+                  //       } else if (driver.isVerified == false) {
+                  //
+                  //         navPushBottomRemove(
+                  //           duration: 1,
+                  //           context: context,
+                  //           action: const MainScreen(),
+                  //         );
+                  //
+                  //       } else {
+                  //
+                  //         navPushBottomRemove(
+                  //           duration: 1,
+                  //           context: context,
+                  //           action: const MainScreen(),
+                  //         );
+                  //       }
+                  //
+                  //     } else {
+                  //
+                  //       _showError("Invalid OTP");
+                  //
+                  //     }
+                  //
+                  //   }
+                  //       : null,
+                  //
+                  // ),
+                  const SizedBox(height: 20),
+
+                  Text(
+                    'Didn’t receive the OTP SMS?',
+                    style: TextStyle(
+                      color: Colors.black.withValues(alpha: 0.90),
+                      fontSize: 12,
                     ),
-                const SizedBox(height: 40),
-              ],
+                  ),
+                  const SizedBox(height: 5),
+                  secondsRemaining > 0
+                      ? Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(
+                              text: 'Send OTP again in ',
+                              style: TextStyle(
+                                color: Colors.black.withValues(alpha: 0.90),
+                                fontSize: 12,
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                            TextSpan(
+                              text: '0:$secondsRemaining',
+                              style: const TextStyle(
+                                color: Color(0xFF00A642),
+                                fontSize: 12,
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            TextSpan(
+                              text: ' sec',
+                              style: TextStyle(
+                                color: Colors.black.withValues(alpha: 0.90),
+                                fontSize: 12,
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                      : GestureDetector(
+                        onTap: resendOtp,
+                        child: const Text(
+                          "Resend OTP",
+                          style: TextStyle(
+                            color: Color(0xFF00A642),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                  const SizedBox(height: 40),
+                ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );

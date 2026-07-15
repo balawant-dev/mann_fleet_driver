@@ -53,11 +53,12 @@ class _QrScannerScreenState extends State<QrScannerScreen>
 
       try {
         final jsonData = jsonDecode(data);
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>${jsonData}");
 
         String qrToken = jsonData['qrToken'] ?? '';
         String travelDirection = jsonData['travelDirection'] ?? '';
         String currentStopName = jsonData['source'] ?? ''; // ya destination bhi use kar sakte ho
-        String shiftId = "1"; // 👉 yeh tum apni app se dynamic lo
+        String shiftId = jsonData['shiftId'] ?? ''; // 👉 yeh tum apni app se dynamic lo
 
         print("QR TOKEN: $qrToken");
 

@@ -1,8 +1,12 @@
 class ApiConstants {
   //Live Url
   // static const String baseUrl = 'https://admin.mannfleetpartners.com';
+<<<<<<< HEAD
   static const String baseUrl =  'http://167.71.238.86:9021';
   // static const String baseUrl = 'http://167.71.226.189:9020';
+=======
+  static const String baseUrl = 'http://167.71.238.86:9021';
+>>>>>>> 5888f2f (mann driver final update)
 
   static const String verifyOtp = '/api/driver/verifyOtp';
 

@@ -7,6 +7,8 @@ plugins {
 
 android {
     namespace = "com.pilot.mannfleet"
+
+
     compileSdk = 36
     ndkVersion = "28.2.13676358"
 

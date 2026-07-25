@@ -30,7 +30,7 @@ import 'firebase_options.dart';
 void startCallback() {
   FlutterForegroundTask.setTaskHandler(LocationTrackingService());
 }
-
+//LocationTrackingService
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 

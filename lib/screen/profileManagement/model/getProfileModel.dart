@@ -1,6 +1,6 @@
 class GetProfileModel {
-  bool? status;
-  String? message;
+  var status;
+  var message;
   Data? data;
 
   GetProfileModel({this.status, this.message, this.data});
@@ -32,59 +32,59 @@ class Data {
 }
 
 class DriverProfile {
-  String? id;
-  String? phone;
+  var id;
+  var phone;
 
-  bool? isAdharVerified;
-  bool? isVerified;
-  bool? isOnline;
-  bool? isAvailable;
-  bool? firstUser;
-  bool? isPunchedIn;
-  bool? isDeleted;
-  bool? isProfileComplete;
-  bool? isVehicleAssigned;
+  var isAdharVerified;
+  var isVerified;
+  var isOnline;
+  var isAvailable;
+  var firstUser;
+  var isPunchedIn;
+  var isDeleted;
+  var isProfileComplete;
+  var isVehicleAssigned;
 
-  int? rating;
-  int? ratingCount;
-  int? totalRides;
-  int? v;
+ var rating;
+ var ratingCount;
+ var totalRides;
+ var v;
 
-  String? gender;
-  String? deviceId;
-  String? deviceType;
-  String? activePunch;
-  String? createdAt;
-  String? fcmToken;
-  String? email;
-  String? licenseNumber;
-  String? name;
-  String? lastName;
-  String? midName;
+  var gender;
+  var deviceId;
+  var deviceType;
+  var activePunch;
+  var createdAt;
+  var fcmToken;
+  var email;
+  var licenseNumber;
+  var name;
+  var lastName;
+  var midName;
 
-  String? profilePic;
-  String? currentAddress;
-  String? permanentAddress;
-  String? alternatePhone;
+  var profilePic;
+  var currentAddress;
+  var permanentAddress;
+  var alternatePhone;
 
-  String? licenseExpiry;
-  String? licensePhoto;
+  var licenseExpiry;
+  var licensePhoto;
 
-  String? adhaarNumber;
-  String? adhaarFrontPhoto;
-  String? adhaarBackPhoto;
+  var adhaarNumber;
+  var adhaarFrontPhoto;
+  var adhaarBackPhoto;
 
-  String? panNumber;
-  String? panFrontPhoto;
-  String? panBackPhoto;
+  var panNumber;
+  var panFrontPhoto;
+  var panBackPhoto;
 
-  String? policeVerificationPhoto;
-  String? policeVerificationExpiry;
+  var policeVerificationPhoto;
+  var policeVerificationExpiry;
 
-  String? city;
-  String? state;
-  String? pincode;
-  String? grade;
+  var city;
+  var state;
+  var pincode;
+  var grade;
 
   LastLocation? lastLocation;
   Region? region;
@@ -278,7 +278,7 @@ class DriverProfile {
 class LastLocation {
   double? lat;
   double? lng;
-  String? updatedAt;
+  var updatedAt;
 
   LastLocation({this.lat, this.lng, this.updatedAt});
 
@@ -294,9 +294,9 @@ class LastLocation {
 }
 
 class Region {
-  String? id;
-  String? name;
-  String? state;
+  var id;
+  var name;
+  var state;
 
   Region({this.id, this.name, this.state});
 
@@ -312,8 +312,8 @@ class Region {
 }
 
 class PunchRegion {
-  String? id;
-  String? name;
+  var id;
+  var name;
 
   PunchRegion({this.id, this.name});
 
@@ -328,16 +328,16 @@ class PunchRegion {
 }
 
 class Vehicle {
-  String? id;
-  String? brand;
-  String? model;
-  String? fuelType;
-  int? year;
-  String? color;
-  String? carNumber;
-  int? capacity;
-  bool? isActive;
-  String? driver;
+  var id;
+  var brand;
+  var model;
+  var fuelType;
+ var year;
+  var color;
+  var carNumber;
+ var capacity;
+  var isActive;
+  var driver;
 
   Vehicle({
     this.id,

@@ -1,7 +1,7 @@
 class VerifyOtpModel {
-  bool? status;
-  String? message;
-  String? token;
+  var status;
+  var message;
+  var token;
   Data? data;
 
   VerifyOtpModel({this.status, this.message, this.token, this.data});
@@ -46,26 +46,26 @@ class Data {
 }
 
 class Astrologer {
-  String? sId;
-  String? phone;
-  bool? isVerified;
-  bool? isOnline;
-  bool? isAvailable;
-  int? rating;
-  int? ratingCount;
-  int? totalRides;
-  String? gender;
-  bool? firstUser;
-  bool? isProfileComplete;
-  String? deviceId;
-  String? deviceType;
-  bool? isPunchedIn;
-  bool? isDeleted;
-  String? activePunch;
-  String? createdAt;
-  int? iV;
-  String? fcmToken;
-  String? id;
+  var sId;
+  var phone;
+  var isVerified;
+  var isOnline;
+  var isAvailable;
+  var rating;
+  var ratingCount;
+  var totalRides;
+  var gender;
+  var firstUser;
+  var isProfileComplete;
+  var deviceId;
+  var deviceType;
+  var isPunchedIn;
+  var isDeleted;
+  var activePunch;
+  var createdAt;
+  var iV;
+  var fcmToken;
+  var id;
 
   Astrologer(
       {this.sId,

@@ -137,6 +137,7 @@ class _FuelEntryScreenState extends State<FuelEntryScreen> {
                   controller: provider.odometerController,
                   keyboardType: TextInputType.number,
                   hintText: 'Enter KM',
+                  readOnly: true,
                 ),
 
                 const SizedBox(height: 10),
@@ -149,6 +150,7 @@ class _FuelEntryScreenState extends State<FuelEntryScreen> {
                   controller: provider.fuelQtyController,
                   keyboardType: TextInputType.number,
                   hintText: 'Enter Liters',
+                  readOnly: true,
                   // onChanged: (_) => provider.calculateAmount(),
                 ),
 
@@ -162,6 +164,7 @@ class _FuelEntryScreenState extends State<FuelEntryScreen> {
                   controller: provider.fuelPriceController,
                   keyboardType: TextInputType.number,
                   hintText: '₹ / Liter',
+                  readOnly: true,
                   // onChanged: (_) => provider.calculateAmount(),
                 ),
 
@@ -172,6 +175,7 @@ class _FuelEntryScreenState extends State<FuelEntryScreen> {
                   controller: provider.invoiceNumberController,
                   keyboardType: TextInputType.number,
                   hintText: 'Invoice Number',
+                  readOnly: true,
                 ),
                 const SizedBox(height: 10),
 
@@ -179,11 +183,12 @@ class _FuelEntryScreenState extends State<FuelEntryScreen> {
                 // _label('Total Amount'),
                 CommonTextFormField(
                   controller: provider.fuelAmountController,
-                  readOnly: false,
+
                   keyboardType: TextInputType.number,
                   hintText: 'Total Amount',
                   labelText: 'Total Amount',
                   isRequired: true,
+                  readOnly: true,
                 ),
 
                 const SizedBox(height: 100),

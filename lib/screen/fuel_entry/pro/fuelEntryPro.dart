@@ -706,10 +706,11 @@ class FuelEntryProvider extends ChangeNotifier {
     fuelPriceController.clear();
     fuelAmountController.clear();
 
-    odometerImage = null;
-    startImage = null;
-    endImage = null;
-    billImage = null;
+
+
+
+
+
 
     notifyListeners();
   }

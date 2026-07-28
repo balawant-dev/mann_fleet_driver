@@ -215,7 +215,12 @@ class _SplashScreenState extends State<SplashScreen> {
       },
     );
   }
-
+  @override
+  void dispose() {
+    _videoController.pause();
+    _videoController.dispose();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(

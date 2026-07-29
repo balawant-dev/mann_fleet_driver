@@ -1,6 +1,6 @@
 class VerifyBookingOtpModel {
-  bool? status;
-  String? message;
+  var status;
+  var message;
   Data? data;
 
   VerifyBookingOtpModel({this.status, this.message, this.data});
@@ -23,15 +23,15 @@ class VerifyBookingOtpModel {
 }
 
 class Data {
-  String? bookingId;
-  String? bookingNumber;
-  String? otpType;
-  bool? verified;
-  String? tripStatus;
+  var bookingId;
+  var bookingNumber;
+  var otpType;
+  var verified;
+  var tripStatus;
   User? user;
   Pickup? pickup;
   Pickup? dropoff;
-  String? bookingType;
+  var bookingType;
 
   Data(
       {this.bookingId,
@@ -80,7 +80,7 @@ class Data {
 }
 
 class User {
-  String? name;
+  var name;
 
   User({this.name});
 
@@ -96,9 +96,9 @@ class User {
 }
 
 class Pickup {
-  double? lat;
-  double? lng;
-  String? address;
+  var lat;
+  var lng;
+  var address;
 
   Pickup({this.lat, this.lng, this.address});
 

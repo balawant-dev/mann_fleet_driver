@@ -40,7 +40,7 @@ class UploadSpeedoMeterImageScreen extends StatelessWidget {
               controller: provider.speedoMetervalue,
               keyboardType: TextInputType.number,
               hintText: 'Enter KM',
-              readOnly: true,
+              readOnly: false,
 
             ),
 

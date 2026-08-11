@@ -25,8 +25,8 @@ android {
         applicationId = "com.pilot.mannfleet"
         minSdk = 24
         targetSdk = flutter.targetSdkVersion
-        versionCode = 31
-        versionName = "1.3.9"
+        versionCode = 33
+        versionName = "1.4.1"
     }
     signingConfigs {
         create("release") {

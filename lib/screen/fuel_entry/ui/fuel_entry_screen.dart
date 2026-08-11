@@ -9,8 +9,9 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:provider/provider.dart';
 import 'dart:io';
 import '../../vehicle/provider/editVehicalDetailPro.dart';
+import '../model/fetchedFuelLogModel.dart';
 import '../pro/fuelEntryPro.dart';
-
+import 'package:intl/intl.dart';
 class FuelEntryScreen extends StatefulWidget {
   const FuelEntryScreen({super.key});
 
@@ -24,6 +25,7 @@ class _FuelEntryScreenState extends State<FuelEntryScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<EditVehicleDetailsPro>().getVehicleApi(context: context);
+      context.read<FuelEntryProvider>().getFuelLogApi( context);
       context.read<FuelEntryProvider>().getCurrentLocation();
       context.read<FuelEntryProvider>().setVehicleNumber(context);
     });
@@ -188,9 +190,149 @@ class _FuelEntryScreenState extends State<FuelEntryScreen> {
                   hintText: 'Total Amount',
                   labelText: 'Total Amount',
                   isRequired: true,
-                  readOnly: true,
+                  // readOnly: true,
                 ),
 
+                const SizedBox(height: 10),const SizedBox(height: 10),
+
+                /// PAYMENT SOURCE
+                CustomText(
+                  'Payment Source',
+                  size: 13,
+                  weight: FontWeight.w600,
+                  color: ColorResource.grayText,
+                ),
+
+                const SizedBox(height: 6),
+
+                DropdownButtonFormField<String>(
+                  value: provider.paymentSource,
+                  style: TextStyle(color: Color(0xff6B7280),fontWeight: FontWeight.w400),
+                  decoration: InputDecoration(
+
+                    hintText: 'Select Payment Source',
+                    hintStyle: TextStyle(color: Color(0xff6B7280),fontWeight: FontWeight.w400),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      borderSide: BorderSide(color: Color(0xffDBDBDB))
+                    ) ,
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),       borderSide: BorderSide(color: Color(0xffDBDBDB))
+                    ) ,
+                    focusedErrorBorder:  OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),       borderSide: BorderSide(color: Color(0xffDBDBDB))
+                    ),
+                    errorBorder:  OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),       borderSide: BorderSide(color: Color(0xffDBDBDB))
+                    ),disabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),       borderSide: BorderSide(color: Color(0xffDBDBDB))
+                  ) ,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),       borderSide: BorderSide(color: Color(0xffDBDBDB))
+                    ),
+                  ),
+                  items: provider.paymentSources.map((source) {
+                    return DropdownMenuItem<String>(
+                      value: source,
+                      child: Text(source),
+                    );
+                  }).toList(),
+                  onChanged: provider.setPaymentSource,
+                ),
+
+                const SizedBox(height: 15),
+
+                /// TANK FULL
+                CustomText(
+                  'Is Tank Full?',
+                  size: 13,
+                  weight: FontWeight.w600,
+                  color: ColorResource.grayText,
+                ),
+
+                Row(
+                  children: [
+                    Expanded(
+                      child: RadioListTile<bool>(
+                        contentPadding: EdgeInsets.zero,
+                        activeColor: ColorResource.primaryColor,
+                        title: const Text('Yes'),
+                        value: true,
+                        groupValue: provider.isTankFull,
+                        onChanged: (value) {
+                          if (value != null) {
+                            provider.setTankFull(value);
+                          }
+                        },
+                      ),
+                    ),
+                    Expanded(
+                      child: RadioListTile<bool>(
+                        contentPadding: EdgeInsets.zero,
+                        activeColor: ColorResource.primaryColor,
+                        title: const Text('No'),
+                        value: false,
+                        groupValue: provider.isTankFull,
+                        onChanged: (value) {
+                          if (value != null) {
+                            provider.setTankFull(value);
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+              Divider(),
+                const SizedBox(height: 20),
+
+                CustomText(
+                  'Fueling History',
+                  size: 20,
+                  weight: FontWeight.w700,
+                  color: ColorResource.black,
+                ),
+
+                const SizedBox(height: 12),
+
+                if (provider.isLoading2)
+                  const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(20),
+                      child: CircularProgressIndicator(),
+                    ),
+                  )
+                else if (provider.fetchedFuelLogModel?.data == null ||
+                    provider.fetchedFuelLogModel!.data!.isEmpty)
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: const Color(0xffE5E7EB),
+                      ),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: const Center(
+                      child: Text(
+                        "No Fuel Log Found",
+                        style: TextStyle(
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ),
+                  )
+                else
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: provider.fetchedFuelLogModel!.data!.length,
+                    itemBuilder: (context, index) {
+                      final log = provider.fetchedFuelLogModel!.data![index];
+
+                      return _fuelLogCard(log);
+                    },
+                  ),
                 const SizedBox(height: 100),
               ],
             ),
@@ -198,8 +340,147 @@ class _FuelEntryScreenState extends State<FuelEntryScreen> {
         );
       },
     );
+  }String formatDate(String? date) {
+    if (date == null || date.isEmpty) return "-";
+
+    try {
+      final parsedDate = DateTime.parse(date).toLocal();
+      return DateFormat('dd MMM yyyy, hh:mm a').format(parsedDate);
+    } catch (e) {
+      return date;
+    }
+  }
+  Widget _fuelLogCard(FuelLogData log) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(0xffE5E7EB),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+
+          /// VEHICLE + DATE
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  "${log.carNumber ?? "-"}",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+
+              Text(formatDate(log.date?.toString()),
+                // "${log.date ?? "-"}",
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey,
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 12),
+
+          /// FUEL TYPE
+          _logRow(
+            "Fuel Type",
+            "${log.fuelType ?? "-"}",
+          ),
+
+          _logRow(
+            "Quantity",
+            "${log.fuelQuantity ?? "-"} L",
+          ),
+
+          _logRow(
+            "Price / Liter",
+            "₹ ${log.fuelPrice ?? "-"}",
+          ),
+
+          _logRow(
+            "Total Amount",
+            "₹ ${log.fuelAmount ?? "-"}",
+          ),
+
+          _logRow(
+            "Payment Source",
+            "${log.paymentSource ?? "-"}",
+          ),
+
+          _logRow(
+            "Tank Full",
+            log.isTankFull == true ? "Yes" : "No",
+          ),
+
+          _logRow(
+            "Odometer",
+            "${log.odometerReading ?? "-"} KM",
+          ),
+
+          const SizedBox(height: 8),
+
+          /// LOCATION
+          Text(
+            "${log.locationAddress ?? "-"}",
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 12,
+              color: Colors.grey,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
+  Widget _logRow(String title, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontSize: 13,
+                color: Colors.grey,
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Flexible(
+            child: Text(
+              value,
+              textAlign: TextAlign.right,
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
   /// LABEL
   Widget _label(String text) {
     return Padding(

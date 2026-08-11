@@ -5,11 +5,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:mann_fleet_driver/apiservice/services/secure_storage_service.dart';
+import 'package:mann_fleet_driver/screen/bottomBar/bottomBar.dart';
 import 'package:mann_fleet_driver/screen/fuel_entry/service/open_ai_service.dart';
 import '../../../widget/motionToastHelper.dart';
 import '../../../widget/navigator_method.dart';
 import '../../../widget/showLoaderFunction.dart';
 import '../../profileManagement/provider/profileDetailProvider.dart';
+import '../model/fetchedFuelLogModel.dart';
 import '../repo/fuelEntryRepo.dart';
 import 'dart:convert';
 import 'package:provider/provider.dart';
@@ -42,8 +44,9 @@ class FuelEntryProvider extends ChangeNotifier {
   File? billImage;
 
   final picker = ImagePicker();
-
+  FetchedFuelLogModel?fetchedFuelLogModel;
   bool isLoading = false;
+  bool isLoading2 = false;
 
   void setVehicleNumber(BuildContext context) {
     final profileProvider = context.read<ProfileDetailProvider>();
@@ -522,12 +525,38 @@ class FuelEntryProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Payment Source
+  String? paymentSource;
+
+  final List<String> paymentSources = [
+    "CASH",
+    "HPCL CARD",
+    "BPCL CARD",
+    "IOCL CARD",
+    "OWN KAPASEHRA PETROL PUMP",
+    "AHUJA PETROL PUMP OKHLA",
+  ];
+
+// Tank Full
+  bool? isTankFull;
+
+  void setPaymentSource(String? value) {
+    paymentSource = value;
+    notifyListeners();
+  }
+
+  void setTankFull(bool value) {
+    isTankFull = value;
+    notifyListeners();
+  }
+
   /// Submit API
   Future<void> submit(BuildContext context) async {
     if (vehicleController.text.isEmpty ||
         fuelTypeController.text.isEmpty ||
         fuelQtyController.text.isEmpty ||
-        fuelAmountController.text.isEmpty) {
+        fuelAmountController.text.isEmpty||    paymentSource == null ||
+        isTankFull == null) {
       ToastHelper.show(context, message: "Please fill all required fields");
       return;
     }
@@ -535,6 +564,7 @@ class FuelEntryProvider extends ChangeNotifier {
     try {
       debugPrint("=========== FUEL ENTRY REQUEST ===========");
       debugPrint("📦 LAT: $lat | LNG: $lng");
+      debugPrint("📦 paymentSource: $paymentSource | isTankFull: $isTankFull");
       debugPrint("📍 ADDRESS: ${addressController.text}");
 
       debugPrint("🚗 Car Number: ${vehicleController.text}");
@@ -560,6 +590,8 @@ class FuelEntryProvider extends ChangeNotifier {
 
       final res = await repo.fuelEntryAPi(
         context: context,
+        isTankFull: isTankFull!,
+        paymentSource: paymentSource!,
         carNumber: vehicleController.text,
         fuelType: fuelTypeController.text,
         locationAddress: addressController.text,
@@ -581,10 +613,18 @@ class FuelEntryProvider extends ChangeNotifier {
       if (res.status == true) {
         ToastHelper.show(
           context,
-          message: "Fuel Entry Added ✅",
+          message: res.message??"Fuel Entry Added ✅",
           type: ToastType.success,
         );
+        navPushReplace(context: context, action: MainScreen());
+        await getFuelLogApi(context);
         clear();
+      }else{
+        ToastHelper.show(
+          context,
+          message:res.message?? "failed to add",
+          type: ToastType.error,
+        );
       }
     } catch (e) {
       Navigator.pop(context);
@@ -593,6 +633,47 @@ class FuelEntryProvider extends ChangeNotifier {
       notifyListeners();
     } //9161470607
   }
+
+  Future<void> getFuelLogApi(BuildContext context) async {
+    try {
+      isLoading2 = true;
+      notifyListeners();
+
+      final res = await repo.getFuelLogApi(
+        context: context,
+      );
+
+      if (res.status == true) {
+        fetchedFuelLogModel = res;
+
+        debugPrint(
+          "Fuel Logs Count: ${fetchedFuelLogModel?.data?.length}",
+        );
+      } else {
+        fetchedFuelLogModel = null;
+
+        ToastHelper.show(
+          context,
+          message: res.message ?? "Failed to fetch Fuel Log",
+          type: ToastType.error,
+        );
+      }
+    } catch (e) {
+      debugPrint("GET FUEL LOG ERROR: $e");
+
+      ToastHelper.show(
+        context,
+        message: "Something went wrong",
+        type: ToastType.error,
+      );
+    } finally {
+      isLoading2 = false;
+      notifyListeners();
+    }
+  }
+
+
+
 
   Future<void> handleFuelDisplayScan(
     File imageFile,

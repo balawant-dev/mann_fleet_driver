@@ -7,12 +7,15 @@ import '../../../../../apiservice/network/api_service.dart';
 import '../../../../../apiservice/network/network_utils.dart';
 import '../../../../../apiservice/services/secure_storage_service.dart';
 
+import '../model/fetchedFuelLogModel.dart';
 import '../model/fuelEntryModel.dart';
 
 class FuelEntryRepo {
   final ApiService _api = ApiService();
   Future<FuelEntryModel> fuelEntryAPi({
     required String carNumber,
+    required String paymentSource,
+    required bool isTankFull,
     required String fuelType,
     required String locationAddress,
     required String locationLat,
@@ -31,6 +34,8 @@ class FuelEntryRepo {
     try {
       FormData formData = FormData.fromMap({
         "carNumber": carNumber,
+        "isTankFull": isTankFull,
+        "paymentSource": paymentSource,
         "fuelType": fuelType,
 
         "locationAddress": locationAddress,
@@ -76,12 +81,23 @@ class FuelEntryRepo {
 
       return FuelEntryModel.fromJson(response);
     } on DioException catch (e) {
+      if (e.response != null) {
+        // ✅ Yeh line important hai - 400 error ke bawajood body parse kar rahe hain
+        try {
+          return FuelEntryModel.fromJson(e.response!.data);
+        } catch (_) {
+          rethrow;
+        }
+      }
+
       if (e.error is NoInternetException) {
         showNoInternetScreen(
           context,
           onRetry:
               () => fuelEntryAPi(
                 context: context,
+                isTankFull:isTankFull,
+                paymentSource:paymentSource,
                 invoiceNumber: invoiceNumber,
                 fuelType: fuelType,
                 carNumber: carNumber,
@@ -104,6 +120,8 @@ class FuelEntryRepo {
           context,
           onRetry:
               () => fuelEntryAPi(
+                isTankFull:isTankFull,
+                paymentSource:paymentSource,
                 context: context,
                 fuelType: fuelType,
                 carNumber: carNumber,
@@ -133,33 +151,33 @@ class FuelEntryRepo {
     }
   }
 
-  // Future<GetProfileModel> getProfileApi({required BuildContext context}) async {
-  //   try {
-  //     final response = await _api.get(ApiConstants.profile, requiresAuth: true);
-  //     //   await SecureStorageService.saveToken(response['token']);
-  //     return GetProfileModel.fromJson(response);
-  //     //  return LoginModel.fromJson(response['user']);
-  //   } on DioException catch (e) {
-  //     if (e.error is NoInternetException) {
-  //       showNoInternetScreen(
-  //         context,
-  //         onRetry: () => getProfileApi(context: context),
-  //       );
-  //       throw NoInternetException();
-  //     } else if (e.error is ServerException) {
-  //       showServerErrorScreen(
-  //         context,
-  //         onRetry: () => getProfileApi(context: context),
-  //       );
-  //       throw ServerException();
-  //     } else if (e.error is UnauthorizedException) {
-  //       await SecureStorageService.logout(context);
-  //       throw UnauthorizedException();
-  //     } else {
-  //       rethrow;
-  //     }
-  //   } catch (e) {
-  //     throw ApiException(0, e.toString());
-  //   }
-  // }
+  Future<FetchedFuelLogModel> getFuelLogApi({required BuildContext context}) async {
+    try {
+      final response = await _api.get(ApiConstants.fuelLogs, requiresAuth: true);
+      //   await SecureStorageService.saveToken(response['token']);
+      return FetchedFuelLogModel.fromJson(response);
+      //  return LoginModel.fromJson(response['user']);
+    } on DioException catch (e) {
+      if (e.error is NoInternetException) {
+        showNoInternetScreen(
+          context,
+          onRetry: () => getFuelLogApi(context: context),
+        );
+        throw NoInternetException();
+      } else if (e.error is ServerException) {
+        showServerErrorScreen(
+          context,
+          onRetry: () => getFuelLogApi(context: context),
+        );
+        throw ServerException();
+      } else if (e.error is UnauthorizedException) {
+        await SecureStorageService.logout(context);
+        throw UnauthorizedException();
+      } else {
+        rethrow;
+      }
+    } catch (e) {
+      throw ApiException(0, e.toString());
+    }
+  }
 }

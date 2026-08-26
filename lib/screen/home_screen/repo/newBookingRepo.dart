@@ -10,6 +10,7 @@ import '../../../../../apiservice/network/network_utils.dart';
 import '../../../../../apiservice/services/secure_storage_service.dart';
 import '../../auth/register/model/registerModel.dart';
 
+import '../../bookingDetail/model/VoiceCallInitiateModel.dart';
 import '../../bookingDetail/model/bookingDetailModel.dart';
 import '../../sqlite_local_location/local_db_service.dart';
 import '../model/bookingAcceptedModel.dart';
@@ -26,6 +27,21 @@ import '../model/verifyBookingOtpModel.dart';
 
 class NewBookingRepo {
   final ApiService _api = ApiService();
+  Future<VoiceCallInitiateModel> initiateVoiceCall({
+    required BuildContext context,
+    required String bookingId,
+    required String initiatedBy,
+  }) async {
+    final response = await _api.post(
+      "${ApiConstants.booking}/$bookingId/voice-call/initiate",
+      data: {
+        "initiatedBy": initiatedBy,
+      },
+      requiresAuth: true,
+    );
+
+    return VoiceCallInitiateModel.fromJson(response);
+  }
 
   Future<GetBannerModel> getBannerApi({required BuildContext context}) async {
     try {

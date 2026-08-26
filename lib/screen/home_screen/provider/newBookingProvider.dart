@@ -10,6 +10,7 @@ import '../../../apiservice/services/secure_storage_service.dart';
 import '../../../widget/showLoaderFunction.dart';
 import 'package:http/http.dart' as http;
 import '../../bookingDetail/model/bookingDetailModel.dart';
+import '../../bookingDetail/ui/VoiceCallScreen.dart';
 import '../../fuel_entry/service/googleGeminiService.dart';
 import '../model/bookingAcceptedModel.dart';
 import '../model/bookingCancelModel.dart';
@@ -38,7 +39,43 @@ class NewBookingProvider extends ChangeNotifier {
   FinalFarePreviewModel? finalFarePreviewModel;
   UpdateLocationModel? updateLocationModel;
   bool isLoading = false;
+  Future<void> callUser({
+    required BuildContext context,
+    required String bookingId,
+  }) async {
+    try {
+      showLoader(context);
 
+      final res = await api.initiateVoiceCall(
+        context: context,
+        bookingId: bookingId,
+        initiatedBy: "driver",
+      );
+
+      Navigator.pop(context);
+
+      if (res.status == true) {
+        navPush(
+          context: context,
+          action: VoiceCallScreen(
+            bookingId: bookingId,
+            token: res.data!.token!,
+            channelName: res.data!.channelName!,
+            uid: res.data!.uid!,
+            appId: "b2ec8d246fb3407f8bf76884a32d7a47",
+          ),
+        );
+      }
+    } catch (e) {
+      Navigator.pop(context);
+
+      ToastHelper.show(
+        context,
+        message: "Unable to start call",
+        type: ToastType.error,
+      );
+    }
+  }
   // ── Get pending / assigned bookings ────────────────────────────────────────
   Future<void> getBannerApi({required BuildContext context}) async {
     try {
@@ -847,7 +884,7 @@ class NewBookingProvider extends ChangeNotifier {
         print("Get Profile Successfully");
       }
     } catch (e) {
-      debugPrint("Error in Get Profile: $e");
+      debugPrint("Error in Get Profile4: $e");
     } finally {
       isLoading2 = false;
       notifyListeners();

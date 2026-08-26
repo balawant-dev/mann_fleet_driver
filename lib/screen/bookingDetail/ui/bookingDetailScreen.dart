@@ -240,32 +240,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
     stopLocationUpdates();
     super.dispose();
   }
-  // void startLocationUpdates({
-  //   required BuildContext context,
-  //   required String bookingId,
-  // }) {
-  //   _getCurrentLocation();
-  //   String pickupTime= context.read<NewBookingProvider>().bookingDetailModel!.data!.scheduledAtIST.toString();//"2026-06-09 12:11:00",
-  //   /// every 10 seconds
-  //   locationTimer = Timer.periodic(const Duration(seconds: 10), (timer) async {
-  //     await context.read<NewBookingProvider>().updateDriverLocationApi(
-  //       id: bookingId,
-  //       lng: currentLng ?? 0.0,
-  //       lat: currentLat ?? 0.0,
-  //       context: context,
-  //     );
-  //   });
-  // }
 
-  // void stopLocationUpdates() {
-  //   locationTimer?.cancel();
-  // }
-  //
-  // @override
-  // void dispose() {
-  //   super.dispose();
-  //   stopLocationUpdates();
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -302,6 +277,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
           }
         }
         final bookingId = data?.bookingNumber ?? "B0045681021";
+        // final bookingIdApi = data?.bookingNumber ?? "B0045681021";
         final tripType = data?.bookingType ?? "One Way Trip";
 
         final pickup = data?.pickup?.address ?? "Sector- 63, Noida";
@@ -358,6 +334,48 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                   Row(
+                     mainAxisAlignment: MainAxisAlignment.end,
+                     children: [
+                       ElevatedButton.icon(
+                         onPressed: () {
+                           context.read<NewBookingProvider>().callUser(
+                             context: context,
+                             bookingId: widget.id,
+                           );
+                         },
+                         icon: const Icon(Icons.call, size: 20),
+                         label: const Text(
+                           "Call User",
+                           style: TextStyle(
+                             fontSize: 15,
+                             fontWeight: FontWeight.w600,
+                           ),
+                         ),
+                         style: ElevatedButton.styleFrom(
+                           backgroundColor: Colors.green,
+                           foregroundColor: Colors.white,
+                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                           shape: RoundedRectangleBorder(
+                             borderRadius: BorderRadius.circular(10),
+                           ),
+                           elevation: 2,
+                         ),
+                       ),
+                     ],
+                   ),
+                    // IconButton(
+                    //   onPressed: () {
+                    //     context.read<NewBookingProvider>().callUser(
+                    //       context: context,
+                    //       bookingId: widget.id,
+                    //     );
+                    //   },
+                    //   icon: const Icon(
+                    //     Icons.call,
+                    //     color: Colors.green,
+                    //   ),
+                    // ),
                     /// 🔹 DATE + BOOKING ID
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -386,7 +404,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Text(
-                              "🕘 : $bookingId",
+                              "Booking ID : $bookingId",
                               style: const TextStyle(
                                 fontWeight: FontWeight.w700,
                               ),

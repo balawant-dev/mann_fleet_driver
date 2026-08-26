@@ -42,7 +42,7 @@ class ProfileDetailProvider extends ChangeNotifier {
         );
       }
     } catch (e) {
-      debugPrint("Error in Get Profile: $e");
+      debugPrint("Error in Get Profile5: $e");
     } finally {
       isLoading = false;
       notifyListeners();
@@ -82,7 +82,7 @@ class ProfileDetailProvider extends ChangeNotifier {
           res.data!.first.name!.rOpenAiVersion!,
         );
       }
-      getProfileApi(context: context);
+      // getProfileApi(context: context);
       errorMessage = null;
     } catch (e) {
       errorMessage = e.toString();

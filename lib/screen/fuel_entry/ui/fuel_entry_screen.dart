@@ -189,8 +189,8 @@ class _FuelEntryScreenState extends State<FuelEntryScreen> {
                   keyboardType: TextInputType.number,
                   hintText: 'Total Amount',
                   labelText: 'Total Amount',
-                  isRequired: true,
-                  // readOnly: true,
+                  // isRequired: true,
+                  readOnly: true,
                 ),
 
                 const SizedBox(height: 10),const SizedBox(height: 10),

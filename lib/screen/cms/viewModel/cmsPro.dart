@@ -29,7 +29,7 @@ class CMSProvider extends ChangeNotifier {
         print("Get privacyPolicyModel Successfully");
       }
     } catch (e) {
-      debugPrint("Error in Get Profile: $e");
+      debugPrint("Error in Get Profile1: $e");
     } finally {
       isLoading = false;
       notifyListeners();
@@ -46,7 +46,7 @@ class CMSProvider extends ChangeNotifier {
         print("Get privacyPolicyModel Successfully");
       }
     } catch (e) {
-      debugPrint("Error in Get Profile: $e");
+      debugPrint("Error in Get Profile2: $e");
     } finally {
       isLoading = false;
       notifyListeners();
@@ -62,7 +62,7 @@ class CMSProvider extends ChangeNotifier {
         print("Get privacyPolicyModel Successfully");
       }
     } catch (e) {
-      debugPrint("Error in Get Profile: $e");
+      debugPrint("Error in Get Profile3: $e");
     } finally {
       isLoading = false;
       notifyListeners();

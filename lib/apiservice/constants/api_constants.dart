@@ -1,18 +1,10 @@
 class ApiConstants {
   //Live Url
 
-  static const String baseUrl = 'https://admin.mannfleetpartners.com';
-
- // static const String baseUrl =  'http://167.71.238.86:9021';
-  // static const String baseUrl = 'http://167.71.226.189:9020';
-
-  //static const String baseUrl = 'http://167.71.238.86:9021';
-
-
   // static const String baseUrl = 'https://admin.mannfleetpartners.com';
-  // static const String baseUrl = 'https://test.teknikoglobal.in';
-  // static const String baseUrl = 'http://167.71.238.86:9021';
-  // static const String baseUrl = 'https://enquiry.teknikoglobal.com';
+
+ static const String baseUrl =  'http://167.71.238.86:9021';
+
 
 
   static const String verifyOtp = '/api/driver/verifyOtp';
@@ -65,7 +57,8 @@ class ApiConstants {
   static const String aboutUs = '/api/driver/aboutUs';
   static const String refundPolicy = '/api/driver/refundPolicy';
 
-
+// Corporate Bookings
+ static const String corporateBookings = '/api/driver/corporate-bookings';
 
   static const String resendOtp = '/api/v1/driver/resend-otp';
   static const String update = '/api/v1/driver/update';

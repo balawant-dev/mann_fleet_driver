@@ -7,6 +7,8 @@ import 'package:provider/provider.dart';
 import '../../../apiservice/services/secure_storage_service.dart';
 import '../../../widget/custom_text.dart';
 import '../../cms/ui/cMSContentScreen.dart';
+import '../../corporateBookings/ui/corporate_booking_history_screen.dart';
+import '../../corporateBookings/ui/corporate_booking_list_screen.dart';
 import '../../fuel_entry/ui/fuel_entry_screen.dart';
 import '../../penalty/ui/penaltyScreen.dart';
 import '../../profileManagement/provider/profileDetailProvider.dart';
@@ -142,6 +144,27 @@ class _CustomDrawerState extends State<CustomDrawer> {
                             navPush(
                               context: context,
                               action: ProfileManagementScreen(),
+                            );
+                            // TODO: Navigate to profile
+                          },
+                        ),
+                        drawerItem(
+                          icon: Icons.ten_k_outlined,
+                          title: "Corporate Booking",
+                          onTap: () {
+                            navPush(
+                              context: context,
+                              action: CorporateBookingListScreen(),
+                            );
+                            // TODO: Navigate to profile
+                          },
+                        ),     drawerItem(
+                          icon: Icons.history,
+                          title: "Corporate Booking History",
+                          onTap: () {
+                            navPush(
+                              context: context,
+                              action: CorporateBookingHistoryScreen(),
                             );
                             // TODO: Navigate to profile
                           },

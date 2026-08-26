@@ -107,49 +107,131 @@ class FuelEntryProvider extends ChangeNotifier {
   }
 
   Future<void> pickImage(
-    String type,
-    ImageSource source,
-    BuildContext context,
-  ) async {
+      String type,
+      ImageSource source,
+      BuildContext context,
+      ) async {
     try {
-      final pickedFile = await ImagePicker().pickImage(
+      debugPrint("IMAGE PICK START => $type");
+
+      final XFile? pickedFile = await picker.pickImage(
         source: source,
-        imageQuality: 70,
+        imageQuality: 60,
+        maxWidth: 1280,
+        maxHeight: 1280,
       );
 
-      if (pickedFile == null) return;
+      if (pickedFile == null) {
+        debugPrint("IMAGE PICK CANCELLED");
+        return;
+      }
 
-      File image = File(pickedFile.path);
+      final File image = File(pickedFile.path);
 
-      /// SET IMAGE
+      debugPrint("IMAGE PATH => ${image.path}");
+
+      if (!await image.exists()) {
+        debugPrint("IMAGE DOES NOT EXIST");
+        return;
+      }
+
+      final int fileSize = await image.length();
+
+      debugPrint(
+        "IMAGE SIZE => ${(fileSize / 1024 / 1024).toStringAsFixed(2)} MB",
+      );
+
       switch (type) {
         case "bill":
           billImage = image;
-          await scanInvoiceBillDisplayWithGemini(image, context);
+          notifyListeners();
+
+          await scanInvoiceBillDisplayWithGemini(
+            image,
+            context,
+          );
           break;
 
         case "odometer":
           odometerImage = image;
-          await scanOdometerDisplayWithGemini(image, context);
+          notifyListeners();
+
+          await scanOdometerDisplayWithGemini(
+            image,
+            context,
+          );
           break;
 
         case "start":
           startImage = image;
+          notifyListeners();
           break;
 
         case "end":
           endImage = image;
-          await handleFuelDisplayScan(image, context);
+          notifyListeners();
+
+          await handleFuelDisplayScan(
+            image,
+            context,
+          );
           break;
       }
 
-      notifyListeners();
-
-      print("IMAGE SELECTED => ${image.path}");
-    } catch (e) {
-      print("IMAGE PICK ERROR => $e");
+      debugPrint("IMAGE PROCESS COMPLETE => $type");
+    } catch (e, stack) {
+      debugPrint("IMAGE PICK/PROCESS ERROR => $e");
+      debugPrint("STACK TRACE => $stack");
     }
   }
+
+  // Future<void> pickImage(
+  //   String type,
+  //   ImageSource source,
+  //   BuildContext context,
+  // ) async {
+  //   try {
+  //     final pickedFile = await ImagePicker().pickImage(
+  //       source: source,
+  //       imageQuality: 60,
+  //       maxWidth: 1280,
+  //       maxHeight: 1280,
+  //       // imageQuality: 70,
+  //     );
+  //
+  //     if (pickedFile == null) return;
+  //
+  //     File image = File(pickedFile.path);
+  //
+  //     /// SET IMAGE
+  //     switch (type) {
+  //       case "bill":
+  //         billImage = image;
+  //         await scanInvoiceBillDisplayWithGemini(image, context);
+  //         break;
+  //
+  //       case "odometer":
+  //         odometerImage = image;
+  //         await scanOdometerDisplayWithGemini(image, context);
+  //         break;
+  //
+  //       case "start":
+  //         startImage = image;
+  //         break;
+  //
+  //       case "end":
+  //         endImage = image;
+  //         await handleFuelDisplayScan(image, context);
+  //         break;
+  //     }
+  //
+  //     notifyListeners();
+  //
+  //     print("IMAGE SELECTED => ${image.path}");
+  //   } catch (e) {
+  //     print("IMAGE PICK ERROR => $e");
+  //   }
+  // }
 
   Future<void> scanFuelDisplayOCR(File file) async {
     try {
@@ -311,208 +393,7 @@ class FuelEntryProvider extends ChangeNotifier {
     debugPrint("Amount: ${fuelAmountController.text}");
   }
 
-  Future<void> scanBillOCR(File file) async {
-    try {
-      final inputImage = InputImage.fromFile(file);
-      final textRecognizer = TextRecognizer();
 
-      final RecognizedText recognizedText = await textRecognizer.processImage(
-        inputImage,
-      );
-
-      textRecognizer.close();
-
-      extractDataAdvanced(recognizedText.text);
-    } catch (e) {
-      debugPrint("OCR Error: $e");
-    }
-  }
-
-  void extractDataAdvanced(String text) {
-    List<String> invoiceKeys = [
-      "invoice no",
-      "invoice number",
-      "invoice",
-      "bill no",
-      "bill number",
-      "txn no",
-      "transaction no",
-      "inv no",
-      "inv",
-      "invoice#",
-      "bill#",
-    ];
-    List<String> rateKeys = ["rate", "price", "rs/ltr", "rs.\/ltr"];
-
-    List<String> amountKeys = [
-      "total amount",
-      "total amt",
-      "total",
-      "sale",
-      "amount",
-      "amt",
-      "net amount",
-      "sale amount",
-      "grand total",
-      "payable amount",
-      "rs",
-      "rs.",
-      "inr",
-      "₹",
-    ];
-    List<String> fuelTypeKeys = ["petrol", "diesel", "cng"];
-
-    /// 🔥 FUEL QUANTITY KEYS
-    List<String> fuelQuantityKeys = [
-      "volume",
-      "qty",
-      "quantity",
-      "litre",
-      "liter",
-      "ltr",
-      "ltrs",
-      "liters",
-      "litres",
-    ];
-
-    String foundInvoice = "";
-    String foundAmount = "";
-    String foundFuelQty = "";
-
-    List<String> lines = text.split('\n');
-
-    /// 🔍 INVOICE NUMBER (HP BILL PERFECT)
-    RegExp invoiceReg = RegExp(r'([A-Za-z]{2,5}-\d{3,}-[A-Za-z0-9]+)');
-
-    final invoiceMatch = invoiceReg.firstMatch(text);
-
-    if (invoiceMatch != null) {
-      foundInvoice = invoiceMatch.group(1)!;
-    }
-
-    /// 💰 AMOUNT
-    List<double> amounts = [];
-
-    for (int i = 0; i < lines.length; i++) {
-      String line = lines[i];
-      String l = line.toLowerCase();
-
-      for (String key in amountKeys) {
-        if (l.contains(key)) {
-          RegExp reg = RegExp(r'(\d+\.?\d{0,2})');
-
-          Iterable<Match> matches = reg.allMatches(line);
-
-          for (var m in matches) {
-            double val = double.tryParse(m.group(0)!) ?? 0;
-
-            if (val > 100 && val < 10000) {
-              amounts.add(val);
-            }
-          }
-        }
-      }
-    }
-
-    if (amounts.isNotEmpty) {
-      amounts.sort();
-      foundAmount = amounts.last.toStringAsFixed(2);
-    }
-
-    /// ⛽ FUEL QUANTITY
-    for (int i = 0; i < lines.length; i++) {
-      String line = lines[i];
-      String l = line.toLowerCase();
-
-      for (String key in fuelQuantityKeys) {
-        if (l.contains(key) && foundFuelQty.isEmpty) {
-          /// Example:
-          /// Volume : 30.00L
-          /// Qty : 15.5
-          /// Volume 30.00
-
-          RegExp reg = RegExp(r'(\d+\.?\d{0,2})');
-
-          final match = reg.firstMatch(line);
-
-          if (match != null) {
-            foundFuelQty = match.group(1)!;
-            break;
-          }
-
-          /// next line fallback
-          if (i + 1 < lines.length) {
-            final nextMatch = RegExp(
-              r'(\d+\.?\d{0,2})',
-            ).firstMatch(lines[i + 1]);
-
-            if (nextMatch != null) {
-              foundFuelQty = nextMatch.group(1)!;
-              break;
-            }
-          }
-        }
-      }
-    }
-
-    /// ⛽ RATE
-    for (int i = 0; i < lines.length; i++) {
-      String line = lines[i];
-      String l = line.toLowerCase();
-
-      for (String key in rateKeys) {
-        if (l.contains(key) && foundRate.isEmpty) {
-          RegExp reg = RegExp(r'(\d+\.?\d{0,2})');
-
-          final match = reg.firstMatch(line);
-
-          if (match != null) {
-            foundRate = match.group(1)!;
-            break;
-          }
-        }
-      }
-    }
-
-    /// ⛽ FUEL TYPE
-    for (int i = 0; i < lines.length; i++) {
-      String line = lines[i].toLowerCase();
-
-      for (String type in fuelTypeKeys) {
-        if (line.contains(type)) {
-          foundFuelType = type.toUpperCase();
-          break;
-        }
-      }
-      if (foundFuelType.isNotEmpty) break;
-    }
-    debugPrint("🧾 INVOICE: $foundInvoice");
-    debugPrint("💰 AMOUNT: $foundAmount");
-    debugPrint("⛽ QTY: $foundFuelQty");
-    debugPrint("⛽ foundRate: $foundRate");
-    debugPrint("⛽ foundFuelType: $foundFuelType");
-    if (foundFuelType.isNotEmpty) {
-      fuelTypeController.text = foundFuelType;
-    }
-    if (foundRate.isNotEmpty) {
-      fuelPriceController.text = foundRate;
-    }
-
-    /// ✅ AUTO FILL (IMPORTANT 🔥)
-    if (foundInvoice.isNotEmpty) {
-      invoiceNumberController.text = foundInvoice;
-    }
-
-    if (foundAmount.isNotEmpty) {
-      fuelAmountController.text = foundAmount;
-    }
-
-    /// 🔥 AUTO FILL FUEL QUANTITY
-    if (foundFuelQty.isNotEmpty) {
-      fuelQtyController.text = foundFuelQty;
-    }
-    notifyListeners();
-  }
 
   /// Auto Calculate Amount
   void calculateAmount() {
@@ -675,39 +556,87 @@ class FuelEntryProvider extends ChangeNotifier {
 
 
 
+  bool _isScanning = false;
+
   Future<void> handleFuelDisplayScan(
-    File imageFile,
-    BuildContext context,
-  ) async {
-    showLoader(context);
+      File imageFile,
+      BuildContext context,
+      ) async {
+    if (_isScanning) return;
+
+    _isScanning = true;
+    notifyListeners();
 
     try {
-      final FuelScanResult results = await getFuelDetailsFromImageOpenAi(
-        imageFile,
-      );
+      final FuelScanResult result =
+      await getFuelDetailsFromImageOpenAi(imageFile);
 
-      fuelQtyController.text = results.liters.toStringAsFixed(2);
-      fuelPriceController.text = results.pricePerLiter.toStringAsFixed(2);
-      fuelAmountController.text = results.totalAmount.toStringAsFixed(2);
+      if (!context.mounted) return;
 
-      print("FUEL AUTO FILL COMPLETE");
+      fuelQtyController.text =
+          result.liters.toStringAsFixed(2);
+
+      fuelPriceController.text =
+          result.pricePerLiter.toStringAsFixed(2);
+
+      fuelAmountController.text =
+          result.totalAmount.toStringAsFixed(2);
+
       notifyListeners();
-    } catch (error) {
+    } catch (e, stack) {
+      debugPrint("FUEL OCR ERROR => $e");
+      debugPrint("STACK => $stack");
+
+      _clearFuelFields();
+
       if (context.mounted) {
-        _clearFuelFields();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(error.toString().replaceFirst("Exception: ", "")),
-            duration: Duration(seconds: 2),
+            content: Text(
+              e.toString().replaceFirst("Exception: ", ""),
+            ),
           ),
         );
       }
     } finally {
-      if (context.mounted) {
-        Navigator.pop(context);
-      }
+      _isScanning = false;
+      notifyListeners();
     }
   }
+
+  // Future<void> handleFuelDisplayScan(
+  //   File imageFile,
+  //   BuildContext context,
+  // ) async {
+  //   showLoader(context);
+  //
+  //   try {
+  //     final FuelScanResult results = await getFuelDetailsFromImageOpenAi(
+  //       imageFile,
+  //     );
+  //
+  //     fuelQtyController.text = results.liters.toStringAsFixed(2);
+  //     fuelPriceController.text = results.pricePerLiter.toStringAsFixed(2);
+  //     fuelAmountController.text = results.totalAmount.toStringAsFixed(2);
+  //
+  //     print("FUEL AUTO FILL COMPLETE");
+  //     notifyListeners();
+  //   } catch (error) {
+  //     if (context.mounted) {
+  //       _clearFuelFields();
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(
+  //           content: Text(error.toString().replaceFirst("Exception: ", "")),
+  //           duration: Duration(seconds: 2),
+  //         ),
+  //       );
+  //     }
+  //   } finally {
+  //     if (context.mounted) {
+  //       Navigator.pop(context);
+  //     }
+  //   }
+  // }
 
   void _clearFuelFields() {
     fuelQtyController.clear();

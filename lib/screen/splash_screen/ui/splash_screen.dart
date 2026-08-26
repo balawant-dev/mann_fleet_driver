@@ -30,7 +30,8 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     _videoController = VideoPlayerController.asset(
-      'assets/images/spalshVideo.mp4',
+      'assets/images/introLogoAppaudio.mp4',
+      // 'assets/images/spalshVideo.mp4',
     )
       ..initialize().then((_) {
         setState(() {});
@@ -38,6 +39,50 @@ class _SplashScreenState extends State<SplashScreen> {
         _videoController.setLooping(true);
       });
     loadInitialData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkPendingIncomingCall();
+    });
+  }
+
+  Future<void> _checkPendingIncomingCall() async {
+    try {
+      debugPrint(
+        "🔍 SPLASH: Checking pending incoming call...",
+      );
+
+      await Future.delayed(
+        const Duration(milliseconds: 500),
+      );
+
+      if (!mounted) return;
+
+      final hasCall =
+      await FirebaseService.hasIncomingCall();
+
+      debugPrint(
+        "📞 SPLASH: Has incoming call = $hasCall",
+      );
+
+      if (!hasCall) {
+        return;
+      }
+
+      debugPrint(
+        "📞 SPLASH: Pending incoming call found",
+      );
+
+      await FirebaseService.checkAndOpenIncomingCall();
+
+    } catch (e, stackTrace) {
+
+      debugPrint(
+        "❌ SPLASH pending call error: $e",
+      );
+
+      debugPrint(
+        stackTrace.toString(),
+      );
+    }
   }
 
   bool isUpdateRequired(String currentVersion, String apiVersion) {
@@ -63,9 +108,10 @@ class _SplashScreenState extends State<SplashScreen> {
       context,
       listen: false,
     );
+    // if(!mounted)
     await vmProfile.getPlatformDependenciesApi(context: context);
     final data = vmProfile.platformDependenciesModel?.data;
-    vmProfile.getProfileApi(context: context);
+    // vmProfile.getProfileApi(context: context);
 
     final info = await PackageInfo.fromPlatform();
     final currentVersion = info.version;
@@ -90,6 +136,19 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> checkSession() async {
+    final hasCall =
+    await FirebaseService.hasIncomingCall();
+
+    if (hasCall) {
+
+      debugPrint(
+        "📞 SPLASH: Incoming call has priority",
+      );
+
+      await FirebaseService.checkAndOpenIncomingCall();
+
+      return;
+    }
     final token = await SecureStorageService.getToken();
 
     await Future.delayed(const Duration(seconds: 3));

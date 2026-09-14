@@ -1,9 +1,9 @@
 class ApiConstants {
   //Live Url
 
-  // static const String baseUrl = 'https://admin.mannfleetpartners.com';
+  static const String baseUrl = 'https://admin.mannfleetpartners.com';
 
- static const String baseUrl =  'http://167.71.238.86:9021';
+ // static const String baseUrl =  'http://167.71.238.86:9021';
 
 
 

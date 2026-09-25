@@ -291,7 +291,8 @@ class CorporateBookingDetailModel {
 }
 
 class CorporateBookingDetail {
-  final GuestDetail guestDetail;
+  final GuestDetail? guestDetail;
+  final User? user;
   final Location pickup;
   final Location dropoff;
   final Actual actual;
@@ -304,6 +305,7 @@ class CorporateBookingDetail {
   final int legNumber;
   final int vehicleSlot;
   final Corporate corporate;
+  // final User user;
   final Booker booker;
   final String vehicleReleaseDate;
   final int numberofPassangers;
@@ -326,7 +328,7 @@ class CorporateBookingDetail {
   final String corporateApprovedBy;
   final bool isOutOfPolicy;
   final List<dynamic> policyViolationReasons;
-  final String user;
+  // final String user;
   final Checkpoint garageStart;
   final Checkpoint pickupCheckpoint;
   final Checkpoint dropCheckpoint;
@@ -343,6 +345,7 @@ class CorporateBookingDetail {
 
   CorporateBookingDetail({
     required this.guestDetail,
+     this.user,
     required this.pickup,
     required this.dropoff,
     required this.actual,
@@ -377,7 +380,7 @@ class CorporateBookingDetail {
     required this.corporateApprovedBy,
     required this.isOutOfPolicy,
     required this.policyViolationReasons,
-    required this.user,
+    // required this.user,
     required this.garageStart,
     required this.pickupCheckpoint,
     required this.dropCheckpoint,
@@ -395,18 +398,37 @@ class CorporateBookingDetail {
 
   factory CorporateBookingDetail.fromJson(Map<String, dynamic> json) {
     // Safely handle guestDetail (can be List or Map)
-    GuestDetail guest;
+    GuestDetail? guest;
     final guestRaw = json['guestDetail'];
+
     if (guestRaw is List && guestRaw.isNotEmpty) {
-      guest = GuestDetail.fromJson(Map<String, dynamic>.from(guestRaw.first));
+      guest = GuestDetail.fromJson(
+        Map<String, dynamic>.from(guestRaw.first),
+      );
     } else if (guestRaw is Map) {
-      guest = GuestDetail.fromJson(Map<String, dynamic>.from(guestRaw));
-    } else {
-      guest = GuestDetail(name: '', email: '', phone: '');
+      guest = GuestDetail.fromJson(
+        Map<String, dynamic>.from(guestRaw),
+      );
     }
 
+    // ========== USER ==========
+    User? user;
+    final userRaw = json['user'];
+
+    if (userRaw is List && userRaw.isNotEmpty) {
+      user = User.fromJson(
+        Map<String, dynamic>.from(userRaw.first),
+      );
+    } else if (userRaw is Map) {
+      user = User.fromJson(
+        Map<String, dynamic>.from(userRaw),
+      );
+    }
+
+
     return CorporateBookingDetail(
-      guestDetail: guest, // ← yahan guest use karo (pehle wali line mat use karna)
+      guestDetail: guest,
+      user: user,
       pickup: Location.fromJson(json['pickup'] ?? {}),
       dropoff: Location.fromJson(json['dropoff'] ?? {}),
       actual: Actual.fromJson(json['actual'] ?? {}),
@@ -443,7 +465,7 @@ class CorporateBookingDetail {
       corporateApprovedBy: json['corporateApprovedBy']?.toString() ?? '',
       isOutOfPolicy: json['isOutOfPolicy'] ?? false,
       policyViolationReasons: json['policyViolationReasons'] ?? [],
-      user: json['user']?.toString() ?? '',
+      // user: User.fromJson(json['user'] ?? {}),
       garageStart: Checkpoint.fromJson(json['garageStart'] ?? {}),
       pickupCheckpoint: Checkpoint.fromJson(json['pickupCheckpoint'] ?? {}),
       dropCheckpoint: Checkpoint.fromJson(json['dropCheckpoint'] ?? {}),
@@ -550,6 +572,33 @@ class PackageSnapshot {
       stateCharge: json['stateCharge'] ?? 0,
       otherCharges: json['otherCharges'] ?? 0,
       numberOfVechicle: json['numberOfVechicle'] ?? 0,
+    );
+  }
+}
+
+
+class User {
+  final String sId;
+  final String name;
+  final String email;
+  final String mobile;
+  final String id;
+
+  User({
+    required this.sId,
+    required this.name,
+    required this.email,
+    required this.mobile,
+    required this.id,
+  });
+
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      sId: json['_id'] ?? json['_id'] ?? '',
+      name: json['name'] ?? '',
+      email: json['email'] ?? '',
+      mobile: json['mobile'] ?? '',
+      id: json['id'] ?? '',
     );
   }
 }

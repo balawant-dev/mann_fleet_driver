@@ -321,6 +321,30 @@ class Corporate {
       createdAtIST: json['createdAtIST'] ?? '',
     );
   }
+}class User {
+  final String sId;
+  final String name;
+  final String email;
+  final String mobile;
+  final String id;
+
+  User({
+    required this.sId,
+    required this.name,
+    required this.email,
+    required this.mobile,
+    required this.id,
+  });
+
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      sId: json['_id'] ?? json['_id'] ?? '',
+      name: json['name'] ?? '',
+      email: json['email'] ?? '',
+      mobile: json['mobile'] ?? '',
+      id: json['id'] ?? '',
+    );
+  }
 }
 
 class Booker {

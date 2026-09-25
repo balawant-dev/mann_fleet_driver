@@ -148,27 +148,27 @@ class _CustomDrawerState extends State<CustomDrawer> {
                             // TODO: Navigate to profile
                           },
                         ),
-                        drawerItem(
-                          icon: Icons.ten_k_outlined,
-                          title: "Corporate Booking",
-                          onTap: () {
-                            navPush(
-                              context: context,
-                              action: CorporateBookingListScreen(),
-                            );
-                            // TODO: Navigate to profile
-                          },
-                        ),     drawerItem(
-                          icon: Icons.history,
-                          title: "Corporate Booking History",
-                          onTap: () {
-                            navPush(
-                              context: context,
-                              action: CorporateBookingHistoryScreen(),
-                            );
-                            // TODO: Navigate to profile
-                          },
-                        ),
+                        // drawerItem(
+                        //   icon: Icons.ten_k_outlined,
+                        //   title: "Corporate Booking",
+                        //   onTap: () {
+                        //     navPush(
+                        //       context: context,
+                        //       action: CorporateBookingListScreen(),
+                        //     );
+                        //     // TODO: Navigate to profile
+                        //   },
+                        // ),     drawerItem(
+                        //   icon: Icons.history,
+                        //   title: "Corporate Booking History",
+                        //   onTap: () {
+                        //     navPush(
+                        //       context: context,
+                        //       action: CorporateBookingHistoryScreen(),
+                        //     );
+                        //     // TODO: Navigate to profile
+                        //   },
+                        // ),
                         drawerItem(
                           icon: Icons.star_border,
                           title: "Driver Rating",
@@ -329,7 +329,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   ),
                 ),
               ),
-              Text("Version 1.0.0", style: TextStyle(color: Colors.grey)),
+              // Text("Version 1.0.0", style: TextStyle(color: Colors.grey)),
               SizedBox(height: 5),
             ],
           ),

@@ -1377,6 +1377,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../widget/commonAppBar.dart';
 import '../../../widget/motionToastHelper.dart';
+import '../../fuel_entry/service/open_ai_service.dart';
 import '../pro/corporate_booking_provider.dart';
 
 class CorporateBookingDetailScreen extends StatefulWidget {
@@ -1481,15 +1482,24 @@ class _CorporateBookingDetailScreenState
                   ],
                 ),
 
-                // ========== GUEST ==========
-                _sectionCard(
-                  title: 'Guest Details',
-                  children: [
-                    _detailRow('Name', d.guestDetail.name),
-                    _detailRow('Email', d.guestDetail.email),
-                    _detailRow('Phone', '${d.guestDetail.phone}'),
-                  ],
-                ),
+                if (d.guestDetail != null)
+                  _sectionCard(
+                    title: 'Guest Details',
+                    children: [
+                      _detailRow('Name', d.guestDetail?.name ?? '-'),
+                      _detailRow('Email', d.guestDetail?.email ?? '-'),
+                      _detailRow('Phone', '${d.guestDetail?.phone ?? '-'}'),
+                    ],
+                  ),
+                if (d.user != null)
+                  _sectionCard(
+                    title: 'User Details',
+                    children: [
+                      _detailRow('Name', d.user?.name ?? '-'),
+                      _detailRow('Email', d.user?.email ?? '-'),
+                      _detailRow('Phone', '${d.user?.mobile ?? '-'}'),
+                    ],
+                  ),
 
                 // ========== CORPORATE ==========
                 _sectionCard(
@@ -1820,7 +1830,7 @@ class _CorporateBookingDetailScreenState
                     _actionButton(
                       label: 'Complete Trip',
                       color: ColorResource.primaryColor,
-                      isLoading: provider.isGarageEnd,
+                      isLoading: provider.isCompleteTrip,
                       // or use a new flag if you have isExtraCharge
                       onPressed: () async {
                         final success = await provider.completeTripApi(
@@ -2024,7 +2034,7 @@ class _CorporateBookingDetailScreenState
                     _actionButton(
                       label: 'Complete Trip',
                       color: ColorResource.primaryColor,
-                      isLoading: provider.isGarageEnd,
+                      isLoading: provider.isCompleteTrip,
                       // or use a new flag if you have isExtraCharge
                       onPressed: () async {
                         final success = await provider.completeTripApi(
@@ -2061,33 +2071,7 @@ class _CorporateBookingDetailScreenState
                     ),
                 ],
                 if (tripType == 'pickup to destination') ...[
-                  // 1. Garage Start
-                  // if (d.tripStatus == 'driver_enroute')
-                  //   _actionButton(
-                  //     label: 'Garage Start',
-                  //     color: Colors.indigo,
-                  //     isLoading: provider.isGarageStarting,
-                  //     onPressed: () => _showOdometerSheet(
-                  //       context: context,
-                  //       provider: provider,
-                  //       bookingId: d.id,
-                  //       title: 'Garage Start',
-                  //       submitLabel: 'Submit Garage Start',
-                  //       successMessage: 'Garage Start successful',
-                  //       onSubmit: (odometer, lat, lng, image) {
-                  //         return provider.garageStart(
-                  //           context: context,
-                  //           bookingId: d.id,
-                  //           odometer: odometer,
-                  //           currentLat: lat,
-                  //           currentLng: lng,
-                  //           odometerImage: image,
-                  //         );
-                  //       },
-                  //     ),
-                  //   ),
 
-                  // 2. Pickup Checkpoint
                   if (d.tripStatus == 'driver_enroute')
                     _actionButton(
                       label: 'Pickup Checkpoint',
@@ -2225,7 +2209,183 @@ class _CorporateBookingDetailScreenState
                     _actionButton(
                       label: 'Complete Trip',
                       color: ColorResource.primaryColor,
+                      isLoading: provider.isCompleteTrip,
+                      // or use a new flag if you have isExtraCharge
+                      onPressed: () async {
+                        final success = await provider.completeTripApi(
+                          context: context,
+                          bookingId: widget.bookingId,
+                        );
+
+                        if (success && context.mounted) {
+                          ToastHelper.show(
+                            context,
+                            message: 'Complete trip successfully',
+                            type: ToastType.success,
+                          );
+                          // _showSnack(
+                          //   context,
+                          //   'Complete trip successfully',
+                          //   Colors.green,
+                          // );
+                        } else if (context.mounted) {
+                          ToastHelper.show(
+                            context,
+                            message:
+                                provider.errorMessage ??
+                                'Failed to complete trip',
+                            type: ToastType.error,
+                          );
+                          // _showSnack(
+                          //   context,
+                          //   provider.errorMessage ?? 'Failed to complete trip',
+                          //   Colors.red,
+                          // );
+                        }
+                      },
+                    ),
+                ],
+
+                if (tripType == 'pickup to pickup') ...[
+
+                  if (d.tripStatus == 'driver_enroute')
+                    _actionButton(
+                      label: 'Pickup Checkpoint',
+                      color: Colors.indigo,
+                      isLoading: provider.isPickupCheckpoint,
+                      onPressed:
+                          () => _showOdometerSheet(
+                            isLoading: provider.isPickupCheckpoint,
+                            context: context,
+                            provider: provider,
+                            bookingId: d.id,
+                            title: 'Pickup Checkpoint',
+                            submitLabel: 'Submit Pickup Checkpoint',
+                            successMessage: 'Pickup Checkpoint successful',
+                            onSubmit: (odometer, lat, lng, image) {
+                              return provider.pickupCheckpoint(
+                                context: context,
+                                bookingId: d.id,
+                                odometer: odometer,
+                                currentLat: lat,
+                                currentLng: lng,
+                                odometerImage: image,
+                              );
+                            },
+                          ),
+                    ),
+
+                  // 3. Start Ride (after arrived)
+                  if (d.tripStatus == 'arrived')
+                    _actionButton(
+                      label: 'Start Ride',
+                      color: Colors.indigo,
+                      isLoading: provider.isStartRide,
+                      onPressed: () async {
+                        final success = await provider.startRide(
+                          context: context,
+                          bookingId: widget.bookingId,
+                        );
+
+                        if (success && context.mounted) {
+                          ToastHelper.show(
+                            context,
+                            message: 'Start Ride successful',
+                            type: ToastType.success,
+                          );
+                          // _showSnack(
+                          //   context,
+                          //   'Start Ride successful',
+                          //   Colors.green,
+                          // );
+                        } else if (context.mounted) {
+                          ToastHelper.show(
+                            context,
+                            message: provider.errorMessage ?? 'Failed',
+                            type: ToastType.error,
+                          );
+                          // _showSnack(
+                          //   context,
+                          //   provider.errorMessage ?? 'Failed',
+                          //   Colors.red,
+                          // );
+                        }
+                      },
+                    ),
+
+                  // 4. Drop Checkpoint
+                  if (d.tripStatus == 'in_progress')
+                    _actionButton(
+                      label: 'Drop Checkpoint',
+                      color: Colors.indigo,
+                      isLoading: provider.isDropCheckpoint,
+                      onPressed:
+                          () => _showOdometerSheet(
+                            isLoading: provider.isDropCheckpoint,
+                            context: context,
+                            provider: provider,
+                            bookingId: d.id,
+                            title: 'Drop Checkpoint',
+                            submitLabel: 'Submit Drop Checkpoint',
+                            successMessage: 'Drop Checkpoint successful',
+                            onSubmit: (odometer, lat, lng, image) {
+                              return provider.dropCheckpoint(
+                                context: context,
+                                bookingId: d.id,
+                                odometer: odometer,
+                                currentLat: lat,
+                                currentLng: lng,
+                                odometerImage: image,
+                              );
+                            },
+                          ),
+                    ),
+
+                  // 5. Garage End
+                  // if (d.tripStatus == 'returning_garage')
+                  //   _actionButton(
+                  //     label: 'Garage End',
+                  //     color: Colors.indigo,
+                  //     isLoading: provider.isGarageEnd,
+                  //     onPressed: () => _showOdometerSheet(
+                  //       context: context,
+                  //       provider: provider,
+                  //       bookingId: d.id,
+                  //       title: 'Garage End',
+                  //       submitLabel: 'Submit Garage End',
+                  //       successMessage: 'Garage End successful',
+                  //       onSubmit: (odometer, lat, lng, image) {
+                  //         return provider.garageEndApi(
+                  //           context: context,
+                  //           bookingId: d.id,
+                  //           odometer: odometer,
+                  //           currentLat: lat,
+                  //           currentLng: lng,
+                  //           odometerImage: image,
+                  //         );
+                  //       },
+                  //     ),
+                  //   ),
+
+                  // 6. Extra Charges (after dropped)
+                  if (d.tripStatus == 'returning_garage')
+                    _actionButton(
+                      label: 'Add Extra Charges',
+                      color: Colors.deepOrange,
                       isLoading: provider.isGarageEnd,
+                      // or use a new flag if you have isExtraCharge
+                      onPressed:
+                          () => _showExtraChargeSheet(
+                            context: context,
+                            provider: provider,
+                            bookingId: d.id,
+                          ),
+                    ),
+                  if (d.tripStatus == 'returning_garage')
+                    _actionButton(
+                      label: 'Complete Trip',
+                      color: ColorResource.primaryColor,
+                      isLoading: provider.isCompleteTrip,
                       // or use a new flag if you have isExtraCharge
                       onPressed: () async {
                         final success = await provider.completeTripApi(
@@ -2488,16 +2648,16 @@ class _CorporateBookingDetailScreenState
     required bool isLoading,
     required String successMessage,
     required Future<bool> Function(
-      String odometer,
-      double lat,
-      double lng,
-      File image,
-    )
-    onSubmit,
+        String odometer,
+        double lat,
+        double lng,
+        File image,
+        ) onSubmit,
   }) async {
     final odometerController = TextEditingController();
     File? selectedImage;
     final picker = ImagePicker();
+    bool isScanning = false;
 
     await showModalBottomSheet(
       context: context,
@@ -2540,29 +2700,46 @@ class _CorporateBookingDetailScreenState
                   ),
                   const SizedBox(height: 20),
 
-                  // Odometer
-                  TextField(
-                    controller: odometerController,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      labelText: 'Odometer Reading',
-                      prefixIcon: const Icon(Icons.speed),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
+                  // ========== Odometer Field (Auto-filled + ReadOnly after scan) ==========
 
-                  // Image picker
+
+                  // ========== Image Picker ==========
                   GestureDetector(
                     onTap: () async {
                       final picked = await picker.pickImage(
                         source: ImageSource.camera,
                         imageQuality: 70,
                       );
-                      if (picked != null) {
-                        setModalState(() => selectedImage = File(picked.path));
+                      if (picked == null) return;
+
+                      setModalState(() {
+                        selectedImage = File(picked.path);
+                        isScanning = true;
+                        odometerController.clear();
+                      });
+
+                      // Auto scan
+                      try {
+                        final double reading =
+                        await getOdometerReadingFromImageOpenAi(
+                            File(picked.path));
+
+                        setModalState(() {
+                          odometerController.text =
+                              reading.toStringAsFixed(0);
+                          isScanning = false;
+                        });
+                      } catch (e) {
+                        setModalState(() => isScanning = false);
+                        if (context.mounted) {
+                          ToastHelper.show(
+                            context,
+                            message: e
+                                .toString()
+                                .replaceFirst("Exception: ", ""),
+                            type: ToastType.error,
+                          );
+                        }
                       }
                     },
                     child: Container(
@@ -2573,49 +2750,73 @@ class _CorporateBookingDetailScreenState
                         borderRadius: BorderRadius.circular(14),
                         color: Colors.grey.shade50,
                       ),
-                      child:
-                          selectedImage == null
-                              ? const Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.camera_alt,
-                                    size: 42,
-                                    color: Colors.grey,
-                                  ),
-                                  SizedBox(height: 8),
-                                  Text(
-                                    'Tap to capture Odometer Image',
-                                    style: TextStyle(color: Colors.grey),
-                                  ),
-                                ],
-                              )
-                              : ClipRRect(
-                                borderRadius: BorderRadius.circular(14),
-                                child: Image.file(
-                                  selectedImage!,
-                                  fit: BoxFit.cover,
-                                  width: double.infinity,
-                                ),
-                              ),
+                      child: selectedImage == null
+                          ? const Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.camera_alt,
+                              size: 42, color: Colors.grey),
+                          SizedBox(height: 8),
+                          Text(
+                            'Tap to capture Odometer Image',
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                        ],
+                      )
+                          : ClipRRect(
+                        borderRadius: BorderRadius.circular(14),
+                        child: Image.file(
+                          selectedImage!,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                        ),
+                      ),
                     ),
                   ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: odometerController,
+                    keyboardType: TextInputType.number,
+                    readOnly: false,
+                    // readOnly: selectedImage != null, // image aane ke baad edit band
+                    decoration: InputDecoration(
+                      labelText: 'Odometer Reading',
+                      prefixIcon: const Icon(Icons.speed),
+                      suffixIcon: isScanning
+                          ? const Padding(
+                        padding: EdgeInsets.all(12),
+                        child: SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      )
+                          : null,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      helperText: selectedImage != null
+                          ? 'Auto-filled from image (tap image to re-scan)'
+                          : 'Capture image to auto-fill',
+                    ),
+                  ),
+
                   const SizedBox(height: 24),
 
-                  // Submit
+                  // ========== Submit Button ==========
                   SizedBox(
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
-                      onPressed: () async {
+                      onPressed: isScanning
+                          ? null
+                          : () async {
                         if (odometerController.text.trim().isEmpty) {
                           ToastHelper.show(
                             context,
                             message: 'Please enter odometer reading',
                             type: ToastType.warning,
                           );
-                          // _showSnack(
-                          //     context, 'Please enter odometer reading', Colors.orange);
                           return;
                         }
                         if (selectedImage == null) {
@@ -2624,53 +2825,40 @@ class _CorporateBookingDetailScreenState
                             message: "Please capture odometer image",
                             type: ToastType.warning,
                           );
-                          // _showSnack(
-                          //     context, 'Please capture odometer image', Colors.orange);
                           return;
                         }
 
                         // Location check
                         bool serviceEnabled =
-                            await Geolocator.isLocationServiceEnabled();
+                        await Geolocator.isLocationServiceEnabled();
                         if (!serviceEnabled) {
                           ToastHelper.show(
                             context,
                             message: "Please enable location",
                             type: ToastType.warning,
                           );
-                          // _showSnack(context, 'Please enable location', Colors.orange);
                           return;
                         }
 
                         LocationPermission permission =
-                            await Geolocator.checkPermission();
+                        await Geolocator.checkPermission();
                         if (permission == LocationPermission.denied) {
-                          permission = await Geolocator.requestPermission();
+                          permission =
+                          await Geolocator.requestPermission();
                           if (permission == LocationPermission.denied) {
                             ToastHelper.show(
                               context,
                               message: 'Location permission denied',
                               type: ToastType.error,
                             );
-                            // _showSnack(
-                            //     context, 'Location permission denied', Colors.red);
                             return;
                           }
                         }
 
-                        final position = await Geolocator.getCurrentPosition(
+                        final position =
+                        await Geolocator.getCurrentPosition(
                           desiredAccuracy: LocationAccuracy.high,
                         );
-
-                        ////yhi code
-
-                        // final confirmed = await _showConfirmDialog(
-                        //   context: context,
-                        //   title: 'Confirm Action',
-                        //   message: 'Are you sure you want to submit $title?',
-                        // );
-                        // if (!confirmed) return;
-                        ////yhi code hai
 
                         Navigator.pop(ctx);
 
@@ -2685,20 +2873,15 @@ class _CorporateBookingDetailScreenState
                           ToastHelper.show(
                             context,
                             message: successMessage,
-                            type: ToastType.error,
+                            type: ToastType.success, // pehle error tha, ab success
                           );
-                          // _showSnack(context, successMessage, Colors.green);
                         } else if (context.mounted) {
                           ToastHelper.show(
                             context,
-                            message: provider.errorMessage ?? 'Failed',
+                            message:
+                            provider.errorMessage ?? 'Failed',
                             type: ToastType.error,
                           );
-                          // _showSnack(
-                          //   context,
-                          //   provider.errorMessage ?? 'Failed',
-                          //   Colors.red,
-                          // );
                         }
                       },
                       style: ElevatedButton.styleFrom(
@@ -2708,10 +2891,16 @@ class _CorporateBookingDetailScreenState
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child:
-                          isLoading == true
-                              ? CircularProgressIndicator()
-                              : Text(submitLabel),
+                      child: isLoading
+                          ? const SizedBox(
+                        height: 22,
+                        width: 22,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          color: Colors.white,
+                        ),
+                      )
+                          : Text(submitLabel),
                     ),
                   ),
                 ],
@@ -2722,6 +2911,249 @@ class _CorporateBookingDetailScreenState
       },
     );
   }
+  // Future<void> _showOdometerSheet({
+  //   required BuildContext context,
+  //   required CorporateBookingProvider provider,
+  //   required String bookingId,
+  //   required String title,
+  //   required String submitLabel,
+  //   required bool isLoading,
+  //   required String successMessage,
+  //   required Future<bool> Function(
+  //     String odometer,
+  //     double lat,
+  //     double lng,
+  //     File image,
+  //   )
+  //   onSubmit,
+  // }) async {
+  //   final odometerController = TextEditingController();
+  //   File? selectedImage;
+  //   final picker = ImagePicker();
+  //
+  //   await showModalBottomSheet(
+  //     context: context,
+  //     isScrollControlled: true,
+  //     backgroundColor: Colors.transparent,
+  //     builder: (ctx) {
+  //       return StatefulBuilder(
+  //         builder: (context, setModalState) {
+  //           return Container(
+  //             padding: EdgeInsets.only(
+  //               bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+  //               left: 20,
+  //               right: 20,
+  //               top: 16,
+  //             ),
+  //             decoration: const BoxDecoration(
+  //               color: Colors.white,
+  //               borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+  //             ),
+  //             child: Column(
+  //               mainAxisSize: MainAxisSize.min,
+  //               children: [
+  //                 // Handle bar
+  //                 Container(
+  //                   width: 40,
+  //                   height: 4,
+  //                   margin: const EdgeInsets.only(bottom: 16),
+  //                   decoration: BoxDecoration(
+  //                     color: Colors.grey.shade300,
+  //                     borderRadius: BorderRadius.circular(10),
+  //                   ),
+  //                 ),
+  //
+  //                 Text(
+  //                   title,
+  //                   style: const TextStyle(
+  //                     fontSize: 18,
+  //                     fontWeight: FontWeight.bold,
+  //                   ),
+  //                 ),
+  //                 const SizedBox(height: 20),
+  //
+  //                 // Odometer
+  //                 TextField(
+  //                   controller: odometerController,
+  //                   keyboardType: TextInputType.number,
+  //                   decoration: InputDecoration(
+  //                     labelText: 'Odometer Reading',
+  //                     prefixIcon: const Icon(Icons.speed),
+  //                     border: OutlineInputBorder(
+  //                       borderRadius: BorderRadius.circular(12),
+  //                     ),
+  //                   ),
+  //                 ),
+  //                 const SizedBox(height: 16),
+  //
+  //                 // Image picker
+  //                 GestureDetector(
+  //                   onTap: () async {
+  //                     final picked = await picker.pickImage(
+  //                       source: ImageSource.camera,
+  //                       imageQuality: 70,
+  //                     );
+  //                     if (picked != null) {
+  //                       setModalState(() => selectedImage = File(picked.path));
+  //                     }
+  //                   },
+  //                   child: Container(
+  //                     height: 150,
+  //                     width: double.infinity,
+  //                     decoration: BoxDecoration(
+  //                       border: Border.all(color: Colors.grey.shade300),
+  //                       borderRadius: BorderRadius.circular(14),
+  //                       color: Colors.grey.shade50,
+  //                     ),
+  //                     child:
+  //                         selectedImage == null
+  //                             ? const Column(
+  //                               mainAxisAlignment: MainAxisAlignment.center,
+  //                               children: [
+  //                                 Icon(
+  //                                   Icons.camera_alt,
+  //                                   size: 42,
+  //                                   color: Colors.grey,
+  //                                 ),
+  //                                 SizedBox(height: 8),
+  //                                 Text(
+  //                                   'Tap to capture Odometer Image',
+  //                                   style: TextStyle(color: Colors.grey),
+  //                                 ),
+  //                               ],
+  //                             )
+  //                             : ClipRRect(
+  //                               borderRadius: BorderRadius.circular(14),
+  //                               child: Image.file(
+  //                                 selectedImage!,
+  //                                 fit: BoxFit.cover,
+  //                                 width: double.infinity,
+  //                               ),
+  //                             ),
+  //                   ),
+  //                 ),
+  //                 const SizedBox(height: 24),
+  //
+  //                 // Submit
+  //                 SizedBox(
+  //                   width: double.infinity,
+  //                   height: 50,
+  //                   child: ElevatedButton(
+  //                     onPressed: () async {
+  //                       if (odometerController.text.trim().isEmpty) {
+  //                         ToastHelper.show(
+  //                           context,
+  //                           message: 'Please enter odometer reading',
+  //                           type: ToastType.warning,
+  //                         );
+  //                         // _showSnack(
+  //                         //     context, 'Please enter odometer reading', Colors.orange);
+  //                         return;
+  //                       }
+  //                       if (selectedImage == null) {
+  //                         ToastHelper.show(
+  //                           context,
+  //                           message: "Please capture odometer image",
+  //                           type: ToastType.warning,
+  //                         );
+  //                         // _showSnack(
+  //                         //     context, 'Please capture odometer image', Colors.orange);
+  //                         return;
+  //                       }
+  //
+  //                       // Location check
+  //                       bool serviceEnabled =
+  //                           await Geolocator.isLocationServiceEnabled();
+  //                       if (!serviceEnabled) {
+  //                         ToastHelper.show(
+  //                           context,
+  //                           message: "Please enable location",
+  //                           type: ToastType.warning,
+  //                         );
+  //                         // _showSnack(context, 'Please enable location', Colors.orange);
+  //                         return;
+  //                       }
+  //
+  //                       LocationPermission permission =
+  //                           await Geolocator.checkPermission();
+  //                       if (permission == LocationPermission.denied) {
+  //                         permission = await Geolocator.requestPermission();
+  //                         if (permission == LocationPermission.denied) {
+  //                           ToastHelper.show(
+  //                             context,
+  //                             message: 'Location permission denied',
+  //                             type: ToastType.error,
+  //                           );
+  //                           // _showSnack(
+  //                           //     context, 'Location permission denied', Colors.red);
+  //                           return;
+  //                         }
+  //                       }
+  //
+  //                       final position = await Geolocator.getCurrentPosition(
+  //                         desiredAccuracy: LocationAccuracy.high,
+  //                       );
+  //
+  //                       ////yhi code
+  //
+  //                       // final confirmed = await _showConfirmDialog(
+  //                       //   context: context,
+  //                       //   title: 'Confirm Action',
+  //                       //   message: 'Are you sure you want to submit $title?',
+  //                       // );
+  //                       // if (!confirmed) return;
+  //                       ////yhi code hai
+  //
+  //                       Navigator.pop(ctx);
+  //
+  //                       final success = await onSubmit(
+  //                         odometerController.text.trim(),
+  //                         position.latitude,
+  //                         position.longitude,
+  //                         selectedImage!,
+  //                       );
+  //
+  //                       if (success && context.mounted) {
+  //                         ToastHelper.show(
+  //                           context,
+  //                           message: successMessage,
+  //                           type: ToastType.error,
+  //                         );
+  //                         // _showSnack(context, successMessage, Colors.green);
+  //                       } else if (context.mounted) {
+  //                         ToastHelper.show(
+  //                           context,
+  //                           message: provider.errorMessage ?? 'Failed',
+  //                           type: ToastType.error,
+  //                         );
+  //                         // _showSnack(
+  //                         //   context,
+  //                         //   provider.errorMessage ?? 'Failed',
+  //                         //   Colors.red,
+  //                         // );
+  //                       }
+  //                     },
+  //                     style: ElevatedButton.styleFrom(
+  //                       backgroundColor: Colors.indigo,
+  //                       foregroundColor: Colors.white,
+  //                       shape: RoundedRectangleBorder(
+  //                         borderRadius: BorderRadius.circular(12),
+  //                       ),
+  //                     ),
+  //                     child:
+  //                         isLoading == true
+  //                             ? CircularProgressIndicator()
+  //                             : Text(submitLabel),
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //           );
+  //         },
+  //       );
+  //     },
+  //   );
+  // }
 
   Future<bool> _showConfirmDialog({
     required BuildContext context,
@@ -2899,7 +3331,7 @@ class _CorporateBookingDetailScreenState
           ),
           Expanded(
             child: Text(
-              value,
+              formatText( value),
               style: const TextStyle(
                 fontSize: 13.5,
                 fontWeight: FontWeight.w500,
@@ -2921,4 +3353,17 @@ class _CorporateBookingDetailScreenState
   //     ),
   //   );
   // }
+}
+
+
+String formatText(String value) {
+  return value
+      .replaceAll('_', ' ')
+      .split(' ')
+      .map(
+        (word) => word.isEmpty
+        ? ''
+        : '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}',
+  )
+      .join(' ');
 }

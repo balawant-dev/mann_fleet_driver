@@ -1,7 +1,3 @@
-
-
-
-
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
@@ -79,7 +75,7 @@ class _CorporateBookingListScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: CommonAppBar(title: 'Corporate Booking'),
+      appBar: CommonAppBar(title: 'Corporate Booking'),
       // appBar: AppBar(
       //   title: const Text('Corporate Bookings'),
       //   centerTitle: true,
@@ -128,9 +124,10 @@ class _CorporateBookingListScreenState
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => CorporateBookingDetailScreen(
-                          bookingId: booking.id,
-                        ),
+                        builder:
+                            (_) => CorporateBookingDetailScreen(
+                              bookingId: booking.id,
+                            ),
                       ),
                     );
                   },
@@ -248,10 +245,13 @@ class _BookingCard extends StatelessWidget {
                   ),
                   Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 4),
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
-                      color: _statusColor(booking.overallStatus ?? '')
-                          .withOpacity(0.15),
+                      color: _statusColor(
+                        booking.overallStatus ?? '',
+                      ).withOpacity(0.15),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
@@ -273,9 +273,12 @@ class _BookingCard extends StatelessWidget {
               // if (booking.guestDetail?.name != null)
               if (booking.guestDetail.isNotEmpty)
                 _infoRow(Icons.person, booking.guestDetail.first.name),
-                // _infoRow(Icons.person, booking.guestDetail.name),
+              // _infoRow(Icons.person, booking.guestDetail.name),
               if (booking.corporate?.companyName != null)
                 _infoRow(Icons.business, booking.corporate.companyName),
+
+              if (booking.tripType != null)
+                _infoRow(Icons.business, booking.tripType),
               if (booking.scheduledAtIST != null)
                 _infoRow(Icons.calendar_today, booking.scheduledAtIST),
               if (booking.pickup?.lat != null && booking.pickup?.lng != null)
@@ -287,8 +290,11 @@ class _BookingCard extends StatelessWidget {
                       label: booking.pickup?.address,
                     );
                   },
-                  child: _infoRow(Icons.my_location, booking.pickup.address,
-                      maxLines: 1),
+                  child: _infoRow(
+                    Icons.my_location,
+                    booking.pickup.address,
+                    maxLines: 1,
+                  ),
                 ),
 
               if (booking.dropoff?.lat != null && booking.dropoff?.lng != null)
@@ -300,8 +306,11 @@ class _BookingCard extends StatelessWidget {
                       label: booking.dropoff?.address,
                     );
                   },
-                  child: _infoRow(Icons.location_on, booking.dropoff.address,
-                      maxLines: 1),
+                  child: _infoRow(
+                    Icons.location_on,
+                    booking.dropoff.address,
+                    maxLines: 1,
+                  ),
                 ),
               if (booking.vehicle != null)
                 _infoRow(
@@ -326,19 +335,20 @@ class _BookingCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        child: isResponding
-                            ? const SizedBox(
-                          height: 18,
-                          width: 18,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                            : const Text(
-                          'Accept',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
+                        child:
+                            isResponding
+                                ? const SizedBox(
+                                  height: 18,
+                                  width: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                                : const Text(
+                                  'Accept',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -368,6 +378,7 @@ class _BookingCard extends StatelessWidget {
       ),
     );
   }
+
   Future<void> _openMapsNavigation({
     required double destLat,
     required double destLng,
@@ -376,9 +387,9 @@ class _BookingCard extends StatelessWidget {
     // Google Maps navigation URL (from current location → destination)
     final uri = Uri.parse(
       'https://www.google.com/maps/dir/?api=1'
-          '&destination=$destLat,$destLng'
-          '${label != null ? '&destination_place_id=&travelmode=driving' : ''}'
-          '&travelmode=driving',
+      '&destination=$destLat,$destLng'
+      '${label != null ? '&destination_place_id=&travelmode=driving' : ''}'
+      '&travelmode=driving',
     );
 
     // Alternative (works well on both Android & iOS):
@@ -394,6 +405,7 @@ class _BookingCard extends StatelessWidget {
       await launchUrl(fallback, mode: LaunchMode.externalApplication);
     }
   }
+
   Widget _infoRow(IconData icon, String text, {int maxLines = 2}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),

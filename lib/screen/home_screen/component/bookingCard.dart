@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import '../../../util/color/app_colors.dart';
 import '../../../widget/custom_text.dart';
+import '../../corporateBookings/ui/corporate_booking_detail_screen.dart';
 
 class BookingCard extends StatelessWidget {
   // All data passed from parent
@@ -73,7 +74,7 @@ class BookingCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       CustomText(
-                        title,
+                        "Normal # $bookingId",
                         size: 18,
                         weight: FontWeight.w700,
                         color: ColorResource.black,
@@ -123,7 +124,7 @@ class BookingCard extends StatelessWidget {
                       color: ColorResource.grayText,
                     ),
                     CustomText(
-                      bookingType.toUpperCase(),
+                        formatText( bookingType),
                       size: 14,
                       weight: FontWeight.w700,
                       color: ColorResource.black,
@@ -137,7 +138,7 @@ class BookingCard extends StatelessWidget {
                       color: ColorResource.grayText,
                     ),
                     CustomText(
-                      tripStatus.toUpperCase(),
+                      formatText(tripStatus),
                       size: 14,
                       weight: FontWeight.w700,
                       color: ColorResource.black,

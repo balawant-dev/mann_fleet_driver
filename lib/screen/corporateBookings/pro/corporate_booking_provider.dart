@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import '../../../apiservice/exceptions/app_exceptions.dart';
+import '../../../widget/motionToastHelper.dart';
+import '../../fuel_entry/service/open_ai_service.dart';
 import '../model/corporate_booking_list_model.dart';
 import '../model/corporate_booking_detail_model.dart';
 import '../repo/corporate_booking_repo.dart';
@@ -12,6 +14,8 @@ class CorporateBookingProvider extends ChangeNotifier {
 
   bool isLoading = false;
   bool isDetailLoading = false;
+  bool isAccepting = false;
+  bool isRejecting = false;
   bool isResponding = false;
 
   String? errorMessage;
@@ -334,6 +338,7 @@ class CorporateBookingProvider extends ChangeNotifier {
     required double currentLat,
     required double currentLng,
   }) async {
+    isAccepting = true;
     isResponding = true;
     errorMessage = null;
     notifyListeners();
@@ -379,6 +384,7 @@ class CorporateBookingProvider extends ChangeNotifier {
       }
       return false;
     } finally {
+      isAccepting = false;
       isResponding = false;
       notifyListeners();
     }
@@ -386,7 +392,8 @@ class CorporateBookingProvider extends ChangeNotifier {
 
   /// Reject – temporary (you will update repo later)
   Future<bool> rejectBooking(BuildContext context, String bookingId) async {
-    isResponding = true;
+    isRejecting  = true;
+    isResponding  = true;
     errorMessage = null;
     notifyListeners();
 
@@ -413,8 +420,34 @@ class CorporateBookingProvider extends ChangeNotifier {
       }
       return false;
     } finally {
-      isResponding = false;
+      isRejecting  = false;
+      isResponding  = false;
       notifyListeners();
+    }
+  }
+
+  // CorporateBookingProvider ke andar add karo
+
+  final TextEditingController odometerController = TextEditingController();
+  File? selectedOdometerImage;
+
+  Future<void> scanOdometerAndPrefill(File imageFile, BuildContext context) async {
+    try {
+      // yahan wohi function use karo jo normal booking me use ho raha hai
+      // Example: getOdometerReadingFromImageOpenAi  OR  Gemini wala
+      final double reading = await getOdometerReadingFromImageOpenAi(imageFile);
+
+      odometerController.text = reading.toStringAsFixed(0);
+      notifyListeners();
+    } catch (e) {
+      odometerController.clear();
+      if (context.mounted) {
+        ToastHelper.show(
+          context,
+          message: e.toString().replaceFirst("Exception: ", ""),
+          type: ToastType.error,
+        );
+      }
     }
   }
 }

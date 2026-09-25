@@ -151,10 +151,19 @@ class CorporateBooking {
   });
 
   factory CorporateBooking.fromJson(Map<String, dynamic> json) {
+    // Safely handle guestDetail (List or Map)
+    GuestDetail? guest;
+    final guestRaw = json['guestDetail'];
+    if (guestRaw is List && guestRaw.isNotEmpty) {
+      guest = GuestDetail.fromJson(Map<String, dynamic>.from(guestRaw.first));
+    } else if (guestRaw is Map) {
+      guest = GuestDetail.fromJson(Map<String, dynamic>.from(guestRaw));
+    } else {
+      guest = null;
+    }
+
     return CorporateBooking(
-      guestDetail: json['guestDetail'] != null
-          ? GuestDetail.fromJson(json['guestDetail'])
-          : null,
+      guestDetail: guest,   // ← yahan use karo
       pickup: json['pickup'] != null ? LocationPoint.fromJson(json['pickup']) : null,
       dropoff: json['dropoff'] != null ? LocationPoint.fromJson(json['dropoff']) : null,
       actual: json['actual'] != null ? ActualTripData.fromJson(json['actual']) : null,
@@ -224,6 +233,81 @@ class CorporateBooking {
       scheduledAtIST: json['scheduledAtIST']?.toString(),
     );
   }
+
+  // factory CorporateBooking.fromJson(Map<String, dynamic> json) {
+  //   return CorporateBooking(
+  //     guestDetail: json['guestDetail'] != null
+  //         ? GuestDetail.fromJson(json['guestDetail'])
+  //         : null,
+  //     pickup: json['pickup'] != null ? LocationPoint.fromJson(json['pickup']) : null,
+  //     dropoff: json['dropoff'] != null ? LocationPoint.fromJson(json['dropoff']) : null,
+  //     actual: json['actual'] != null ? ActualTripData.fromJson(json['actual']) : null,
+  //     driverResponse: json['driverResponse'] != null
+  //         ? DriverResponse.fromJson(json['driverResponse'])
+  //         : null,
+  //     driverCurrentLocation: json['driverCurrentLocation'] != null
+  //         ? DriverCurrentLocation.fromJson(json['driverCurrentLocation'])
+  //         : null,
+  //     id: json['_id'] ?? json['id'],
+  //     agreement: json['agreement']?.toString(),
+  //     agreementCode: json['agreementCode']?.toString(),
+  //     bookingNumber: json['bookingNumber']?.toString(),
+  //     corporateBookingNumber: json['corporateBookingNumber']?.toString(),
+  //     legNumber: json['legNumber'],
+  //     vehicleSlot: json['vehicleSlot'],
+  //     corporate: json['corporate'] != null ? Corporate.fromJson(json['corporate']) : null,
+  //     booker: json['booker']?.toString(),
+  //     vehicleReleaseDate: json['vehicleReleaseDate']?.toString(),
+  //     numberofPassangers: json['numberofPassangers'],
+  //     tripType: json['tripType']?.toString(),
+  //     scheduledAt: json['scheduledAt']?.toString(),
+  //     corporatePackage: json['corporatePackage']?.toString(),
+  //     assignmentStatus: json['assignmentStatus']?.toString(),
+  //     tripStatus: json['tripStatus']?.toString(),
+  //     overallStatus: json['overallStatus']?.toString(),
+  //     billingStatus: json['billingStatus']?.toString(),
+  //     corporateInvoiceId: json['corporateInvoiceId']?.toString(),
+  //     billedAt: json['billedAt']?.toString(),
+  //     tripStartOtp: json['tripStartOtp']?.toString(),
+  //     tripEndOtp: json['tripEndOtp']?.toString(),
+  //     tripStartOtpVerify: json['tripStartOtpVerify'],
+  //     tripEndOtpVerify: json['tripEndOtpVerify'],
+  //     bookingRemark: json['bookingRemark']?.toString(),
+  //     travelPolicyApplied: json['travelPolicyApplied']?.toString(),
+  //     approvalCorporateBooking: json['approvalCorporateBooking']?.toString(),
+  //     corporateApprovedBy: json['corporateApprovedBy']?.toString(),
+  //     isOutOfPolicy: json['isOutOfPolicy'],
+  //     policyViolationReasons: (json['policyViolationReasons'] as List<dynamic>?)
+  //         ?.map((e) => e.toString())
+  //         .toList(),
+  //     user: json['user']?.toString(),
+  //     garageStart: json['garageStart'] != null
+  //         ? Checkpoint.fromJson(json['garageStart'])
+  //         : null,
+  //     pickupCheckpoint: json['pickupCheckpoint'] != null
+  //         ? Checkpoint.fromJson(json['pickupCheckpoint'])
+  //         : null,
+  //     dropCheckpoint: json['dropCheckpoint'] != null
+  //         ? Checkpoint.fromJson(json['dropCheckpoint'])
+  //         : null,
+  //     garageEnd: json['garageEnd'] != null
+  //         ? Checkpoint.fromJson(json['garageEnd'])
+  //         : null,
+  //     createdAt: json['createdAt']?.toString(),
+  //     updatedAt: json['updatedAt']?.toString(),
+  //     v: json['__v'],
+  //     assignedAt: json['assignedAt']?.toString(),
+  //     assignedBy: json['assignedBy']?.toString(),
+  //     driver: json['driver']?.toString(),
+  //     vehicle: json['vehicle'] != null ? Vehicle.fromJson(json['vehicle']) : null,
+  //     pickupAt: json['pickupAt']?.toString(),
+  //     tripStartAt: json['tripStartAt']?.toString(),
+  //     dropoffAt: json['dropoffAt']?.toString(),
+  //     tripEndAt: json['tripEndAt']?.toString(),
+  //     createdAtIST: json['createdAtIST']?.toString(),
+  //     scheduledAtIST: json['scheduledAtIST']?.toString(),
+  //   );
+  // }
 
   Map<String, dynamic> toJson() => {
     'guestDetail': guestDetail?.toJson(),

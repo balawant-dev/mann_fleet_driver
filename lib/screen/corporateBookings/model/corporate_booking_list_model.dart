@@ -27,7 +27,8 @@ class CorporateBookingListModel {
 }
 
 class CorporateBooking {
-  final GuestDetail guestDetail;
+  // final GuestDetail guestDetail;
+  final List<GuestDetail> guestDetail;
   final Location pickup;
   final Location dropoff;
   final Actual actual;
@@ -131,10 +132,17 @@ class CorporateBooking {
 
   factory CorporateBooking.fromJson(Map<String, dynamic> json) {
     return CorporateBooking(
-      guestDetail: GuestDetail.fromJson(json['guestDetail'] ?? {}),
+      guestDetail: (json['guestDetail'] as List? ?? [])
+          .map((e) => GuestDetail.fromJson(e))
+          .toList(),
+      // guestDetail: GuestDetail.fromJson(json['guestDetail'] ?? {}),
       pickup: Location.fromJson(json['pickup'] ?? {}),
       dropoff: Location.fromJson(json['dropoff'] ?? {}),
       actual: Actual.fromJson(json['actual'] ?? {}),
+      user: json['user']?.toString() ?? '',
+      corporateApprovedBy: json['corporateApprovedBy']?.toString() ?? '',
+      driver: json['driver']?.toString() ?? '',
+      assignedBy: json['assignedBy']?.toString() ?? '',
       driverResponse: DriverResponse.fromJson(json['driverResponse'] ?? {}),
       id: json['_id'] ?? json['id'] ?? '',
       agreement: json['agreement'] is String
@@ -146,7 +154,8 @@ class CorporateBooking {
       legNumber: json['legNumber'] ?? 0,
       vehicleSlot: json['vehicleSlot'] ?? 0,
       corporate: Corporate.fromJson(json['corporate'] ?? {}),
-      booker: Booker.fromJson(json['booker'] ?? {}),
+      booker: json['booker'] != null ? Booker.fromJson(json['booker']) : Booker(id: '', name: '', email: '', mobile: ''),
+      // booker: Booker.fromJson(json['booker'] ?? {}),
       vehicleReleaseDate: json['vehicleReleaseDate'] ?? '',
       numberofPassangers: json['numberofPassangers'] ?? 0,
       tripType: json['tripType'] ?? '',
@@ -165,10 +174,10 @@ class CorporateBooking {
       bookingRemark: json['bookingRemark'] ?? '',
       travelPolicyApplied: json['travelPolicyApplied'],
       approvalCorporateBooking: json['approvalCorporateBooking'] ?? '',
-      corporateApprovedBy: json['corporateApprovedBy'] ?? '',
+      // corporateApprovedBy: json['corporateApprovedBy'] ?? '',
       isOutOfPolicy: json['isOutOfPolicy'] ?? false,
       policyViolationReasons: json['policyViolationReasons'] ?? [],
-      user: json['user'] ?? '',
+      // user: json['user'] ?? '',
       garageStart: Checkpoint.fromJson(json['garageStart'] ?? {}),
       pickupCheckpoint: Checkpoint.fromJson(json['pickupCheckpoint'] ?? {}),
       dropCheckpoint: Checkpoint.fromJson(json['dropCheckpoint'] ?? {}),
@@ -177,8 +186,8 @@ class CorporateBooking {
       updatedAt: json['updatedAt'] ?? '',
       v: json['__v'] ?? 0,
       assignedAt: json['assignedAt'] ?? '',
-      assignedBy: json['assignedBy'] ?? '',
-      driver: json['driver'] ?? '',
+      // assignedBy: json['assignedBy'] ?? '',
+      // driver: json['driver'] ?? '',
       vehicle: Vehicle.fromJson(json['vehicle'] ?? {}),
       createdAtIST: json['createdAtIST'] ?? '',
       scheduledAtIST: json['scheduledAtIST'] ?? '',

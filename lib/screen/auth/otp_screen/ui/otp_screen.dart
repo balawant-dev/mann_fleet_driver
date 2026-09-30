@@ -277,7 +277,10 @@ class _OtpScreenState extends State<OtpScreen> {
                           );
                         }
                       } else {
-                        _showError("Invalid OTP");
+                        _showError(
+                          otpProvider.verifyOtpModel?.message ??
+                              "OTP verification failed",
+                        );
                       }
                     },
                   ),
@@ -440,7 +443,25 @@ class _OtpScreenState extends State<OtpScreen> {
     );
   }
 
+  void _showSuccess(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(msg),
+        backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
   void _showError(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(msg),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 3),
+      ),
+    );
   }
 }

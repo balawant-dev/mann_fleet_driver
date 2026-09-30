@@ -30,6 +30,14 @@ class VerifyOtpRepo{
       return VerifyOtpModel.fromJson(response);
       //  return LoginModel.fromJson(response['user']);
     } on DioException catch (e) {
+      if (e.response != null) {
+        // ✅ Yeh line important hai - 400 error ke bawajood body parse kar rahe hain
+        try {
+          return VerifyOtpModel.fromJson(e.response!.data);
+        } catch (_) {
+          rethrow;
+        }
+      }
       if (e.error is NoInternetException) {
         showNoInternetScreen(
           context,

@@ -697,10 +697,173 @@ class CorporateBookingRepo {
       throw ApiException(0, e.toString());
     }
   }
+  Future<bool> uploadExpenseImages({
+    required BuildContext context,
+    required String bookingId,
+    required List<File> expenseImages,
+  }) async {
+    try {
+      final formData = FormData();
+
+      for (int i = 0; i < expenseImages.length; i++) {
+        formData.files.add(
+          MapEntry(
+            'expenseImages',
+            await MultipartFile.fromFile(
+              expenseImages[i].path,
+              filename: expenseImages[i].path.split('/').last,
+            ),
+          ),
+        );
+      }
+
+      final response = await _api.patch(
+        "${ApiConstants.corporateBooking}/$bookingId/expense-images",
+        data: formData,
+        requiresAuth: true,
+      );
+      return response['status'] == true;
+    } on DioException catch (e) {
+      String errorMsg = 'Something went wrong';
+      if (e.response?.data != null) {
+        final data = e.response!.data;
+        if (data is Map) {
+          errorMsg = data['error']?['message'] ?? data['message'] ?? errorMsg;
+        }
+      }
+      if (e.error is NoInternetException) {
+        showNoInternetScreen(
+          context,
+          onRetry: () => uploadExpenseImages(
+            context: context,
+            bookingId: bookingId,
+            expenseImages: expenseImages,
+          ),
+        );
+        throw NoInternetException();
+      } else if (e.error is ServerException) {
+        showServerErrorScreen(
+          context,
+          onRetry: () => uploadExpenseImages(
+            context: context,
+            bookingId: bookingId,
+            expenseImages: expenseImages,
+          ),
+        );
+        throw ServerException();
+      } else if (e.error is UnauthorizedException) {
+        await SecureStorageService.logout(context);
+        throw UnauthorizedException();
+      } else {
+        rethrow;
+      }
+    } catch (e) {
+      throw ApiException(0, e.toString());
+    }
+  }
 
 
+  Future<bool> verifyStartOtp({
+    required BuildContext context,
+    required String bookingId,
+    required String otp,
+  }) async {
+    try {
+      final response = await _api.post(
+        "${ApiConstants.corporateBookings}/$bookingId/verify-start-otp",
+        data: {"otp": otp},
+        requiresAuth: true,
+      );
+      return response['status'] == true;
+    } on DioException catch (e) {
+      String errorMsg = 'Something went wrong';
+      if (e.response?.data != null) {
+        final data = e.response!.data;
+        if (data is Map) {
+          errorMsg = data['error']?['message'] ?? data['message'] ?? errorMsg;
+        }
+      }
+      if (e.error is NoInternetException) {
+        showNoInternetScreen(
+          context,
+          onRetry: () => verifyStartOtp(
+            context: context,
+            bookingId: bookingId,
+            otp: otp,
+          ),
+        );
+        throw NoInternetException();
+      } else if (e.error is ServerException) {
+        showServerErrorScreen(
+          context,
+          onRetry: () => verifyStartOtp(
+            context: context,
+            bookingId: bookingId,
+            otp: otp,
+          ),
+        );
+        throw ServerException();
+      } else if (e.error is UnauthorizedException) {
+        await SecureStorageService.logout(context);
+        throw UnauthorizedException();
+      } else {
+        rethrow;
+      }
+    } catch (e) {
+      throw ApiException(0, e.toString());
+    }
+  }
 
-
+  Future<bool> verifyEndOtp({
+    required BuildContext context,
+    required String bookingId,
+    required String otp,
+  }) async {
+    try {
+      final response = await _api.post(
+        "${ApiConstants.corporateBookings}/$bookingId/verify-end-otp",
+        data: {"otp": otp},
+        requiresAuth: true,
+      );
+      return response['status'] == true;
+    } on DioException catch (e) {
+      String errorMsg = 'Something went wrong';
+      if (e.response?.data != null) {
+        final data = e.response!.data;
+        if (data is Map) {
+          errorMsg = data['error']?['message'] ?? data['message'] ?? errorMsg;
+        }
+      }
+      if (e.error is NoInternetException) {
+        showNoInternetScreen(
+          context,
+          onRetry: () => verifyEndOtp(
+            context: context,
+            bookingId: bookingId,
+            otp: otp,
+          ),
+        );
+        throw NoInternetException();
+      } else if (e.error is ServerException) {
+        showServerErrorScreen(
+          context,
+          onRetry: () => verifyEndOtp(
+            context: context,
+            bookingId: bookingId,
+            otp: otp,
+          ),
+        );
+        throw ServerException();
+      } else if (e.error is UnauthorizedException) {
+        await SecureStorageService.logout(context);
+        throw UnauthorizedException();
+      } else {
+        rethrow;
+      }
+    } catch (e) {
+      throw ApiException(0, e.toString());
+    }
+  }
 
 
     Future<bool> startRide({

@@ -59,6 +59,7 @@ class ApiConstants {
 
 // Corporate Bookings
  static const String corporateBookings = '/api/driver/corporate-bookings';
+ static const String corporateBooking = '/api/driver/corporate-booking';
 
   static const String resendOtp = '/api/v1/driver/resend-otp';
   static const String update = '/api/v1/driver/update';

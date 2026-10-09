@@ -29,6 +29,14 @@ class _CustomDrawerState extends State<CustomDrawer> {
   Widget build(BuildContext context) {
     return Consumer<ProfileDetailProvider>(
       builder: (context, profilePro, child) {
+        final vehicle = profilePro
+            .getProfileModel
+            ?.data
+            ?.driver
+            ?.vehicles
+            ?.isNotEmpty == true
+            ? profilePro.getProfileModel!.data!.driver!.vehicles!.first
+            : null;
         // if (profilePro.getProfileModel==null||profilePro.getProfileModel!.data==null) {
         //   return const Center(child: CircularProgressIndicator());
         // }
@@ -118,8 +126,13 @@ class _CustomDrawerState extends State<CustomDrawer> {
                       ),
                       SizedBox(height: 4),
                       Text(
-                        "${profilePro.getProfileModel?.data?.driver?.vehicles?.first.brand ?? "Car"} - ${profilePro.getProfileModel?.data?.driver?.vehicles?.first.model ?? "Model"} - ${profilePro.getProfileModel?.data?.driver?.vehicles?.first.carNumber ?? "Car Number"}",
-                        style: TextStyle(color: Colors.white70, fontSize: 12),
+                        "${vehicle?.brand ?? "Car"} - "
+                            "${vehicle?.model ?? "Model"} - "
+                            "${vehicle?.carNumber ?? "Car Number"}",
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12,
+                        ),
                       ),
                     ],
                   ),

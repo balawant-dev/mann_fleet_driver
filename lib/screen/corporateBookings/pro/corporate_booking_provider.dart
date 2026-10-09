@@ -17,9 +17,11 @@ class CorporateBookingProvider extends ChangeNotifier {
   bool isAccepting = false;
   bool isRejecting = false;
   bool isResponding = false;
-
+// Existing flags ke saath yeh add karo
+  bool isVerifyStartOtp = false;
+  bool isVerifyEndOtp = false;
   String? errorMessage;
-
+  bool isUploadExpenseImages = false;
   List<CorporateBooking> bookings = [];
   CorporateBookingDetail? bookingDetail;
   bool isGarageStarting = false;
@@ -29,6 +31,103 @@ class CorporateBookingProvider extends ChangeNotifier {
   bool isGarageEnd = false;
   bool isExtraCharge = false;
   bool isCompleteTrip = false;
+  Future<bool> uploadExpenseImages({
+    required BuildContext context,
+    required String bookingId,
+    required List<File> expenseImages,
+  }) async {
+    isUploadExpenseImages = true;
+    errorMessage = null;
+    notifyListeners();
+
+    try {
+      final success = await _repo.uploadExpenseImages(
+        context: context,
+        bookingId: bookingId,
+        expenseImages: expenseImages,
+      );
+
+      if (success) {
+        await fetchBookingDetail(context, bookingId);
+      }
+      return success;
+    } catch (e) {
+      if (e is ApiException) {
+        errorMessage = e.message;
+      } else {
+        errorMessage = e.toString();
+      }
+      return false;
+    } finally {
+      isUploadExpenseImages = false;
+      notifyListeners();
+    }
+  }
+  Future<bool> verifyStartOtp({
+    required BuildContext context,
+    required String bookingId,
+    required String otp,
+  }) async {
+    isVerifyStartOtp = true;
+    errorMessage = null;
+    notifyListeners();
+
+    try {
+      final success = await _repo.verifyStartOtp(
+        context: context,
+        bookingId: bookingId,
+        otp: otp,
+      );
+
+      if (success) {
+        await fetchBookingDetail(context, bookingId);
+      }
+      return success;
+    } catch (e) {
+      if (e is ApiException) {
+        errorMessage = e.message;
+      } else {
+        errorMessage = e.toString();
+      }
+      return false;
+    } finally {
+      isVerifyStartOtp = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> verifyEndOtp({
+    required BuildContext context,
+    required String bookingId,
+    required String otp,
+  }) async {
+    isVerifyEndOtp = true;
+    errorMessage = null;
+    notifyListeners();
+
+    try {
+      final success = await _repo.verifyEndOtp(
+        context: context,
+        bookingId: bookingId,
+        otp: otp,
+      );
+
+      if (success) {
+        await fetchBookingDetail(context, bookingId);
+      }
+      return success;
+    } catch (e) {
+      if (e is ApiException) {
+        errorMessage = e.message;
+      } else {
+        errorMessage = e.toString();
+      }
+      return false;
+    } finally {
+      isVerifyEndOtp = false;
+      notifyListeners();
+    }
+  }
 
   Future<bool> extraChargeApi({
     required BuildContext context,

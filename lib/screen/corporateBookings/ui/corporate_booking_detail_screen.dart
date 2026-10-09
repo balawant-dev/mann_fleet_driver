@@ -310,7 +310,7 @@
 //                             : "Garage Start",
 //                       ),
 //                       style: ElevatedButton.styleFrom(
-//                         backgroundColor: Colors.indigo,
+//                         backgroundColor: ColorResource.primaryColor,
 //                         foregroundColor: Colors.white,
 //                         padding: const EdgeInsets.symmetric(vertical: 14),
 //                         shape: RoundedRectangleBorder(
@@ -351,7 +351,7 @@
 //                             : "Pickup Check Start",
 //                       ),
 //                       style: ElevatedButton.styleFrom(
-//                         backgroundColor: Colors.indigo,
+//                         backgroundColor: ColorResource.primaryColor,
 //                         foregroundColor: Colors.white,
 //                         padding: const EdgeInsets.symmetric(vertical: 14),
 //                         shape: RoundedRectangleBorder(
@@ -392,7 +392,7 @@
 //                             : "Drop Check Point",
 //                       ),
 //                       style: ElevatedButton.styleFrom(
-//                         backgroundColor: Colors.indigo,
+//                         backgroundColor: ColorResource.primaryColor,
 //                         foregroundColor: Colors.white,
 //                         padding: const EdgeInsets.symmetric(vertical: 14),
 //                         shape: RoundedRectangleBorder(
@@ -432,7 +432,7 @@
 //                             : "GarageEnd",
 //                       ),
 //                       style: ElevatedButton.styleFrom(
-//                         backgroundColor: Colors.indigo,
+//                         backgroundColor: ColorResource.primaryColor,
 //                         foregroundColor: Colors.white,
 //                         padding: const EdgeInsets.symmetric(vertical: 14),
 //                         shape: RoundedRectangleBorder(
@@ -486,7 +486,7 @@
 //                         provider.isStartRide ? "Starting..." : "Start Ride",
 //                       ),
 //                       style: ElevatedButton.styleFrom(
-//                         backgroundColor: Colors.indigo,
+//                         backgroundColor: ColorResource.primaryColor,
 //                         foregroundColor: Colors.white,
 //                         padding: const EdgeInsets.symmetric(vertical: 14),
 //                         shape: RoundedRectangleBorder(
@@ -688,7 +688,7 @@
 //                         }
 //                       },
 //                       style: ElevatedButton.styleFrom(
-//                         backgroundColor: Colors.indigo,
+//                         backgroundColor: ColorResource.primaryColor,
 //                         foregroundColor: Colors.white,
 //                         padding: const EdgeInsets.symmetric(vertical: 14),
 //                         shape: RoundedRectangleBorder(
@@ -890,7 +890,7 @@
 //                         }
 //                       },
 //                       style: ElevatedButton.styleFrom(
-//                         backgroundColor: Colors.indigo,
+//                         backgroundColor: ColorResource.primaryColor,
 //                         foregroundColor: Colors.white,
 //                         padding: const EdgeInsets.symmetric(vertical: 14),
 //                         shape: RoundedRectangleBorder(
@@ -1092,7 +1092,7 @@
 //                         }
 //                       },
 //                       style: ElevatedButton.styleFrom(
-//                         backgroundColor: Colors.indigo,
+//                         backgroundColor: ColorResource.primaryColor,
 //                         foregroundColor: Colors.white,
 //                         padding: const EdgeInsets.symmetric(vertical: 14),
 //                         shape: RoundedRectangleBorder(
@@ -1292,7 +1292,7 @@
 //                         }
 //                       },
 //                       style: ElevatedButton.styleFrom(
-//                         backgroundColor: Colors.indigo,
+//                         backgroundColor: ColorResource.primaryColor,
 //                         foregroundColor: Colors.white,
 //                         padding: const EdgeInsets.symmetric(vertical: 14),
 //                         shape: RoundedRectangleBorder(
@@ -1372,6 +1372,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mann_fleet_driver/util/color/app_colors.dart';
+import 'package:pinput/pinput.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -1666,7 +1667,7 @@ class _CorporateBookingDetailScreenState
                   if (d.tripStatus == 'driver_enroute')
                     _actionButton(
                       label: 'Garage Start',
-                      color: Colors.indigo,
+                      color: ColorResource.primaryColor,
                       isLoading: provider.isGarageStarting,
                       onPressed:
                           () => _showOdometerSheet(
@@ -1690,11 +1691,37 @@ class _CorporateBookingDetailScreenState
                           ),
                     ),
 
+                  if (d.tripStatus == 'garage_started'&&d.tripStartOtpVerify==false) // ya jo status aapke backend me start OTP ke liye ho
+                    _actionButton(
+                      label: 'Verify Start OTP',
+                      color: ColorResource.primaryColor,
+                      isLoading: provider.isVerifyStartOtp,
+                      onPressed: () => _showOtpSheet(
+                        context: context,
+                        provider: provider,
+                        bookingId: d.id,
+                        title: 'Verify Start OTP',
+                        successMessage: 'Start OTP verified successfully',
+                        isLoading: provider.isVerifyStartOtp,
+                        onSubmit: (otp) {
+                          return provider.verifyStartOtp(
+                            context: context,
+                            bookingId: d.id,
+                            otp: otp,
+                          );
+                        },
+                      ),
+                    ),
+
+
+
+                  ////Balawant add this
+
                   // 2. Pickup Checkpoint
-                  if (d.tripStatus == 'garage_started')
+                  if (d.tripStatus == 'garage_started'&&d.tripStartOtpVerify==true)
                     _actionButton(
                       label: 'Pickup Checkpoint',
-                      color: Colors.indigo,
+                      color: ColorResource.primaryColor,
                       isLoading: provider.isPickupCheckpoint,
                       onPressed:
                           () => _showOdometerSheet(
@@ -1722,7 +1749,7 @@ class _CorporateBookingDetailScreenState
                   if (d.tripStatus == 'arrived')
                     _actionButton(
                       label: 'Start Ride',
-                      color: Colors.indigo,
+                      color: ColorResource.primaryColor,
                       isLoading: provider.isStartRide,
                       onPressed: () async {
                         final success = await provider.startRide(
@@ -1756,11 +1783,35 @@ class _CorporateBookingDetailScreenState
                       },
                     ),
 
+
+                  // ★ END OTP (Drop se pehle)
+                  if (d.tripStatus == 'in_progress'&&d.tripEndOtpVerify==false)
+                    _actionButton(
+                      label: 'Verify End OTP',
+                      color: ColorResource.primaryColor,
+                      isLoading: provider.isVerifyEndOtp,
+                      onPressed: () => _showOtpSheet(
+                        context: context,
+                        provider: provider,
+                        bookingId: d.id,
+                        title: 'Verify End OTP',
+                        successMessage: 'End OTP verified successfully',
+                        isLoading: provider.isVerifyEndOtp,
+                        onSubmit: (otp) {
+                          return provider.verifyEndOtp(
+                            context: context,
+                            bookingId: d.id,
+                            otp: otp,
+                          );
+                        },
+                      ),
+                    ),
+
                   // 4. Drop Checkpoint
-                  if (d.tripStatus == 'in_progress')
+                  if (d.tripStatus == 'in_progress'&&d.tripEndOtpVerify==true)
                     _actionButton(
                       label: 'Drop Checkpoint',
-                      color: Colors.indigo,
+                      color: ColorResource.primaryColor,
                       isLoading: provider.isDropCheckpoint,
                       onPressed:
                           () => _showOdometerSheet(
@@ -1788,7 +1839,7 @@ class _CorporateBookingDetailScreenState
                   if (d.tripStatus == 'returning_garage')
                     _actionButton(
                       label: 'Garage End',
-                      color: Colors.indigo,
+                      color: ColorResource.primaryColor,
                       isLoading: provider.isGarageEnd,
                       onPressed:
                           () => _showOdometerSheet(
@@ -1868,11 +1919,32 @@ class _CorporateBookingDetailScreenState
                 ],
 
                 if (tripType == 'pickup to garage') ...[
+                  if (d.tripStatus == 'driver_enroute'&&d.tripStartOtpVerify==false)
+                  _actionButton(
+                    label: 'Verify Start OTP',
+                    color: ColorResource.primaryColor,
+                    isLoading: provider.isVerifyStartOtp,
+                    onPressed: () => _showOtpSheet(
+                      context: context,
+                      provider: provider,
+                      bookingId: d.id,
+                      title: 'Verify Start OTP',
+                      successMessage: 'Start OTP verified successfully',
+                      isLoading: provider.isVerifyStartOtp,
+                      onSubmit: (otp) {
+                        return provider.verifyStartOtp(
+                          context: context,
+                          bookingId: d.id,
+                          otp: otp,
+                        );
+                      },
+                    ),
+                  ),
                   // 1. Garage Start
                   // if (d.tripStatus == 'driver_enroute')
                   //   _actionButton(
                   //     label: 'Garage Start',
-                  //     color: Colors.indigo,
+                  //     color: ColorResource.primaryColor,
                   //     isLoading: provider.isGarageStarting,
                   //     onPressed: () => _showOdometerSheet(
                   //       context: context,
@@ -1895,10 +1967,10 @@ class _CorporateBookingDetailScreenState
                   //   ),
 
                   // 2. Pickup Checkpoint
-                  if (d.tripStatus == 'driver_enroute')
+                  if (d.tripStatus == 'driver_enroute'&&d.tripStartOtpVerify==true)
                     _actionButton(
                       label: 'Pickup Checkpoint',
-                      color: Colors.indigo,
+                      color: ColorResource.primaryColor,
                       isLoading: provider.isPickupCheckpoint,
                       onPressed:
                           () => _showOdometerSheet(
@@ -1926,7 +1998,7 @@ class _CorporateBookingDetailScreenState
                   if (d.tripStatus == 'arrived')
                     _actionButton(
                       label: 'Start Ride',
-                      color: Colors.indigo,
+                      color: ColorResource.primaryColor,
                       isLoading: provider.isStartRide,
                       onPressed: () async {
                         final success = await provider.startRide(
@@ -1960,11 +2032,34 @@ class _CorporateBookingDetailScreenState
                       },
                     ),
 
+
+                  if (d.tripStatus == 'in_progress'&&d.tripEndOtpVerify==false)
+                    _actionButton(
+                      label: 'Verify End OTP',
+                      color: ColorResource.primaryColor,
+                      isLoading: provider.isVerifyEndOtp,
+                      onPressed: () => _showOtpSheet(
+                        context: context,
+                        provider: provider,
+                        bookingId: d.id,
+                        title: 'Verify End OTP',
+                        successMessage: 'End OTP verified successfully',
+                        isLoading: provider.isVerifyEndOtp,
+                        onSubmit: (otp) {
+                          return provider.verifyEndOtp(
+                            context: context,
+                            bookingId: d.id,
+                            otp: otp,
+                          );
+                        },
+                      ),
+                    ),
+
                   // 4. Drop Checkpoint
-                  if (d.tripStatus == 'in_progress')
+                  if (d.tripStatus == 'in_progress'&&d.tripEndOtpVerify==true)
                     _actionButton(
                       label: 'Drop Checkpoint',
-                      color: Colors.indigo,
+                      color: ColorResource.primaryColor,
                       isLoading: provider.isDropCheckpoint,
                       onPressed:
                           () => _showOdometerSheet(
@@ -1992,7 +2087,7 @@ class _CorporateBookingDetailScreenState
                   if (d.tripStatus == 'returning_garage')
                     _actionButton(
                       label: 'Garage End',
-                      color: Colors.indigo,
+                      color: ColorResource.primaryColor,
                       isLoading: provider.isGarageEnd,
                       onPressed:
                           () => _showOdometerSheet(
@@ -2071,11 +2166,33 @@ class _CorporateBookingDetailScreenState
                     ),
                 ],
                 if (tripType == 'pickup to destination') ...[
+                  // ★ START OTP
+                  if (d.tripStatus == 'driver_enroute'&&d.tripStartOtpVerify==false)
+                    _actionButton(
+                      label: 'Verify Start OTP',
+                      color: ColorResource.primaryColor,
+                      isLoading: provider.isVerifyStartOtp,
+                      onPressed: () => _showOtpSheet(
+                        context: context,
+                        provider: provider,
+                        bookingId: d.id,
+                        title: 'Verify Start OTP',
+                        successMessage: 'Start OTP verified successfully',
+                        isLoading: provider.isVerifyStartOtp,
+                        onSubmit: (otp) {
+                          return provider.verifyStartOtp(
+                            context: context,
+                            bookingId: d.id,
+                            otp: otp,
+                          );
+                        },
+                      ),
+                    ),
 
-                  if (d.tripStatus == 'driver_enroute')
+                  if (d.tripStatus == 'driver_enroute'&&d.tripStartOtpVerify==true)
                     _actionButton(
                       label: 'Pickup Checkpoint',
-                      color: Colors.indigo,
+                      color: ColorResource.primaryColor,
                       isLoading: provider.isPickupCheckpoint,
                       onPressed:
                           () => _showOdometerSheet(
@@ -2103,7 +2220,7 @@ class _CorporateBookingDetailScreenState
                   if (d.tripStatus == 'arrived')
                     _actionButton(
                       label: 'Start Ride',
-                      color: Colors.indigo,
+                      color: ColorResource.primaryColor,
                       isLoading: provider.isStartRide,
                       onPressed: () async {
                         final success = await provider.startRide(
@@ -2136,12 +2253,33 @@ class _CorporateBookingDetailScreenState
                         }
                       },
                     ),
-
+// ★ END OTP
+                  if (d.tripStatus == 'in_progress'&&d.tripEndOtpVerify==false)
+                    _actionButton(
+                      label: 'Verify End OTP',
+                      color: ColorResource.primaryColor,
+                      isLoading: provider.isVerifyEndOtp,
+                      onPressed: () => _showOtpSheet(
+                        context: context,
+                        provider: provider,
+                        bookingId: d.id,
+                        title: 'Verify End OTP',
+                        successMessage: 'End OTP verified successfully',
+                        isLoading: provider.isVerifyEndOtp,
+                        onSubmit: (otp) {
+                          return provider.verifyEndOtp(
+                            context: context,
+                            bookingId: d.id,
+                            otp: otp,
+                          );
+                        },
+                      ),
+                    ),
                   // 4. Drop Checkpoint
-                  if (d.tripStatus == 'in_progress')
+                  if (d.tripStatus == 'in_progress'&&d.tripEndOtpVerify==true)
                     _actionButton(
                       label: 'Drop Checkpoint',
-                      color: Colors.indigo,
+                      color: ColorResource.primaryColor,
                       isLoading: provider.isDropCheckpoint,
                       onPressed:
                           () => _showOdometerSheet(
@@ -2169,7 +2307,7 @@ class _CorporateBookingDetailScreenState
                   // if (d.tripStatus == 'returning_garage')
                   //   _actionButton(
                   //     label: 'Garage End',
-                  //     color: Colors.indigo,
+                  //     color: ColorResource.primaryColor,
                   //     isLoading: provider.isGarageEnd,
                   //     onPressed: () => _showOdometerSheet(
                   //       context: context,
@@ -2247,11 +2385,35 @@ class _CorporateBookingDetailScreenState
                 ],
 
                 if (tripType == 'pickup to pickup') ...[
+                  // ★ START OTP
+                  if (d.tripStatus == 'driver_enroute'&&d.tripStartOtpVerify==false)
 
-                  if (d.tripStatus == 'driver_enroute')
+
+                    _actionButton(
+                      label: 'Verify Start OTP',
+                      color: ColorResource.primaryColor,
+                      isLoading: provider.isVerifyStartOtp,
+                      onPressed: () => _showOtpSheet(
+                        context: context,
+                        provider: provider,
+                        bookingId: d.id,
+                        title: 'Verify Start OTP',
+                        successMessage: 'Start OTP verified successfully',
+                        isLoading: provider.isVerifyStartOtp,
+                        onSubmit: (otp) {
+                          return provider.verifyStartOtp(
+                            context: context,
+                            bookingId: d.id,
+                            otp: otp,
+                          );
+                        },
+                      ),
+                    ),
+
+                  if (d.tripStatus == 'driver_enroute'&&d.tripStartOtpVerify==true)
                     _actionButton(
                       label: 'Pickup Checkpoint',
-                      color: Colors.indigo,
+                      color: ColorResource.primaryColor,
                       isLoading: provider.isPickupCheckpoint,
                       onPressed:
                           () => _showOdometerSheet(
@@ -2279,7 +2441,7 @@ class _CorporateBookingDetailScreenState
                   if (d.tripStatus == 'arrived')
                     _actionButton(
                       label: 'Start Ride',
-                      color: Colors.indigo,
+                      color: ColorResource.primaryColor,
                       isLoading: provider.isStartRide,
                       onPressed: () async {
                         final success = await provider.startRide(
@@ -2311,13 +2473,34 @@ class _CorporateBookingDetailScreenState
                           // );
                         }
                       },
+                    ),// ★ END OTP
+                  if (d.tripStatus == 'in_progress'&&d.tripEndOtpVerify==false)
+                    _actionButton(
+                      label: 'Verify End OTP',
+                      color: ColorResource.primaryColor,
+                      isLoading: provider.isVerifyEndOtp,
+                      onPressed: () => _showOtpSheet(
+                        context: context,
+                        provider: provider,
+                        bookingId: d.id,
+                        title: 'Verify End OTP',
+                        successMessage: 'End OTP verified successfully',
+                        isLoading: provider.isVerifyEndOtp,
+                        onSubmit: (otp) {
+                          return provider.verifyEndOtp(
+                            context: context,
+                            bookingId: d.id,
+                            otp: otp,
+                          );
+                        },
+                      ),
                     ),
 
                   // 4. Drop Checkpoint
-                  if (d.tripStatus == 'in_progress')
+                  if (d.tripStatus == 'in_progress'&&d.tripEndOtpVerify==true)
                     _actionButton(
                       label: 'Drop Checkpoint',
-                      color: Colors.indigo,
+                      color: ColorResource.primaryColor,
                       isLoading: provider.isDropCheckpoint,
                       onPressed:
                           () => _showOdometerSheet(
@@ -2345,7 +2528,7 @@ class _CorporateBookingDetailScreenState
                   // if (d.tripStatus == 'returning_garage')
                   //   _actionButton(
                   //     label: 'Garage End',
-                  //     color: Colors.indigo,
+                  //     color: ColorResource.primaryColor,
                   //     isLoading: provider.isGarageEnd,
                   //     onPressed: () => _showOdometerSheet(
                   //       context: context,
@@ -2428,7 +2611,230 @@ class _CorporateBookingDetailScreenState
       ),
     );
   }
+  Future<void> _showExpenseImagesSheet({
+    required BuildContext context,
+    required CorporateBookingProvider provider,
+    required String bookingId,
+  }) async {
+    List<File> selectedImages = [];
+    final picker = ImagePicker();
 
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(ctx).viewInsets.bottom,
+              ),
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Handle
+                    Container(
+                      width: 40,
+                      height: 4,
+                      margin: const EdgeInsets.only(bottom: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+
+                    const Text(
+                      'Upload Expense Images (Optional)',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'You can upload up to 10 images',
+                      style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Image Grid
+                    if (selectedImages.isNotEmpty)
+                      SizedBox(
+                        height: 110,
+                        child: ListView.separated(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: selectedImages.length,
+                          separatorBuilder: (_, __) => const SizedBox(width: 10),
+                          itemBuilder: (context, index) {
+                            return Stack(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Image.file(
+                                    selectedImages[index],
+                                    width: 100,
+                                    height: 100,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 4,
+                                  right: 4,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setModalState(() {
+                                        selectedImages.removeAt(index);
+                                      });
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.all(4),
+                                      decoration: const BoxDecoration(
+                                        color: Colors.black54,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(
+                                        Icons.close,
+                                        size: 16,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      ),
+
+                    if (selectedImages.isNotEmpty) const SizedBox(height: 16),
+
+                    // Add Image Button
+                    if (selectedImages.length < 10)
+                      GestureDetector(
+                        onTap: () async {
+                          final picked = await picker.pickMultiImage(
+                            imageQuality: 70,
+                          );
+                          if (picked.isEmpty) return;
+
+                          setModalState(() {
+                            final remaining = 10 - selectedImages.length;
+                            final toAdd = picked.take(remaining).toList();
+                            selectedImages.addAll(
+                              toAdd.map((e) => File(e.path)).toList(),
+                            );
+                          });
+                        },
+                        child: Container(
+                          height: 50,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey.shade300),
+                            borderRadius: BorderRadius.circular(12),
+                            color: Colors.grey.shade50,
+                          ),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.add_photo_alternate_outlined, color: Colors.grey),
+                              SizedBox(width: 8),
+                              Text(
+                                'Add Expense Images',
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                    const SizedBox(height: 24),
+
+                    // Submit + Skip
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () => Navigator.pop(ctx),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: Colors.grey.shade700,
+                              side: BorderSide(color: Colors.grey.shade300),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              minimumSize: const Size(0, 50),
+                            ),
+                            child: const Text('Skip'),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: selectedImages.isEmpty || provider.isUploadExpenseImages
+                                ? null
+                                : () async {
+                              Navigator.pop(ctx);
+
+                              final success = await provider.uploadExpenseImages(
+                                context: context,
+                                bookingId: bookingId,
+                                expenseImages: selectedImages,
+                              );
+
+                              if (success && context.mounted) {
+                                ToastHelper.show(
+                                  context,
+                                  message: 'Expense images uploaded successfully',
+                                  type: ToastType.success,
+                                );
+                              } else if (context.mounted) {
+                                ToastHelper.show(
+                                  context,
+                                  message: provider.errorMessage ?? 'Failed to upload images',
+                                  type: ToastType.error,
+                                );
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.deepOrange,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              minimumSize: const Size(0, 50),
+                            ),
+                            child: provider.isUploadExpenseImages
+                                ? const SizedBox(
+                              height: 22,
+                              width: 22,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.5,
+                                color: Colors.white,
+                              ),
+                            )
+                                : const Text(
+                              'Submit',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
   // ==================== EXTRA CHARGES BOTTOM SHEET ====================
   // ==================== EXTRA CHARGES BOTTOM SHEET ====================
   Future<void> _showExtraChargeSheet({
@@ -2512,22 +2918,10 @@ class _CorporateBookingDetailScreenState
                     height: 50,
                     child: ElevatedButton(
                       onPressed: () async {
-                        final toll =
-                            tollController.text.trim().isEmpty
-                                ? '0'
-                                : tollController.text.trim();
-                        final parking =
-                            parkingController.text.trim().isEmpty
-                                ? '0'
-                                : parkingController.text.trim();
-                        final state =
-                            stateController.text.trim().isEmpty
-                                ? '0'
-                                : stateController.text.trim();
-                        final other =
-                            otherController.text.trim().isEmpty
-                                ? '0'
-                                : otherController.text.trim();
+                        final toll = tollController.text.trim().isEmpty ? '0' : tollController.text.trim();
+                        final parking = parkingController.text.trim().isEmpty ? '0' : parkingController.text.trim();
+                        final state = stateController.text.trim().isEmpty ? '0' : stateController.text.trim();
+                        final other = otherController.text.trim().isEmpty ? '0' : otherController.text.trim();
 
                         Navigator.pop(ctx);
 
@@ -2546,26 +2940,79 @@ class _CorporateBookingDetailScreenState
                             message: 'Extra Charges added successfully',
                             type: ToastType.success,
                           );
-                          // _showSnack(
-                          //   context,
-                          //   'Extra Charges added successfully',
-                          //   Colors.green,
-                          // );
+
+                          // ★ Automatically open Expense Images sheet (optional)
+                          await Future.delayed(const Duration(milliseconds: 400));
+                          if (context.mounted) {
+                            _showExpenseImagesSheet(
+                              context: context,
+                              provider: provider,
+                              bookingId: bookingId,
+                            );
+                          }
                         } else if (context.mounted) {
                           ToastHelper.show(
                             context,
-                            message:
-                                provider.errorMessage ??
-                                'Failed to add charges',
+                            message: provider.errorMessage ?? 'Failed to add charges',
                             type: ToastType.error,
                           );
-                          // _showSnack(
-                          //   context,
-                          //   provider.errorMessage ?? 'Failed to add charges',
-                          //   Colors.red,
-                          // );
                         }
                       },
+                      // onPressed: () async {
+                      //   final toll =
+                      //       tollController.text.trim().isEmpty
+                      //           ? '0'
+                      //           : tollController.text.trim();
+                      //   final parking =
+                      //       parkingController.text.trim().isEmpty
+                      //           ? '0'
+                      //           : parkingController.text.trim();
+                      //   final state =
+                      //       stateController.text.trim().isEmpty
+                      //           ? '0'
+                      //           : stateController.text.trim();
+                      //   final other =
+                      //       otherController.text.trim().isEmpty
+                      //           ? '0'
+                      //           : otherController.text.trim();
+                      //
+                      //   Navigator.pop(ctx);
+                      //
+                      //   final success = await provider.extraChargeApi(
+                      //     context: context,
+                      //     bookingId: bookingId,
+                      //     tollAmount: toll,
+                      //     otherCharges: other,
+                      //     parkingCharge: parking,
+                      //     stateCharge: state,
+                      //   );
+                      //
+                      //   if (success && context.mounted) {
+                      //     ToastHelper.show(
+                      //       context,
+                      //       message: 'Extra Charges added successfully',
+                      //       type: ToastType.success,
+                      //     );
+                      //     // _showSnack(
+                      //     //   context,
+                      //     //   'Extra Charges added successfully',
+                      //     //   Colors.green,
+                      //     // );
+                      //   } else if (context.mounted) {
+                      //     ToastHelper.show(
+                      //       context,
+                      //       message:
+                      //           provider.errorMessage ??
+                      //           'Failed to add charges',
+                      //       type: ToastType.error,
+                      //     );
+                      //     // _showSnack(
+                      //     //   context,
+                      //     //   provider.errorMessage ?? 'Failed to add charges',
+                      //     //   Colors.red,
+                      //     // );
+                      //   }
+                      // },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.deepOrange,
                         foregroundColor: Colors.white,
@@ -2637,7 +3084,164 @@ class _CorporateBookingDetailScreenState
       ),
     );
   }
+  Future<void> _showOtpSheet({
+    required BuildContext context,
+    required CorporateBookingProvider provider,
+    required String bookingId,
+    required String title,
+    required String successMessage,
+    required bool isLoading,
+    required Future<bool> Function(String otp) onSubmit,
+  }) async {
+    final otpController = TextEditingController();
 
+    // Pinput Default Theme Definition
+    final defaultPinTheme = PinTheme(
+      width: 56,
+      height: 56,
+      textStyle: const TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.w600,
+        color: Colors.black,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+    );
+
+    // Active / Focused Pin Theme
+    final focusedPinTheme = defaultPinTheme.copyWith(
+      decoration: defaultPinTheme.decoration?.copyWith(
+        border: Border.all(color: ColorResource.primaryColor, width: 2),
+      ),
+    );
+
+    // Submitted Pin Theme
+    final submittedPinTheme = defaultPinTheme.copyWith(
+      decoration: defaultPinTheme.decoration?.copyWith(
+        color: Colors.grey.shade50,
+        border: Border.all(color: ColorResource.primaryColor),
+      ),
+    );
+
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(ctx).viewInsets.bottom,
+          ),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // Standard TextField replaced with 4-digit Pinput
+                Pinput(
+                  length: 4,
+                  controller: otpController,
+                  defaultPinTheme: defaultPinTheme,
+                  focusedPinTheme: focusedPinTheme,
+                  submittedPinTheme: submittedPinTheme,
+                  keyboardType: TextInputType.number,
+                  showCursor: true,
+                  // pinputAutofreq: true,
+                ),
+
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: isLoading
+                        ? null
+                        : () async {
+                      final otp = otpController.text.trim();
+                      if (otp.isEmpty || otp.length < 4) {
+                        ToastHelper.show(
+                          context,
+                          message: 'Please enter 4-digit OTP',
+                          type: ToastType.warning,
+                        );
+                        return;
+                      }
+
+                      Navigator.pop(ctx);
+
+                      final success = await onSubmit(otp);
+
+                      if (success && context.mounted) {
+                        ToastHelper.show(
+                          context,
+                          message: successMessage,
+                          type: ToastType.success,
+                        );
+                      } else if (context.mounted) {
+                        ToastHelper.show(
+                          context,
+                          message: provider.errorMessage ?? 'Failed',
+                          type: ToastType.error,
+                        );
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: ColorResource.primaryColor,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: isLoading
+                        ? const SizedBox(
+                      height: 22,
+                      width: 22,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.5,
+                        color: Colors.white,
+                      ),
+                    )
+                        : const Text(
+                      'Verify OTP',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
   // ==================== REUSABLE ODOMETER BOTTOM SHEET ====================
   Future<void> _showOdometerSheet({
     required BuildContext context,
@@ -2885,7 +3489,7 @@ class _CorporateBookingDetailScreenState
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.indigo,
+                        backgroundColor: ColorResource.primaryColor,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -3134,7 +3738,7 @@ class _CorporateBookingDetailScreenState
   //                       }
   //                     },
   //                     style: ElevatedButton.styleFrom(
-  //                       backgroundColor: Colors.indigo,
+  //                       backgroundColor: ColorResource.primaryColor,
   //                       foregroundColor: Colors.white,
   //                       shape: RoundedRectangleBorder(
   //                         borderRadius: BorderRadius.circular(12),
@@ -3178,7 +3782,7 @@ class _CorporateBookingDetailScreenState
             ElevatedButton(
               onPressed: () => Navigator.pop(ctx),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.indigo,
+                backgroundColor: ColorResource.primaryColor,
                 foregroundColor: Colors.white,
               ),
               child: const Text('Yes, Confirm'),

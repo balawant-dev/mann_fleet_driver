@@ -1,0 +1,913 @@
+       if (tripType == 'garage to garage') ...[
+                  if (billingType == 'corporate') ...[
+                  // 1. Garage Start
+                  if (d.tripStatus == 'driver_enroute')
+                    _actionButton(
+                      label: 'Garage Start',
+                      color: ColorResource.primaryColor,
+                      isLoading: provider.isGarageStarting,
+                      onPressed:
+                          () => _showOdometerSheet(
+                        isLoading: provider.isGarageStarting,
+                        context: context,
+                        provider: provider,
+                        bookingId: d.id,
+                        title: 'Garage Start',
+                        submitLabel: 'Submit Garage Start',
+                        successMessage: 'Garage Start successful',
+                        onSubmit: (odometer, lat, lng, image) {
+                          return provider.garageStart(
+                            context: context,
+                            bookingId: d.id,
+                            odometer: odometer,
+                            currentLat: lat,
+                            currentLng: lng,
+                            odometerImage: image,
+                          );
+                        },
+                      ),
+                    ),
+
+                  if (d.tripStatus == 'garage_started'&&d.tripStartOtpVerify==false) // ya jo status aapke backend me start OTP ke liye ho
+                    _actionButton(
+                      label: 'Verify Start OTP',
+                      color: ColorResource.primaryColor,
+                      isLoading: provider.isVerifyStartOtp,
+                      onPressed: () => _showOtpSheet(
+                        context: context,
+                        provider: provider,
+                        bookingId: d.id,
+                        title: 'Verify Start OTP',
+                        successMessage: 'Start OTP verified successfully',
+                        isLoading: provider.isVerifyStartOtp,
+                        onSubmit: (otp) {
+                          return provider.verifyStartOtp(
+                            context: context,
+                            bookingId: d.id,
+                            otp: otp,
+                          );
+                        },
+                      ),
+                    ),
+
+
+
+                  ////Balawant add this
+
+                  // 2. Pickup Checkpoint
+                  if (d.tripStatus == 'garage_started'&&d.tripStartOtpVerify==true)
+                    _actionButton(
+                      label: 'Pickup Checkpoint',
+                      color: ColorResource.primaryColor,
+                      isLoading: provider.isPickupCheckpoint,
+                      onPressed:
+                          () => _showOdometerSheet(
+                        context: context,
+                        isLoading: provider.isPickupCheckpoint,
+                        provider: provider,
+                        bookingId: d.id,
+                        title: 'Pickup Checkpoint',
+                        submitLabel: 'Submit Pickup Checkpoint',
+                        successMessage: 'Pickup Checkpoint successful',
+                        onSubmit: (odometer, lat, lng, image) {
+                          return provider.pickupCheckpoint(
+                            context: context,
+                            bookingId: d.id,
+                            odometer: odometer,
+                            currentLat: lat,
+                            currentLng: lng,
+                            odometerImage: image,
+                          );
+                        },
+                      ),
+                    ),
+
+                  // 3. Start Ride (after arrived)
+                  if (d.tripStatus == 'arrived')
+                    _actionButton(
+                      label: 'Start Ride',
+                      color: ColorResource.primaryColor,
+                      isLoading: provider.isStartRide,
+                      onPressed: () async {
+                        final success = await provider.startRide(
+                          context: context,
+                          bookingId: widget.bookingId,
+                        );
+
+                        if (success && context.mounted) {
+                          ToastHelper.show(
+                            context,
+                            message: 'Start Ride successful',
+                            type: ToastType.success,
+                          );
+                          // _showSnack(
+                          //   context,
+                          //   'Start Ride successful',
+                          //   Colors.green,
+                          // );
+                        } else if (context.mounted) {
+                          ToastHelper.show(
+                            context,
+                            message: provider.errorMessage ?? 'Failed',
+                            type: ToastType.error,
+                          );
+                          // _showSnack(
+                          //   context,
+                          //   provider.errorMessage ?? 'Failed',
+                          //   Colors.red,
+                          // );
+                        }
+                      },
+                    ),
+
+
+                  // ★ END OTP (Drop se pehle)
+                  if (d.tripStatus == 'in_progress'&&d.tripEndOtpVerify==false)
+                    _actionButton(
+                      label: 'Verify End OTP',
+                      color: ColorResource.primaryColor,
+                      isLoading: provider.isVerifyEndOtp,
+                      onPressed: () => _showOtpSheet(
+                        context: context,
+                        provider: provider,
+                        bookingId: d.id,
+                        title: 'Verify End OTP',
+                        successMessage: 'End OTP verified successfully',
+                        isLoading: provider.isVerifyEndOtp,
+                        onSubmit: (otp) {
+                          return provider.verifyEndOtp(
+                            context: context,
+                            bookingId: d.id,
+                            otp: otp,
+                          );
+                        },
+                      ),
+                    ),
+
+                  // 4. Drop Checkpoint
+                  if (d.tripStatus == 'in_progress'&&d.tripEndOtpVerify==true)
+                    _actionButton(
+                      label: 'Drop Checkpoint',
+                      color: ColorResource.primaryColor,
+                      isLoading: provider.isDropCheckpoint,
+                      onPressed:
+                          () => _showOdometerSheet(
+                        isLoading: provider.isDropCheckpoint,
+                        context: context,
+                        provider: provider,
+                        bookingId: d.id,
+                        title: 'Drop Checkpoint',
+                        submitLabel: 'Submit Drop Checkpoint',
+                        successMessage: 'Drop Checkpoint successful',
+                        onSubmit: (odometer, lat, lng, image) {
+                          return provider.dropCheckpoint(
+                            context: context,
+                            bookingId: d.id,
+                            odometer: odometer,
+                            currentLat: lat,
+                            currentLng: lng,
+                            odometerImage: image,
+                          );
+                        },
+                      ),
+                    ),
+
+                  // 5. Garage End
+                  if (d.tripStatus == 'returning_garage')
+                    _actionButton(
+                      label: 'Garage End',
+                      color: ColorResource.primaryColor,
+                      isLoading: provider.isGarageEnd,
+                      onPressed:
+                          () => _showOdometerSheet(
+                        isLoading: provider.isGarageEnd,
+                        context: context,
+                        provider: provider,
+                        bookingId: d.id,
+                        title: 'Garage End',
+                        submitLabel: 'Submit Garage End',
+                        successMessage: 'Garage End successful',
+                        onSubmit: (odometer, lat, lng, image) {
+                          return provider.garageEndApi(
+                            context: context,
+                            bookingId: d.id,
+                            odometer: odometer,
+                            currentLat: lat,
+                            currentLng: lng,
+                            odometerImage: image,
+                          );
+                        },
+                      ),
+                    ),
+
+                  // 6. Extra Charges (after dropped)
+                  if (d.tripStatus == 'dropped')
+                    _actionButton(
+                      label: 'Add Extra Charges',
+                      color: Colors.deepOrange,
+                      isLoading: provider.isGarageEnd,
+                      // or use a new flag if you have isExtraCharge
+                      onPressed:
+                          () => _showExtraChargeSheet(
+                        context: context,
+                        provider: provider,
+                        bookingId: d.id,
+                      ),
+                    ),
+                  if (d.tripStatus == 'dropped')
+                    _actionButton(
+                      label: 'Complete Trip',
+                      color: ColorResource.primaryColor,
+                      isLoading: provider.isCompleteTrip,
+                      // or use a new flag if you have isExtraCharge
+                      onPressed: () async {
+                        final success = await provider.completeTripApi(
+                          context: context,
+                          bookingId: widget.bookingId,
+                        );
+
+                        if (success && context.mounted) {
+                          ToastHelper.show(
+                            context,
+                            message: 'Complete trip successfully',
+                            type: ToastType.success,
+                          );
+                          // _showSnack(
+                          //   context,
+                          //   'Complete trip successfully',
+                          //   Colors.green,
+                          // );
+                        } else if (context.mounted) {
+                          ToastHelper.show(
+                            context,
+                            message:
+                            provider.errorMessage ??
+                                'Failed to complete trip',
+                            type: ToastType.error,
+                          );
+                          // _showSnack(
+                          //   context,
+                          //   provider.errorMessage ?? 'Failed to complete trip',
+                          //   Colors.red,
+                          // );
+                        }
+                      },
+                    ),
+                ],
+
+                  if (billingType == 'self') ...[
+                    // 1. Garage Start
+                    if (d.tripStatus == 'driver_enroute')
+                      _actionButton(
+                        label: 'Garage Start',
+                        color: ColorResource.primaryColor,
+                        isLoading: provider.isGarageStarting,
+                        onPressed:
+                            () => _showOdometerSheet(
+                          isLoading: provider.isGarageStarting,
+                          context: context,
+                          provider: provider,
+                          bookingId: d.id,
+                          title: 'Garage Start',
+                          submitLabel: 'Submit Garage Start',
+                          successMessage: 'Garage Start successful',
+                          onSubmit: (odometer, lat, lng, image) {
+                            return provider.garageStart(
+                              context: context,
+                              bookingId: d.id,
+                              odometer: odometer,
+                              currentLat: lat,
+                              currentLng: lng,
+                              odometerImage: image,
+                            );
+                          },
+                        ),
+                      ),
+
+                    if (d.tripStatus == 'garage_started'&&d.tripStartOtpVerify==false) // ya jo status aapke backend me start OTP ke liye ho
+                      _actionButton(
+                        label: 'Verify Start OTP',
+                        color: ColorResource.primaryColor,
+                        isLoading: provider.isVerifyStartOtp,
+                        onPressed: () => _showOtpSheet(
+                          context: context,
+                          provider: provider,
+                          bookingId: d.id,
+                          title: 'Verify Start OTP',
+                          successMessage: 'Start OTP verified successfully',
+                          isLoading: provider.isVerifyStartOtp,
+                          onSubmit: (otp) {
+                            return provider.verifyStartOtp(
+                              context: context,
+                              bookingId: d.id,
+                              otp: otp,
+                            );
+                          },
+                        ),
+                      ),
+
+
+
+                    ////Balawant add this
+
+                    // 2. Pickup Checkpoint
+                    if (d.tripStatus == 'garage_started'&&d.tripStartOtpVerify==true)
+                      _actionButton(
+                        label: 'Pickup Checkpoint',
+                        color: ColorResource.primaryColor,
+                        isLoading: provider.isPickupCheckpoint,
+                        onPressed:
+                            () => _showOdometerSheet(
+                          context: context,
+                          isLoading: provider.isPickupCheckpoint,
+                          provider: provider,
+                          bookingId: d.id,
+                          title: 'Pickup Checkpoint',
+                          submitLabel: 'Submit Pickup Checkpoint',
+                          successMessage: 'Pickup Checkpoint successful',
+                          onSubmit: (odometer, lat, lng, image) {
+                            return provider.pickupCheckpoint(
+                              context: context,
+                              bookingId: d.id,
+                              odometer: odometer,
+                              currentLat: lat,
+                              currentLng: lng,
+                              odometerImage: image,
+                            );
+                          },
+                        ),
+                      ),
+
+                    // 3. Start Ride (after arrived)
+                    if (d.tripStatus == 'arrived')
+                      _actionButton(
+                        label: 'Start Ride',
+                        color: ColorResource.primaryColor,
+                        isLoading: provider.isStartRide,
+                        onPressed: () async {
+                          final success = await provider.startRide(
+                            context: context,
+                            bookingId: widget.bookingId,
+                          );
+
+                          if (success && context.mounted) {
+                            ToastHelper.show(
+                              context,
+                              message: 'Start Ride successful',
+                              type: ToastType.success,
+                            );
+                            // _showSnack(
+                            //   context,
+                            //   'Start Ride successful',
+                            //   Colors.green,
+                            // );
+                          } else if (context.mounted) {
+                            ToastHelper.show(
+                              context,
+                              message: provider.errorMessage ?? 'Failed',
+                              type: ToastType.error,
+                            );
+                            // _showSnack(
+                            //   context,
+                            //   provider.errorMessage ?? 'Failed',
+                            //   Colors.red,
+                            // );
+                          }
+                        },
+                      ),
+
+
+                    // ★ END OTP (Drop se pehle)
+                    if (d.tripStatus == 'in_progress'&&d.tripEndOtpVerify==false)
+                      _actionButton(
+                        label: 'Verify End OTP',
+                        color: ColorResource.primaryColor,
+                        isLoading: provider.isVerifyEndOtp,
+                        onPressed: () => _showOtpSheet(
+                          context: context,
+                          provider: provider,
+                          bookingId: d.id,
+                          title: 'Verify End OTP',
+                          successMessage: 'End OTP verified successfully',
+                          isLoading: provider.isVerifyEndOtp,
+                          onSubmit: (otp) {
+                            return provider.verifyEndOtp(
+                              context: context,
+                              bookingId: d.id,
+                              otp: otp,
+                            );
+                          },
+                        ),
+                      ),
+
+                    // 4. Drop Checkpoint
+                    if (d.tripStatus == 'in_progress'&&d.tripEndOtpVerify==true)
+                      _actionButton(
+                        label: 'Drop Checkpoint',
+                        color: ColorResource.primaryColor,
+                        isLoading: provider.isDropCheckpoint,
+                        onPressed:
+                            () => _showOdometerSheet(
+                          isLoading: provider.isDropCheckpoint,
+                          context: context,
+                          provider: provider,
+                          bookingId: d.id,
+                          title: 'Drop Checkpoint',
+                          submitLabel: 'Submit Drop Checkpoint',
+                          successMessage: 'Drop Checkpoint successful',
+                          onSubmit: (odometer, lat, lng, image) {
+                            return provider.dropCheckpoint(
+                              context: context,
+                              bookingId: d.id,
+                              odometer: odometer,
+                              currentLat: lat,
+                              currentLng: lng,
+                              odometerImage: image,
+                            );
+                          },
+                        ),
+                      ),
+
+
+                    if (d.tripStatus == 'dropped')...[        _actionButton(
+                      label: 'Complete Trip',
+                      color: ColorResource.primaryColor,
+                      isLoading: provider.isCompleteTrip,
+                      onPressed: () async {
+                        final success = await provider.completeTripApi(
+                          context: context,
+                          bookingId: widget.bookingId,
+                        );
+                        if (success && context.mounted) {
+                          ToastHelper.show(
+                            context,
+                            message: 'Complete trip successfully',
+                            type: ToastType.success,
+                          );
+                        } else if (context.mounted) {
+                          ToastHelper.show(
+                            context,
+                            message: provider.errorMessage ?? 'Failed',
+                            type: ToastType.error,
+                          );
+                        }
+                      },
+                    ),],
+
+                    // 5. Garage End
+                    // if (d.tripStatus == 'returning_garage')
+                    //   _actionButton(
+                    //     label: 'Garage End',
+                    //     color: ColorResource.primaryColor,
+                    //     isLoading: provider.isGarageEnd,
+                    //     onPressed:
+                    //         () => _showOdometerSheet(
+                    //       isLoading: provider.isGarageEnd,
+                    //       context: context,
+                    //       provider: provider,
+                    //       bookingId: d.id,
+                    //       title: 'Garage End',
+                    //       submitLabel: 'Submit Garage End',
+                    //       successMessage: 'Garage End successful',
+                    //       onSubmit: (odometer, lat, lng, image) {
+                    //         return provider.garageEndApi(
+                    //           context: context,
+                    //           bookingId: d.id,
+                    //           odometer: odometer,
+                    //           currentLat: lat,
+                    //           currentLng: lng,
+                    //           odometerImage: image,
+                    //         );
+                    //       },
+                    //     ),
+                    //   ),
+
+
+                    if(d.tripStatus=='returning_garage' )...[
+
+
+
+                        const SizedBox(height: 8),
+                        Text(
+                          'Garage Address *',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey.shade800,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        GestureDetector(
+                          onTap: () async {
+                            // Yahan aapka AddAddressScreen / LocationSelectScreen open karo
+                            final result = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const AddAddressScreen(), // ← apna screen name
+                              ),
+                            );
+
+                            if (result != null && result is Map<String, dynamic>) {
+                              setState(() {
+                                garageLat = (result['lat'] as num?)?.toDouble();
+                                garageLng = (result['lng'] as num?)?.toDouble();
+                                garageAddress = result['address'] as String?;
+                                garageAddressController.text = garageAddress ?? '';
+                              });
+                            }
+                          },
+                          child: Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              border: Border.all(color: Colors.grey.shade300),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.location_on_outlined, color: Colors.red, size: 22),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    garageAddress ?? 'Select Garage Address',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color: garageAddress == null ? Colors.grey.shade500 : Colors.black87,
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+
+
+                        // Step 1: Extra Charges (always first)
+                        if (provider.selfFareData == null) ...[
+                          _actionButton(
+                            label: 'Add Extra Charges',
+                            color: Colors.deepOrange,
+                            isLoading: provider.isExtraCharge,
+                            onPressed:
+                                () => _showExtraChargeSheet(
+                              context: context,
+                              provider: provider,
+                              bookingId: d.id,
+                              // after success we will auto call calculate fare
+                              onSuccess: () async {
+                                if (!_validateGarageAddress()) return;
+                                final success = await provider
+                                    .selfCalculateFareApi(
+                                  context: context,
+                                  bookingId: d.id,
+                                  garageLat: garageLat,
+                                  garageLng: garageLng,
+                                  garageAddress: garageAddress,
+                                );
+                                if (success && context.mounted) {
+                                  ToastHelper.show(
+                                    context,
+                                    message: 'Fare calculated',
+                                    type: ToastType.success,
+                                  );
+                                }
+                              },
+                            ),
+                          ),
+
+                          // ★ SKIP BUTTON
+                          _actionButton(
+                            label: 'Skip Extra Charges',
+                            color: Colors.grey,
+                            isOutlined: true,
+                            isLoading: provider.isSelfCalculateFare,
+                            onPressed: () async {
+                              if (!_validateGarageAddress()) return;   // ← yeh add karo
+                              final success = await provider.selfCalculateFareApi(
+                                context: context,
+                                bookingId: d.id,
+                                garageLat: garageLat,          // ← yeh add
+                                garageLng: garageLng,          // ← yeh add
+                                garageAddress: garageAddress,  // ← yeh add
+                              );
+                              if (success && context.mounted) {
+                                ToastHelper.show(
+                                  context,
+                                  message: 'Fare calculated (no extra charges)',
+                                  type: ToastType.success,
+                                );
+                              } else if (context.mounted) {
+                                ToastHelper.show(
+                                  context,
+                                  message:
+                                  provider.errorMessage ??
+                                      'Failed to calculate fare',
+                                  type: ToastType.error,
+                                );
+                              }
+                            },
+                          ),
+                        ],
+
+                        // Step 2: Show calculated fare + payment options
+                        if (provider.selfFareData != null &&
+                            !provider.isSelfPaymentDone) ...[
+                          // _sectionCard(
+                          //   title: 'Final Fare',
+                          //   children: [
+                          //     _detailRow('Base Fare', '₹${provider.selfFareData!['baseFare'] ?? '-'}'),
+                          //     _detailRow('Extra Charges', '₹${provider.selfFareData!['extraCharges'] ?? '-'}'),
+                          //     _detailRow('Total Payable', '₹${provider.selfFareData!['totalAmount'] ?? provider.selfFareData!['finalFare'] ?? '-'}'),
+                          //   ],
+                          // ),
+                          Builder(
+                            builder: (context) {
+                              final data = provider.selfFareData!;
+                              final fare = data.fare;
+
+                              return _sectionCard(
+                                title: 'Final Fare Breakdown',
+                                children: [
+                                  _detailRow('Trip Type', data.tripType ?? '-'),
+                                  _detailRow(
+                                    'Distance',
+                                    '${data.distanceKm ?? fare?.totalDistance ?? 0} km',
+                                  ),
+                                  _detailRow(
+                                    'Duration',
+                                    '${data.durationMins ?? fare?.totalDurationMins ?? 0} mins',
+                                  ),
+
+                                  const Divider(height: 20),
+
+                                  _detailRow(
+                                    'Base Charge',
+                                    '₹${_format(fare?.baseCharge)}',
+                                  ),
+                                  _detailRow(
+                                    'Driver Charge',
+                                    '₹${_format(fare?.driverCharge)}',
+                                  ),
+                                  _detailRow(
+                                    'Extra Distance Charge',
+                                    '₹${_format(fare?.extraCharge)}',
+                                  ),
+                                  _detailRow(
+                                    'Extra Time Charge',
+                                    '₹${_format(fare?.extraTimeCharge)}',
+                                  ),
+                                  _detailRow(
+                                    'Night Fare',
+                                    '₹${_format(fare?.nightFare)}',
+                                  ),
+
+                                  const Divider(height: 20),
+
+                                  _detailRow(
+                                    'Parking',
+                                    '₹${_format(fare?.parkingCharge)}',
+                                  ),
+                                  _detailRow(
+                                    'Toll',
+                                    '₹${_format(fare?.tollAmount)}',
+                                  ),
+                                  _detailRow(
+                                    'State Charge',
+                                    '₹${_format(fare?.stateCharge)}',
+                                  ),
+                                  _detailRow(
+                                    'Other Charges',
+                                    '₹${_format(fare?.otherCharges)}',
+                                  ),
+
+                                  // Other charges detail
+                                  if (fare?.otherChargesDetail.isNotEmpty == true)
+                                    ...fare!.otherChargesDetail.map((item) {
+                                      return _detailRow(
+                                        item.name,
+                                        '₹${_format(item.amount)}',
+                                      );
+                                    }),
+
+                                  const Divider(height: 20),
+
+                                  _detailRow(
+                                    'GST (${_format(fare?.gstPercent)}%)',
+                                    '₹${_format(fare?.gstCharge)}',
+                                  ),
+
+                                  const SizedBox(height: 10),
+
+                                  // Payable Amount
+                                  Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 14,
+                                      horizontal: 16,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.green.shade50,
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: Colors.green.shade300,
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Text(
+                                          'Payable Amount',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.green,
+                                          ),
+                                        ),
+                                        Text(
+                                          '₹${_format(data.payableAmount ?? fare?.totalAmount)}',
+                                          style: const TextStyle(
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.w800,
+                                            color: Colors.green,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 8),
+
+                          // Pay Online
+                          _actionButton(
+                            label: 'Pay Online (QR)',
+                            color: Colors.blue,
+                            isLoading: provider.isSelfPayOnline,
+                            onPressed: () async {
+                              final success = await provider.selfPayOnlineApi(
+                                context: context,
+                                bookingId: d.id,
+                              );
+                              if (success && context.mounted) {
+                                _showQrPaymentSheet(
+                                  context: context,
+                                  provider: provider,
+                                  bookingId: d.id,
+                                );
+                              } else if (context.mounted) {
+                                ToastHelper.show(
+                                  context,
+                                  message: provider.errorMessage ?? 'Failed',
+                                  type: ToastType.error,
+                                );
+                              }
+                            },
+                          ),
+
+                          // Pay Cash
+                          _actionButton(
+                            label: 'Pay by Cash',
+                            color: Colors.green,
+                            isLoading: provider.isSelfPayCash,
+                            onPressed: () async {
+                              final success = await provider.selfPayCashApi(
+                                context: context,
+                                bookingId: d.id,
+                              );
+                              if (success && context.mounted) {
+                                ToastHelper.show(
+                                  context,
+                                  message: 'Cash payment recorded',
+                                  type: ToastType.success,
+                                );
+                              } else if (context.mounted) {
+                                ToastHelper.show(
+                                  context,
+                                  message: provider.errorMessage ?? 'Failed',
+                                  type: ToastType.error,
+                                );
+                              }
+                            },
+                          ),
+                        ],
+
+                        // Step 3: After payment success → Complete Trip
+                        if (provider.isSelfPaymentDone&&d.tripStatus=="returning_garage") ...[
+                            _actionButton(
+                              label: 'Garage End',
+                              color: ColorResource.primaryColor,
+                              isLoading: provider.isGarageEnd,
+                              onPressed:
+                                  () => _showOdometerSheet(
+                                isLoading: provider.isGarageEnd,
+                                context: context,
+                                provider: provider,
+                                bookingId: d.id,
+                                title: 'Garage End',
+                                submitLabel: 'Submit Garage End',
+                                successMessage: 'Garage End successful',
+                                onSubmit: (odometer, lat, lng, image) {
+                                  return provider.garageEndApi(
+                                    context: context,
+                                    bookingId: d.id,
+                                    odometer: odometer,
+                                    currentLat: lat,
+                                    currentLng: lng,
+                                    odometerImage: image,
+                                  );
+                                },
+                              ),
+                            ),
+                          // _actionButton(
+                          //   label: 'Complete Trip',
+                          //   color: ColorResource.primaryColor,
+                          //   isLoading: provider.isCompleteTrip,
+                          //   onPressed: () async {
+                          //     final success = await provider.completeTripApi(
+                          //       context: context,
+                          //       bookingId: widget.bookingId,
+                          //     );
+                          //     if (success && context.mounted) {
+                          //       ToastHelper.show(
+                          //         context,
+                          //         message: 'Complete trip successfully',
+                          //         type: ToastType.success,
+                          //       );
+                          //     } else if (context.mounted) {
+                          //       ToastHelper.show(
+                          //         context,
+                          //         message: provider.errorMessage ?? 'Failed',
+                          //         type: ToastType.error,
+                          //       );
+                          //     }
+                          //   },
+                          // ),
+
+                      ],
+                    ],
+
+                    // 6. Extra Charges (after dropped)
+                    // if (d.tripStatus == 'dropped')
+                    //   _actionButton(
+                    //     label: 'Add Extra Charges',
+                    //     color: Colors.deepOrange,
+                    //     isLoading: provider.isGarageEnd,
+                    //     // or use a new flag if you have isExtraCharge
+                    //     onPressed:
+                    //         () => _showExtraChargeSheet(
+                    //       context: context,
+                    //       provider: provider,
+                    //       bookingId: d.id,
+                    //     ),
+                    //   ),
+                    // if (d.tripStatus == 'dropped')
+                    //   _actionButton(
+                    //     label: 'Complete Trip',
+                    //     color: ColorResource.primaryColor,
+                    //     isLoading: provider.isCompleteTrip,
+                    //     // or use a new flag if you have isExtraCharge
+                    //     onPressed: () async {
+                    //       final success = await provider.completeTripApi(
+                    //         context: context,
+                    //         bookingId: widget.bookingId,
+                    //       );
+                    //
+                    //       if (success && context.mounted) {
+                    //         ToastHelper.show(
+                    //           context,
+                    //           message: 'Complete trip successfully',
+                    //           type: ToastType.success,
+                    //         );
+                    //         // _showSnack(
+                    //         //   context,
+                    //         //   'Complete trip successfully',
+                    //         //   Colors.green,
+                    //         // );
+                    //       } else if (context.mounted) {
+                    //         ToastHelper.show(
+                    //           context,
+                    //           message:
+                    //           provider.errorMessage ??
+                    //               'Failed to complete trip',
+                    //           type: ToastType.error,
+                    //         );
+                    //         // _showSnack(
+                    //         //   context,
+                    //         //   provider.errorMessage ?? 'Failed to complete trip',
+                    //         //   Colors.red,
+                    //         // );
+                    //       }
+                    //     },
+                    //   ),
+                  ],
+
+                ],

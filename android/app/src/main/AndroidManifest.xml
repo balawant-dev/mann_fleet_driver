@@ -33,6 +33,9 @@
         android:label="Mann Fleet Chauffeurs"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyAw5iIsWyZnq8Ejy8jLC2jcKvNRxI5Ll3w"/>
         <service
             android:name="com.pravera.flutter_foreground_task.service.ForegroundService"
             android:foregroundServiceType="location"

@@ -701,6 +701,7 @@ import '../../../widget/empty/noAssignedBookingScreen.dart';
 import '../../../widget/motionToastHelper.dart';
 import '../../bookingDetail/ui/bookingDetailScreen.dart';
 
+import '../../corporateBookings/component/corporate_booking_detail_screen.dart';
 import '../../corporateBookings/pro/corporate_booking_provider.dart';
 import '../../corporateBookings/ui/corporate_booking_detail_screen.dart';
 import '../../sqlite_local_location/showdata.dart';

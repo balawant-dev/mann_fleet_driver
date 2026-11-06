@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../dummy.dart';
 import '../../../widget/commonAppBar.dart';
+import '../component/corporate_booking_detail_screen.dart';
 import '../model/corporate_booking_history_model.dart';
 import '../pro/corporate_booking_history_provider.dart';
 import 'corporate_booking_detail_screen.dart'; // agar detail screen hai to

@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import '../../../util/color/app_colors.dart';
 import '../../../widget/custom_text.dart';
+import '../../corporateBookings/component/detail_widgets.dart';
 import '../../corporateBookings/ui/corporate_booking_detail_screen.dart';
 
 class BookingCard extends StatelessWidget {

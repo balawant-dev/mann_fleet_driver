@@ -232,6 +232,7 @@ import 'package:mann_fleet_driver/widget/commonAppBar.dart';
 import 'package:provider/provider.dart';
 
 import '../../../widget/empty/bookingHistoryEmptyScreen.dart';
+import '../../corporateBookings/component/corporate_booking_detail_screen.dart';
 import '../../corporateBookings/model/corporate_booking_history_model.dart';
 import '../../corporateBookings/pro/corporate_booking_history_provider.dart';
 import '../../corporateBookings/ui/corporate_booking_detail_screen.dart';

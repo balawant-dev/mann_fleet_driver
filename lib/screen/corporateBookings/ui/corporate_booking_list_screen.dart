@@ -3,6 +3,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../widget/commonAppBar.dart';
+import '../component/corporate_booking_detail_screen.dart';
 import '../pro/corporate_booking_provider.dart';
 import 'corporate_booking_detail_screen.dart';
 

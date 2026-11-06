@@ -308,6 +308,7 @@ class CorporateBookingDetail {
   // final User user;
   final Booker booker;
   final String vehicleReleaseDate;
+  final String billingType;
   final int numberofPassangers;
   final String tripType;
   final String scheduledAt;
@@ -360,6 +361,7 @@ class CorporateBookingDetail {
     required this.corporate,
     required this.booker,
     required this.vehicleReleaseDate,
+    required this.billingType,
     required this.numberofPassangers,
     required this.tripType,
     required this.scheduledAt,
@@ -445,6 +447,7 @@ class CorporateBookingDetail {
           ? Booker.fromJson(json['booker'])
           : Booker(id: '', name: '', email: '', mobile: ''),
       vehicleReleaseDate: json['vehicleReleaseDate'] ?? '',
+      billingType: json['billingType'] ?? '',
       numberofPassangers: json['numberofPassangers'] ?? 0,
       tripType: json['tripType'] ?? '',
       scheduledAt: json['scheduledAt'] ?? '',

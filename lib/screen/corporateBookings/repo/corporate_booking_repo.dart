@@ -11,6 +11,8 @@ import '../../../../../apiservice/services/secure_storage_service.dart';
 import '../model/corporate_booking_history_model.dart';
 import '../model/corporate_booking_list_model.dart';
 import '../model/corporate_booking_detail_model.dart';
+import '../model/self_payment_model.dart';
+import '../pro/self_fare_model.dart';
 
 class CorporateBookingRepo {
   final ApiService _api = ApiService();
@@ -927,5 +929,102 @@ class CorporateBookingRepo {
   }
 
 
+// ==================== SELF BILLING APIs ====================
 
+  Future<SelfFareResponse?> selfCalculateFare({
+    required BuildContext context,
+    required String bookingId,
+    double? garageLat,
+    double? garageLng,
+    String? garageAddress,
+  }) async {
+    try {
+      final Map<String, dynamic> body = {};
+
+      // Sirf tab bhejo jab values available hon
+      if (garageLat != null && garageLng != null) {
+        body['garageLat'] = garageLat;
+        body['garageLng'] = garageLng;
+        if (garageAddress != null && garageAddress.isNotEmpty) {
+          body['garageAddress'] = garageAddress;
+        }
+      }
+      final response = await _api.post(
+        "${ApiConstants.corporateBookings}/$bookingId/self-calculate-fare",
+        data: body.isNotEmpty ? body : null,
+        requiresAuth: true,
+      );
+      return SelfFareResponse.fromJson(response);
+    } on DioException catch (e) {
+      // apna existing error handling
+      rethrow;
+    } catch (e) {
+      throw ApiException(0, e.toString());
+    }
+  }
+
+  Future<SelfPaymentModel?> selfPayOnline({
+    required BuildContext context,
+    required String bookingId,
+  }) async {
+    try {
+      final response = await _api.post(
+        "${ApiConstants.corporateBooking}/$bookingId/self-pay-online",
+        requiresAuth: true,
+      );
+      if (response['status'] == true) {
+        return SelfPaymentModel.fromJson(response); // expect qr / paymentUrl etc.
+      }
+      return null;
+    } on DioException catch (e) {
+      _handleDioError(e, context, () => selfPayOnline(context: context, bookingId: bookingId));
+      rethrow;
+    } catch (e) {
+      throw ApiException(0, e.toString());
+    }
+  }
+
+  Future<bool> selfPayCash({
+    required BuildContext context,
+    required String bookingId,
+  }) async {
+    try {
+      final response = await _api.post(
+        "${ApiConstants.corporateBooking}/$bookingId/self-pay-cash",
+        requiresAuth: true,
+      );
+      return response['status'] == true;
+    } on DioException catch (e) {
+      _handleDioError(e, context, () => selfPayCash(context: context, bookingId: bookingId));
+      rethrow;
+    } catch (e) {
+      throw ApiException(0, e.toString());
+    }
+  }
+
+  Future<Map<String, dynamic>?> getSelfPaymentStatus({
+    required BuildContext context,
+    required String bookingId,
+  }) async {
+    try {
+      final response = await _api.get(
+        "${ApiConstants.corporateBooking}/$bookingId/self-payment-status",
+        requiresAuth: true,
+      );
+      if (response['status'] == true) {
+        return response['data'] as Map<String, dynamic>?;
+      }
+      return null;
+    } on DioException catch (e) {
+      _handleDioError(e, context, () => getSelfPaymentStatus(context: context, bookingId: bookingId));
+      rethrow;
+    } catch (e) {
+      throw ApiException(0, e.toString());
+    }
+  }
+
+// Helper to reduce duplication (optional – you can keep existing style)
+  void _handleDioError(DioException e, BuildContext context, VoidCallback retry) {
+    // copy your existing NoInternet / Server / Unauthorized handling here
+  }
 }
